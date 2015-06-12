@@ -1,9 +1,29 @@
+# Title: batchr
+# Date: June 12 2015
+# Author: Lars Dalby
+
+# This script will run two tests of the fit of simulation results to data from the hunter survey
+# as well as copy the results from almass and the Hunter_Params.txt to a specified location.
+# The results from all the runs in the batch file will be collected in one file and stored
+# together with the other files.
+# In each scenario, be sure to change the result path - otherwise we will overwrite previous
+# data.
+# If running a scenario where more than one parameter is being changed you need to uncomment
+# a couple of lines in two places. Do a text search on these three characteres @£$ and you will
+# see what to do.
+# Finally, remember to reset the counter to 1 before starting a scenario. This is done by 
+# opening the file counter.txt and changing the number to 1.
+# --------------------------------------------------------------------------------------------# 
+
+# Load the packages we're going to need:
 library(data.table)
 library(ralmass)
 library(stringr)
 
+# Setup work- and results directory:
 setwd('d:/almass/WorkDirectories/HunterModelTesting/')  # The run directory
 resultpath = 'd:/almass/Results/GooseManagement/Hunter/Random/'  # Path where the results will be stored
+
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 hunterdist = fread('Hunter_Hunting_Locations.txt')
 # Save the results of the sim:
@@ -73,7 +93,7 @@ line = line[which(str_detect(line, ' '))]  # Ignore empty lines
 
 param = word(line[counter], 1)  # Get the parameter name
 value = str_split(line[counter], '\t')[[1]][2]  # Get the value
-# Uncomment these when running the scenarios with two parameters:
+# @£$: Uncomment these when running the scenarios with two parameters:
 #param2 = word(line[counter+1], 1)  # Get the parameter name
 #value2 = str_split(line[counter+1], '\t')[[1]][2]  # Get the value
 
@@ -87,7 +107,7 @@ if(counter == 1) {
 
 line = paste(param, value, distancefit, overlab, sep = '\t')
 write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
-# Uncomment these when running the scenarios with two parameters:
+# @£$: Uncomment these when running the scenarios with two parameters:
 #line2 = paste(param2, value2, distancefit, overlab, sep = '\t')
 #write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 counter = counter+1  
