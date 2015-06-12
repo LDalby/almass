@@ -24,6 +24,7 @@
 library(data.table)
 library(ralmass)
 library(stringr)
+#library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work- and results directory:
 setwd('d:/almass/WorkDirectories/HunterModelTesting/')  # The run directory
@@ -119,3 +120,5 @@ counter = counter+1
 # When running scenarios with more than one parameter add a number equal to the number of parameters here:
 #counter = counter+2  
 write(counter, file = 'counter.txt', append = FALSE)
+#slackrSetup(channel="@name", api_token = INSERT YOUR TOKEN)
+#slackr(count)
