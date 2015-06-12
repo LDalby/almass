@@ -4,8 +4,8 @@
 
 # This script will run two tests of the fit of simulation results to data from the hunter survey
 # as well as copy the results from almass and the Hunter_Params.txt to a specified location.
-# The results from all the runs in the batch file will be collected in one file and stored
-# together with the other files.
+# The results from all the runs in the batch file will be collected in the file
+# ParameterFittingResults.txt and stored together with the other files.
 # In each scenario, be sure to change the result path - otherwise we will overwrite previous
 # data.
 # If running a scenario where more than one parameter is being changed you need to uncomment
@@ -13,6 +13,11 @@
 # see what to do.
 # Finally, remember to reset the counter to 1 before starting a scenario. This is done by 
 # opening the file counter.txt and changing the number to 1.
+#
+# Before running this script check that you have the following files in the run directory:
+# 1: counter.txt
+# 2: HunterSurveyResultsDensity.csv
+# 3: HunterSurveyResultsDistance.csv
 # --------------------------------------------------------------------------------------------# 
 
 # Load the packages we're going to need:
@@ -27,6 +32,7 @@ resultpath = 'd:/almass/Results/GooseManagement/Hunter/Random/'  # Path where th
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 hunterdist = fread('Hunter_Hunting_Locations.txt')
 # Save the results of the sim:
+counter = as.numeric(readLines('counter.txt'))
 write.table(hunterdist, file = paste(resultpath,'HuntingLocationsRun', counter, '.txt', sep =''), row.names = FALSE, sep = '\t')
 
 dist = rep(NA, nrow(hunterdist))
@@ -68,7 +74,6 @@ huntersurvey[Bin == 201, ModelRes:= length(hunterdist[Bin == 201, Bin])]
 distancefit = round(with(huntersurvey,
 	cor(RespondModelArea, ModelRes, method = 'kendall')), 3)
 
-
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Density ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 # Load the survey results
 survey = fread('HunterSurveyResultsDensity.csv')
@@ -79,7 +84,7 @@ write.table(hunterdens, file = paste(resultpath, 'HuntingLocationsFarmRun', coun
 
 hunterdens[,Numbers:=NoHunters/(Farmsize/10000)]
 hunterdens[,Type:= 'Simulated']
-simulated = hunterdens[, c('Numbers', 'Type'), with = FALSE]
+simulated = hunterdens[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
 # Collect the survey and sim results:
 density = rbind(survey, simulated)
 # Asses the fit
