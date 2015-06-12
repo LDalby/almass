@@ -116,9 +116,11 @@ write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), a
 # @£$: Uncomment these when running the scenarios with two parameters:
 #line2 = paste(param2, value2, distancefit, overlab, sep = '\t')
 #write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+
+# If you want updates:
+#slackrSetup(channel="@name", api_token = INSERT YOUR TOKEN)
+#slackr(paste(counter))
 counter = counter+1  
 # When running scenarios with more than one parameter add a number equal to the number of parameters here:
 #counter = counter+2  
 write(counter, file = 'counter.txt', append = FALSE)
-#slackrSetup(channel="@name", api_token = INSERT YOUR TOKEN)
-#slackr(count)
