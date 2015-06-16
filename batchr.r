@@ -119,8 +119,23 @@ write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), a
 
 # If you want updates:
 #slackrSetup(channel="@name", api_token = INSERT YOUR TOKEN)
-#slackr(paste(counter))
+# slackr(paste(counter))
 counter = counter+1  
 # When running scenarios with more than one parameter add a number equal to the number of parameters here:
 #counter = counter+2  
 write(counter, file = 'counter.txt', append = FALSE)
+
+# As the very last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farm.txt
+# We do this because almass might exit without distributing hunters. If that happens files from a previous
+# run might still be sitting in the run directory and we would simply analyze these as if they were the new 
+# run and get results identical to the previous run
+
+if(length(grep("Hunter_Hunting_Locations.txt", dir())) > 0)
+{
+	file.remove("Hunter_Hunting_Locations.txt")
+}
+
+if(length(grep("Hunter_Hunting_Locations_Farm.txt", dir())) > 0)
+{
+	file.remove("Hunter_Hunting_Locations_Farm.txt")
+}
