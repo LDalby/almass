@@ -34,6 +34,26 @@ resultpath = 'd:/almass/Results/GooseManagement/Hunter/Random/'  # Path where th
 hunterdist = fread('Hunter_Hunting_Locations.txt')
 # Save the results of the sim:
 counter = as.numeric(readLines('counter.txt'))
+if(counter == 1 ){
+# Set up the headers in first run
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', sep = '\t')
+	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
+	# Copy the Hunter params to the result folder for reference and checking
+	file.copy('Hunter_Params.txt', resultpath, copy.date = TRUE)
+	# If there is no results from the sim:
+	if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0){
+		line = readLines('Hunter_Params.txt')
+		line = line[which(is.na(str_locate(line, '#')[,1]))]  # Avoid the comments
+		line = line[which(str_detect(line, ' '))]  # Ignore empty lines
+		param = word(line[counter], 1)  # Get the parameter name
+		value = str_split(line[counter], '\t')[[1]][2]  # Get the value
+		line = paste(param, value, NA, NA, sep = '\t')
+		write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	}
+}
+
+
+
 write.table(hunterdist, file = paste(resultpath,'HuntingLocationsRun', counter, '.txt', sep =''), row.names = FALSE, sep = '\t')
 
 dist = rep(NA, nrow(hunterdist))
@@ -102,14 +122,6 @@ value = str_split(line[counter], '\t')[[1]][2]  # Get the value
 # @£$: Uncomment these when running the scenarios with two parameters:
 #param2 = word(line[counter+1], 1)  # Get the parameter name
 #value2 = str_split(line[counter+1], '\t')[[1]][2]  # Get the value
-
-if(counter == 1) {
-	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', sep = '\t')
-	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
-	# Copy the Hunter params to the result folder for reference and checking
-	file.copy('Hunter_Params.txt', resultpath, copy.date = TRUE)
-}
 
 line = paste(param, value, distancefit, overlab, sep = '\t')
 write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
