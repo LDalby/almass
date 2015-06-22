@@ -28,7 +28,7 @@ library(stringr)
 
 # Setup work- and results directory:
 setwd('d:/almass/WorkDirectories/HunterModelTesting/')  # The run directory
-resultpath = 'd:/almass/Results/GooseManagement/Hunter/Random/'  # Path where the results will be stored
+resultpath = 'd:/almass/Results/GooseManagement/Hunter/RandomOpenMaxDensity/'  # Path where the results will be stored
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
 
@@ -36,8 +36,8 @@ counter = as.numeric(readLines('counter.txt'))
 
 if(counter == 1 )
 {
-# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters' sep = '\t')
+	# Set up the headers in first run
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('Hunter_Params.txt', resultpath, copy.date = TRUE)
@@ -51,8 +51,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	line = line[which(str_detect(line, ' '))]  # Ignore empty lines
 	param = word(line[counter], 1)  # Get the parameter name
 	value = str_split(line[counter], '\t')[[1]][2]  # Get the value
-	line = paste(param, value, NA, NA, sep = '\t')
-	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	line1 = paste(param, value, NA, NA, NA, sep = '\t')
+	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	# @£$: Uncomment these when running the scenarios with two parameters:
+	param2 = word(line[counter+1], 1)  # Get the parameter name
+	value2 = str_split(line[counter+1], '\t')[[1]][2]  # Get the value
+	line2 = paste(param2, value2, NA, NA, NA, sep = '\t')
+	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 }
 
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
@@ -79,10 +84,10 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	hunterdist[Dists <= 200 & Dists > 150, Bin:=200]
 	hunterdist[Dists > 200, Bin:=201]
 
-# The survey results:
+	# The survey results:
 	huntersurvey = fread('HunterSurveyResultsDistance.csv')
-# The simulation results needs to be binned manually and added to the survey data:
-	huntersurvey[Bin == 0, ModelRes:= length(hunterdist[Bin == 0, Bin])]
+	# The simulation results needs to be binned manually and added to the survey data:
+		huntersurvey[Bin == 0, ModelRes:= length(hunterdist[Bin == 0, Bin])]
 	huntersurvey[Bin == 10, ModelRes:= length(hunterdist[Bin == 10, Bin])]
 	huntersurvey[Bin == 20, ModelRes:= length(hunterdist[Bin == 20, Bin])]
 	huntersurvey[Bin == 40, ModelRes:= length(hunterdist[Bin == 40, Bin])]
@@ -93,51 +98,51 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	huntersurvey[Bin == 200, ModelRes:= length(hunterdist[Bin == 200, Bin])]
 	huntersurvey[Bin == 201, ModelRes:= length(hunterdist[Bin == 201, Bin])]
 
-#distancefit = with(huntersurvey,
+	#distancefit = with(huntersurvey,
 	#chisq.test(RespondModelArea, ModelRes)$statistic)
 	distancefit = round(with(huntersurvey,
 		cor(RespondModelArea, ModelRes, method = 'kendall')), 3)
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Density ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
-# Load the survey results
+	# Load the survey results
 	survey = fread('HunterSurveyResultsDensity.csv')
-# Simulation results:
+	# Simulation results:
 	hunterdens = fread('Hunter_Hunting_Locations_Farms.txt', skip = 1)
-# Save the results of the sim:
+	# Save the results of the sim:
 	write.table(hunterdens, file = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep =''), row.names = FALSE, sep = '\t')
 
 	hunterdens[,Numbers:=NoHunters/(Farmsize/10000)]
 	hunterdens[,Type:= 'Simulated']
 	simulated = hunterdens[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
-# Collect the survey and sim results:
+	# Collect the survey and sim results:
 	density = rbind(survey, simulated)
-# Asses the fit
+	# Asses the fit
 	overlab = round(CalcOverlab(density, species = 'Hunter'), 3)  #see ?CalcOverlab for documentation
-# Find the maximum number of hunters on any farm:
-	MaxHunters = max(hunterdens[,NoHunters])
-# Write out the results of the parameter fitting and prepare for next run:
-# Clean file for comments and empty lines:
+	# Find the maximum number of hunters on any farm:
+	maxhunters = max(hunterdens[,NoHunters])
+	# Write out the results of the parameter fitting and prepare for next run:
+	# Clean file for comments and empty lines:
 	line = readLines('Hunter_Params.txt')
 	line = line[which(is.na(str_locate(line, '#')[,1]))]  # Avoid the comments
 	line = line[which(str_detect(line, ' '))]  # Ignore empty lines
 
 	param = word(line[counter], 1)  # Get the parameter name
 	value = str_split(line[counter], '\t')[[1]][2]  # Get the value
-# @£$: Uncomment these when running the scenarios with two parameters:
-#param2 = word(line[counter+1], 1)  # Get the parameter name
-#value2 = str_split(line[counter+1], '\t')[[1]][2]  # Get the value
+	# @£$: Uncomment these when running the scenarios with two parameters:
+	param2 = word(line[counter+1], 1)  # Get the parameter name
+	value2 = str_split(line[counter+1], '\t')[[1]][2]  # Get the value
 
-	line = paste(param, value, distancefit, overlab, sep = '\t')
-	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
-# @£$: Uncomment these when running the scenarios with two parameters:
-#line2 = paste(param2, value2, distancefit, overlab, sep = '\t')
-#write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	line1 = paste(param, value, distancefit, overlab, maxhunters, sep = '\t')
+	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	# @£$: Uncomment these when running the scenarios with two parameters:
+	line2 = paste(param2, value2, distancefit, overlab, maxhunters, sep = '\t')
+	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 
-# As the last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
-# We do this because almass might exit without distributing hunters. If that happens files from a previous
-# run might still be sitting in the run directory and we would simply analyze these as if they were the new 
-# run and get results identical to the previous run
+	# As the last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
+	# We do this because almass might exit without distributing hunters. If that happens files from a previous
+	# run might still be sitting in the run directory and we would simply analyze these as if they were the new 
+	# run and get results identical to the previous run
 
 	if(length(grep("Hunter_Hunting_Locations.txt", dir())) > 0)
 	{
@@ -155,7 +160,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 # slackr(paste(counter))
 
 # Very last thing is to update the counter:
-counter = counter+1  
+# counter = counter+1  
 # When running scenarios with more than one parameter add a number equal to the number of parameters here:
-# counter = counter+2  
+counter = counter+2  
 write(counter, file = 'counter.txt', append = FALSE)
