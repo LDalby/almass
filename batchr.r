@@ -50,6 +50,9 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0){
 	value = str_split(line[counter], '\t')[[1]][2]  # Get the value
 	line = paste(param, value, NA, NA, sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+    # Add one to the counter before exit
+	counter = counter+1
+	write(counter, file = 'counter.txt', append = FALSE)
 }
 
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
@@ -137,7 +140,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 #counter = counter+2  
 	write(counter, file = 'counter.txt', append = FALSE)
 
-# As the very last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farm.txt
+# As the very last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
 # We do this because almass might exit without distributing hunters. If that happens files from a previous
 # run might still be sitting in the run directory and we would simply analyze these as if they were the new 
 # run and get results identical to the previous run
@@ -147,8 +150,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 		file.remove("Hunter_Hunting_Locations.txt")
 	}
 
-	if(length(grep("Hunter_Hunting_Locations_Farm.txt", dir())) > 0)
+	if(length(grep("Hunter_Hunting_Locations_Farms.txt", dir())) > 0)
 	{
-		file.remove("Hunter_Hunting_Locations_Farm.txt")
+		file.remove("Hunter_Hunting_Locations_Farms.txt")
 	}
 }
