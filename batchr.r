@@ -29,20 +29,23 @@ library(stringr)
 # Setup work- and results directory:
 setwd('d:/almass/WorkDirectories/HunterModelTesting/')  # The run directory
 resultpath = 'd:/almass/Results/GooseManagement/Hunter/Random/'  # Path where the results will be stored
+# Figure out how far we have come
+counter = as.numeric(readLines('counter.txt'))
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 
-# Save the results of the sim:
-counter = as.numeric(readLines('counter.txt'))
-if(counter == 1 ){
+if(counter == 1 )
+{
 # Set up the headers in first run
 	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters' sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('Hunter_Params.txt', resultpath, copy.date = TRUE)
 }
+
 # If there is no results from the sim because no hunters were distributed:
-if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0){
+if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
+{
 	line = readLines('Hunter_Params.txt')
 	line = line[which(is.na(str_locate(line, '#')[,1]))]  # Avoid the comments
 	line = line[which(str_detect(line, ' '))]  # Ignore empty lines
@@ -50,9 +53,6 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0){
 	value = str_split(line[counter], '\t')[[1]][2]  # Get the value
 	line = paste(param, value, NA, NA, sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
-    # Add one to the counter before exit
-	counter = counter+1
-	write(counter, file = 'counter.txt', append = FALSE)
 }
 
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
@@ -133,15 +133,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 #line2 = paste(param2, value2, distancefit, overlab, sep = '\t')
 #write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
-# If you want updates:
-#slackrSetup(channel="@name", api_token = INSERT YOUR TOKEN)
-# slackr(paste(counter))
-	counter = counter+1  
-# When running scenarios with more than one parameter add a number equal to the number of parameters here:
-#counter = counter+2  
-	write(counter, file = 'counter.txt', append = FALSE)
 
-# As the very last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
+# As the last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
 # We do this because almass might exit without distributing hunters. If that happens files from a previous
 # run might still be sitting in the run directory and we would simply analyze these as if they were the new 
 # run and get results identical to the previous run
@@ -156,3 +149,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 		file.remove("Hunter_Hunting_Locations_Farms.txt")
 	}
 }
+
+# If you want updates:
+# slackrSetup(channel="@name", api_token = INSERT YOUR TOKEN)
+# slackr(paste(counter))
+
+# Very last thing is to update the counter:
+counter = counter+1  
+# When running scenarios with more than one parameter add a number equal to the number of parameters here:
+# counter = counter+2  
+write(counter, file = 'counter.txt', append = FALSE)
