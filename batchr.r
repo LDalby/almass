@@ -36,7 +36,7 @@ resultpath = 'd:/almass/Results/GooseManagement/Hunter/Random/'  # Path where th
 counter = as.numeric(readLines('counter.txt'))
 if(counter == 1 ){
 # Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', sep = '\t')
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters' sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('Hunter_Params.txt', resultpath, copy.date = TRUE)
@@ -113,7 +113,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	density = rbind(survey, simulated)
 # Asses the fit
 	overlab = round(CalcOverlab(density, species = 'Hunter'), 3)  #see ?CalcOverlab for documentation
-
+# Find the maximum number of hunters on any farm:
+	MaxHunters = max(hunterdens[,NoHunters])
 # Write out the results of the parameter fitting and prepare for next run:
 # Clean file for comments and empty lines:
 	line = readLines('Hunter_Params.txt')
