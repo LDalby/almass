@@ -31,7 +31,7 @@ setwd('d:/almass/WorkDirectories/HunterModelTesting/')  # The run directory
 resultpath = 'd:/almass/Results/GooseManagement/Hunter/RandomOpenMaxDensity/'  # Path where the results will be stored
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
-
+lineno = seq(1, 228*2, 2)  # To get the line number in the parameter list in multi parameter runs
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 
 if(counter == 1 )
@@ -49,13 +49,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	line = readLines('Hunter_Params.txt')
 	line = line[which(is.na(str_locate(line, '#')[,1]))]  # Avoid the comments
 	line = line[which(str_detect(line, ' '))]  # Ignore empty lines
-	param = word(line[counter], 1)  # Get the parameter name
-	value = str_split(line[counter], '\t')[[1]][2]  # Get the value
+	param = word(line[lineno[counter]], 1)  # Get the parameter name
+	value = str_split(line[lineno[counter]], '\t')[[1]][2]  # Get the value
 	line1 = paste(param, value, NA, NA, NA, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 	# @£$: Uncomment these when running the scenarios with two parameters:
-	param2 = word(line[counter+1], 1)  # Get the parameter name
-	value2 = str_split(line[counter+1], '\t')[[1]][2]  # Get the value
+	param2 = word(line[lineno[counter]+1], 1)  # Get the parameter name
+	value2 = str_split(line[lineno[counter]+1], '\t')[[1]][2]  # Get the value
 	line2 = paste(param2, value2, NA, NA, NA, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 }
@@ -126,15 +126,14 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	line = line[which(is.na(str_locate(line, '#')[,1]))]  # Avoid the comments
 	line = line[which(str_detect(line, ' '))]  # Ignore empty lines
 
-	param = word(line[counter], 1)  # Get the parameter name
-	value = str_split(line[counter], '\t')[[1]][2]  # Get the value
-	# @£$: Uncomment these when running the scenarios with two parameters:
-	param2 = word(line[counter+1], 1)  # Get the parameter name
-	value2 = str_split(line[counter+1], '\t')[[1]][2]  # Get the value
-
+	param = word(line[lineno[counter]], 1)  # Get the parameter name
+	value = str_split(line[lineno[counter]], '\t')[[1]][2]  # Get the value
 	line1 = paste(param, value, distancefit, overlab, maxhunters, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+
 	# @£$: Uncomment these when running the scenarios with two parameters:
+	param2 = word(line[lineno[counter]+1], 1)  # Get the parameter name
+	value2 = str_split(line[lineno[counter]+1], '\t')[[1]][2]  # Get the value
 	line2 = paste(param2, value2, distancefit, overlab, maxhunters, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
@@ -160,7 +159,5 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 # slackr(paste(counter))
 
 # Very last thing is to update the counter:
-# counter = counter+1  
-# When running scenarios with more than one parameter add a number equal to the number of parameters here:
-counter = counter+2  
+counter = counter+1  
 write(counter, file = 'counter.txt', append = FALSE)
