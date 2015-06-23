@@ -29,11 +29,15 @@ library(stringr)
 # Setup work- and results directory:
 setwd('d:/almass/WorkDirectories/HunterModelTesting/')  # The run directory
 resultpath = 'd:/almass/Results/GooseManagement/Hunter/RandomOpenMaxDensity/'  # Path where the results will be stored
+# To get the line number in the parameter list in multi parameter runs we make a vector of line numbers for the
+# first of the parameters in each run:
+runs = 228  # The number of runs
+params =  # The number of paramters being modified per run 
+lineno = seq(1, runs*params, params)
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
-lineno = seq(1, 228*2, 2)  # To get the line number in the parameter list in multi parameter runs
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 
+# If this is the first run, set up the results files make a copy of the parameter list
 if(counter == 1 )
 {
 	# Set up the headers in first run
@@ -46,23 +50,26 @@ if(counter == 1 )
 # If there is no results from the sim because no hunters were distributed:
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 {
-	line = readLines('Hunter_Params.txt')
-	line = line[which(is.na(str_locate(line, '#')[,1]))]  # Avoid the comments
-	line = line[which(str_detect(line, ' '))]  # Ignore empty lines
-	param = word(line[lineno[counter]], 1)  # Get the parameter name
-	value = str_split(line[lineno[counter]], '\t')[[1]][2]  # Get the value
+	lines = readLines('Hunter_Params.txt')
+	lines = lines[which(is.na(str_locate(lines, '#')[,1]))]  # Avoid the comments
+	lines = lines[which(str_detect(lines, ' '))]  # Ignore empty lines
+	param = word(lines[lineno[counter]], 1)  # Get the parameter name
+	value = str_split(lines[lineno[counter]], '\t')[[1]][2]  # Get the value
 	line1 = paste(param, value, NA, NA, NA, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 	# @£$: Uncomment these when running the scenarios with two parameters:
-	param2 = word(line[lineno[counter]+1], 1)  # Get the parameter name
-	value2 = str_split(line[lineno[counter]+1], '\t')[[1]][2]  # Get the value
+	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
+	value2 = str_split(lines[lineno[counter]+1], '\t')[[1]][2]  # Get the value
 	line2 = paste(param2, value2, NA, NA, NA, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 }
 
+#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
+
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	hunterdist = fread('Hunter_Hunting_Locations.txt')
-	write.table(hunterdist, file = paste(resultpath,'HuntingLocationsRun', counter, '.txt', sep =''), row.names = FALSE, sep = '\t')
+	filename = paste(resultpath,'HuntingLocationsRun', counter, '.txt', sep ='')
+	write.table(hunterdist, file = filename, row.names = FALSE, sep = '\t')
 
 	dist = rep(NA, nrow(hunterdist))
 	for (i in 1:nrow(hunterdist))
@@ -109,7 +116,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	# Simulation results:
 	hunterdens = fread('Hunter_Hunting_Locations_Farms.txt', skip = 1)
 	# Save the results of the sim:
-	write.table(hunterdens, file = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep =''), row.names = FALSE, sep = '\t')
+	filename = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep ='')
+	write.table(hunterdens, file = filename, row.names = FALSE, sep = '\t')
 
 	hunterdens[,Numbers:=NoHunters/(Farmsize/10000)]
 	hunterdens[,Type:= 'Simulated']
@@ -122,18 +130,18 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	maxhunters = max(hunterdens[,NoHunters])
 	# Write out the results of the parameter fitting and prepare for next run:
 	# Clean file for comments and empty lines:
-	line = readLines('Hunter_Params.txt')
-	line = line[which(is.na(str_locate(line, '#')[,1]))]  # Avoid the comments
-	line = line[which(str_detect(line, ' '))]  # Ignore empty lines
+	lines = readLines('Hunter_Params.txt')
+	lines = lines[which(is.na(str_locate(lines, '#')[,1]))]  # Avoid the comments
+	lines = lines[which(str_detect(lines, ' '))]  # Ignore empty lines
 
-	param = word(line[lineno[counter]], 1)  # Get the parameter name
-	value = str_split(line[lineno[counter]], '\t')[[1]][2]  # Get the value
+	param = word(lines[lineno[counter]], 1)  # Get the parameter name
+	value = str_split(lines[lineno[counter]], '\t')[[1]][2]  # Get the value
 	line1 = paste(param, value, distancefit, overlab, maxhunters, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 	# @£$: Uncomment these when running the scenarios with two parameters:
-	param2 = word(line[lineno[counter]+1], 1)  # Get the parameter name
-	value2 = str_split(line[lineno[counter]+1], '\t')[[1]][2]  # Get the value
+	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
+	value2 = str_split(lines[lineno[counter]+1], '\t')[[1]][2]  # Get the value
 	line2 = paste(param2, value2, distancefit, overlab, maxhunters, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
