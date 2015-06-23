@@ -32,11 +32,12 @@ resultpath = 'd:/almass/Results/GooseManagement/Hunter/RandomOpenMaxDensity/'  #
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
 runs = 228  # The number of runs
-params =  # The number of paramters being modified per run 
+params = 2  # The number of paramters being modified per run 
 lineno = seq(1, runs*params, params)
 
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
+
 # If this is the first run, set up the results files make a copy of the parameter list
 if(counter == 1 )
 {
