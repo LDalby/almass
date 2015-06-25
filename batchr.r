@@ -42,7 +42,7 @@ counter = as.numeric(readLines('counter.txt'))
 if(counter == 1 )
 {
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', sep = '\t')
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('Hunter_Params.txt', resultpath, copy.date = TRUE)
@@ -56,12 +56,12 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	lines = lines[which(str_detect(lines, ' '))]  # Ignore empty lines
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = str_split(lines[lineno[counter]], '\t')[[1]][2]  # Get the value
-	line1 = paste(param, value, NA, NA, NA, sep = '\t')
+	line1 = paste(param, value, NA, NA, NA, NA, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 	# @£$: Uncomment these when running the scenarios with two parameters:
 	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
 	value2 = str_split(lines[lineno[counter]+1], '\t')[[1]][2]  # Get the value
-	line2 = paste(param2, value2, NA, NA, NA, sep = '\t')
+	line2 = paste(param2, value2, NA, NA, NA, NA, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 }
 
@@ -106,10 +106,10 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	huntersurvey[Bin == 200, ModelRes:= length(hunterdist[Bin == 200, Bin])]
 	huntersurvey[Bin == 201, ModelRes:= length(hunterdist[Bin == 201, Bin])]
 
-	#distancefit = with(huntersurvey,
-	#chisq.test(RespondModelArea, ModelRes)$statistic)
-	distancefit = round(with(huntersurvey,
-		cor(RespondModelArea, ModelRes, method = 'kendall')), 3)
+	huntersurvey[, propSim:=ModelRes/sum(ModelRes)]
+	huntersurvey[, propSur:=RespondModelArea/sum(RespondModelArea)]
+
+	distancefit = with(huntersurvey, sum((propSim-propSur)^2))
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Density ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 	# Load the survey results
@@ -129,6 +129,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	overlab = round(CalcOverlab(density, species = 'Hunter'), 3)  #see ?CalcOverlab for documentation
 	# Find the maximum number of hunters on any farm:
 	maxhunters = max(hunterdens[,NoHunters])
+	# Calculate the overall model fit
+	OverallFit = distancefit+overlab
 	# Write out the results of the parameter fitting and prepare for next run:
 	# Clean file for comments and empty lines:
 	lines = readLines('Hunter_Params.txt')
@@ -137,13 +139,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = str_split(lines[lineno[counter]], '\t')[[1]][2]  # Get the value
-	line1 = paste(param, value, distancefit, overlab, maxhunters, sep = '\t')
+	line1 = paste(param, value, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 	# @£$: Uncomment these when running the scenarios with two parameters:
 	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
 	value2 = str_split(lines[lineno[counter]+1], '\t')[[1]][2]  # Get the value
-	line2 = paste(param2, value2, distancefit, overlab, maxhunters, sep = '\t')
+	line2 = paste(param2, value2, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 
