@@ -45,13 +45,13 @@ if(counter == 1 )
 	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
 	# Copy the Hunter params to the result folder for reference and checking
-	file.copy('Hunter_Params.txt', resultpath, copy.date = TRUE)
+	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
 }
 
 # If there is no results from the sim because no hunters were distributed:
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 {
-	lines = readLines('Hunter_Params.txt')
+	lines = readLines('ParameterValues.txt')
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
 	line1 = paste(param, value, NA, NA, NA, NA, sep = '\t')
@@ -131,7 +131,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	OverallFit = distancefit+overlab
 	# Write out the results of the parameter fitting and prepare for next run:
 	# Clean file for comments and empty lines:
-	lines = readLines('Hunter_Params.txt')
+	lines = readLines('ParameterValues.txt')
 
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
