@@ -31,7 +31,7 @@ setwd('d:/almass/WorkDirectories/HunterModelTesting/')  # The run directory
 resultpath = 'd:/almass/Results/GooseManagement/Hunter/RandomOpenMaxDensity/'  # Path where the results will be stored
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
-runs = 228  # The number of runs
+runs = 120  # The number of runs
 params = 2  # The number of paramters being modified per run 
 lineno = seq(1, runs*params, params)
 
@@ -52,15 +52,13 @@ if(counter == 1 )
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 {
 	lines = readLines('Hunter_Params.txt')
-	lines = lines[which(is.na(str_locate(lines, '#')[,1]))]  # Avoid the comments
-	lines = lines[which(str_detect(lines, ' '))]  # Ignore empty lines
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
-	value = str_split(lines[lineno[counter]], '\t')[[1]][2]  # Get the value
+	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
 	line1 = paste(param, value, NA, NA, NA, NA, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 	# @£$: Uncomment these when running the scenarios with two parameters:
 	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
-	value2 = str_split(lines[lineno[counter]+1], '\t')[[1]][2]  # Get the value
+	value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
 	line2 = paste(param2, value2, NA, NA, NA, NA, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 }
@@ -95,7 +93,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	# The survey results:
 	huntersurvey = fread('HunterSurveyResultsDistance.csv')
 	# The simulation results needs to be binned manually and added to the survey data:
-		huntersurvey[Bin == 0, ModelRes:= length(hunterdist[Bin == 0, Bin])]
+	huntersurvey[Bin == 0, ModelRes:= length(hunterdist[Bin == 0, Bin])]
 	huntersurvey[Bin == 10, ModelRes:= length(hunterdist[Bin == 10, Bin])]
 	huntersurvey[Bin == 20, ModelRes:= length(hunterdist[Bin == 20, Bin])]
 	huntersurvey[Bin == 40, ModelRes:= length(hunterdist[Bin == 40, Bin])]
@@ -134,17 +132,15 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	# Write out the results of the parameter fitting and prepare for next run:
 	# Clean file for comments and empty lines:
 	lines = readLines('Hunter_Params.txt')
-	lines = lines[which(is.na(str_locate(lines, '#')[,1]))]  # Avoid the comments
-	lines = lines[which(str_detect(lines, ' '))]  # Ignore empty lines
 
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
-	value = str_split(lines[lineno[counter]], '\t')[[1]][2]  # Get the value
+	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
 	line1 = paste(param, value, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 	# @£$: Uncomment these when running the scenarios with two parameters:
 	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
-	value2 = str_split(lines[lineno[counter]+1], '\t')[[1]][2]  # Get the value
+	value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
 	line2 = paste(param2, value2, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
