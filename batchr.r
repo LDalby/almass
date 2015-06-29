@@ -107,7 +107,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	huntersurvey[, propSim:=ModelRes/sum(ModelRes)]
 	huntersurvey[, propSur:=RespondModelArea/sum(RespondModelArea)]
 
-	distancefit = with(huntersurvey, sum((propSim-propSur)^2))
+	distancefit = with(huntersurvey, 1-sum((propSim-propSur)^2))
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Density ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 	# Load the survey results
