@@ -14,7 +14,10 @@ lineno = seq(1, runs*numberofparams, numberofparams)
 params = readLines('ParameterValues.txt')
 
 counter = as.numeric(readLines('counter.txt'))
-
+if(counter == 1)
+{
+	write('#---------- Start auto change ----------#', 'TIALMaSSConfig.cfg', append = TRUE)
+}
 write(params[lineno[counter]], 'TIALMaSSConfig.cfg', append = TRUE)
 if(numberofparams > 1)
 {
@@ -22,4 +25,8 @@ if(numberofparams > 1)
 	{
 		write(params[lineno[counter]+1], 'TIALMaSSConfig.cfg', append = TRUE)
 	}
+}
+if(counter == runs)
+{
+	write('#----------- End auto change -----------#', 'TIALMaSSConfig.cfg', append = TRUE)
 }
