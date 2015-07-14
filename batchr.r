@@ -42,7 +42,7 @@ counter = as.numeric(readLines('counter.txt'))
 if(counter == 1 )
 {
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'HuntingAreaFit', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -54,12 +54,12 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	lines = readLines('ParameterValues.txt')
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
-	line1 = paste(param, value, NA, NA, NA, NA, sep = '\t')
+	line1 = paste(param, value, NA, NA, NA, NA, NA, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 	# @£$: Uncomment these when running the scenarios with two parameters:
 	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
 	value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
-	line2 = paste(param2, value2, NA, NA, NA, NA, sep = '\t')
+	line2 = paste(param2, value2, NA, NA, NA, NA, NA, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 }
 
@@ -119,7 +119,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	filename = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep ='')
 	write.table(hunterdens, file = filename, row.names = FALSE, sep = '\t')
 
-	hunterdens[,Numbers:=NoHunters/(Farmsize/10000)]
+	# hunterdens[,Numbers:=NoHunters/(Farmsize/10000)]
+	hunterdens[,Numbers:=NoHunters/(AreaOpen/10000)]
 	hunterdens[,Type:= 'Simulated']
 	simulated = hunterdens[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
 	# Collect the survey and sim results:
@@ -128,26 +129,30 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	overlab = round(CalcOverlab(density, species = 'Hunter'), 3)  #see ?CalcOverlab for documentation
 	# Find the maximum number of hunters on any farm:
 	maxhunters = max(hunterdens[,NoHunters])
-	# Calculate the overall model fit
-	OverallFit = distancefit+overlab
+	
 
 	# -------------------- Number of hunting areas -------------------- #
 library(data.table)
 	huntareas = fread('C:/Users/lada/Downloads/Hunter_Hunting_Locations.txt', skip = 1)
-	farmrefcols = match('FarmRef1', names(huntareas)):match('FarmRef5', names(huntareas))
+	farmrefcols = match('FarmRef1', names(huntareas)):match('FarmRef10', names(huntareas))
 	setnames(huntareas, old = 'No farmrefs', new = 'NoFarmrefs')
 	huntareas$Nfarms = apply(huntareas[,farmrefcols, with = FALSE], MARGIN = 1, FUN = function(x) sum(!is.na(x)))
-	all.equal(huntareas[,NoFarmrefs], huntareas[,Nfarms])
-	huntareas[,Nfarms:=lapply(.SD,function(x) length(!is.na(x))),by=refID, .SDcols = farmrefcols]
-	huntareas[,NDiffarms:=lapply(.SD,function(x) length(unique(x))),by=refID, .SDcols = farmrefcols]
-	summary(huntareas)
+	if(!all.equal(huntareas[,NoFarmrefs], huntareas[,Nfarms]))
+	{
+		line = paste(Sys.Date(), ': Error in batch.r - inconsistent number of hunting areas')
+		write(line, 'TIALMaSSConfig.cfg', append = TRUE)
+	}
+	huntareas[,Nfarms:=lapply(.SD,function(x) length(!is.na(x))),by=refID, .SDcols = farmrefcols]  # Number of farms
+	huntareas[,NDiffarms:=lapply(.SD,function(x) length(unique(x))),by=refID, .SDcols = farmrefcols]  # Number of diff farms
 	temp = huntareas[, .N, by = Nfarms][, prop:=N/sum(N)]
 	surveyarea = data.table(Nfarms = 1:5, Prop = rnorm(5), ModelProp = rep(0,5))
 	proprows = match(temp$Nfarms, surveyarea$Nfarms)
 	surveyarea[proprows, ModelProp:=temp$prop]
-	huntareasfit = with(surveyarea, 1-sum((ModelProp-Prop)^2))
+	huntingareafit = with(surveyarea, 1-sum((ModelProp-Prop)^2))
 	
 
+	# Calculate the overall model fit
+	OverallFit = distancefit + overlab + huntingareafit
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	# Clean file for comments and empty lines:
@@ -155,13 +160,13 @@ library(data.table)
 
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
-	line1 = paste(param, value, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
+	line1 = paste(param, value, distancefit, overlab, huntingareafit, maxhunters, OverallFit, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 	# @£$: Uncomment these when running the scenarios with two parameters:
 	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
 	value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
-	line2 = paste(param2, value2, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
+	line2 = paste(param2, value2, distancefit, overlab, huntingareafit, maxhunters, OverallFit, sep = '\t')
 	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 
