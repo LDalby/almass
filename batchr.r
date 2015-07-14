@@ -119,8 +119,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	filename = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep ='')
 	write.table(hunterdens, file = filename, row.names = FALSE, sep = '\t')
 
-	# hunterdens[,Numbers:=NoHunters/(Farmsize/10000)]
-	hunterdens[,Numbers:=NoHunters/(AreaOpen/10000)]
+	hunterdens[,Numbers:=NoHunters/(Farmsize/10000)]
+	# hunterdens[,Numbers:=NoHunters/(AreaOpen/10000)]  # Not implemented in almass yet.
 	hunterdens[,Type:= 'Simulated']
 	simulated = hunterdens[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
 	# Collect the survey and sim results:
