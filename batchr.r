@@ -65,7 +65,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 
-if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
+if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
+{
 	hunterdist = fread('Hunter_Hunting_Locations.txt')
 	filename = paste(resultpath,'HuntingLocationsRun', counter, '.txt', sep ='')
 	write.table(hunterdist, file = filename, row.names = FALSE, sep = '\t')
@@ -109,7 +110,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 
 	distancefit = with(huntersurvey, 1-sum((propSim-propSur)^2))
 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Density ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
+    #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Density ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 	# Load the survey results
 	survey = fread('HunterSurveyResultsDensity.csv')
 	# Simulation results:
@@ -129,6 +130,21 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0){
 	maxhunters = max(hunterdens[,NoHunters])
 	# Calculate the overall model fit
 	OverallFit = distancefit+overlab
+
+	# -------------------- Number of hunting areas -------------------- #
+library(data.table)
+	huntareas = fread('C:/Users/lada/Downloads/Hunter_Hunting_Locations.txt', skip = 1)
+	farmrefcols = match('FarmRef1', names(huntareas)):match('FarmRef5', names(huntareas))
+	setnames(huntareas, old = 'No farmrefs', new = 'NoFarmrefs')
+	huntareas$Nfarms = apply(huntareas[,farmrefcols, with = FALSE], MARGIN = 1, FUN = function(x) sum(!is.na(x)))
+	all.equal(huntareas[,NoFarmrefs], huntareas[,Nfarms])
+	huntareas[,Nfarms:=lapply(.SD,function(x) length(!is.na(x))),by=refID, .SDcols = farmrefcols]
+	huntareas[,NDiffarms:=lapply(.SD,function(x) length(unique(x))),by=refID, .SDcols = farmrefcols]
+	
+
+
+
+
 	# Write out the results of the parameter fitting and prepare for next run:
 	# Clean file for comments and empty lines:
 	lines = readLines('ParameterValues.txt')
