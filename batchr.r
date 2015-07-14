@@ -140,9 +140,13 @@ library(data.table)
 	all.equal(huntareas[,NoFarmrefs], huntareas[,Nfarms])
 	huntareas[,Nfarms:=lapply(.SD,function(x) length(!is.na(x))),by=refID, .SDcols = farmrefcols]
 	huntareas[,NDiffarms:=lapply(.SD,function(x) length(unique(x))),by=refID, .SDcols = farmrefcols]
+	summary(huntareas)
+	temp = huntareas[, .N, by = Nfarms][, prop:=N/sum(N)]
+	surveyarea = data.table(Nfarms = 1:5, Prop = rnorm(5), ModelProp = rep(0,5))
+	proprows = match(temp$Nfarms, surveyarea$Nfarms)
+	surveyarea[proprows, ModelProp:=temp$prop]
+	huntareasfit = with(surveyarea, 1-sum((ModelProp-Prop)^2))
 	
-
-
 
 
 	# Write out the results of the parameter fitting and prepare for next run:
