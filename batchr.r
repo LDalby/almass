@@ -138,25 +138,19 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	
 
 	# -------------------- Number of hunting areas -------------------- #
-library(data.table)
-	huntareas = fread('C:/Users/lada/Downloads/Hunter_Hunting_Locations.txt', skip = 1)
-	farmrefcols = match('FarmRef1', names(huntareas)):match('FarmRef10', names(huntareas))
-	setnames(huntareas, old = 'No farmrefs', new = 'NoFarmrefs')
-	huntareas$Nfarms = apply(huntareas[,farmrefcols, with = FALSE], MARGIN = 1, FUN = function(x) sum(!is.na(x)))
-	if(!all.equal(huntareas[,NoFarmrefs], huntareas[,Nfarms]))
+	farmrefcols = match('FarmRef1', names(locations)):match('FarmRef10', names(locations))
+	locations$Nfarms = apply(locations[,farmrefcols, with = FALSE], MARGIN = 1, FUN = function(x) sum(!is.na(x)))
+	if(!all.equal(locations[,NoFarmRefs], locations[,Nfarms]))
 	{
 		line = paste(Sys.Date(), ': Error in batch.r - inconsistent number of hunting areas')
 		write(line, 'TIALMaSSConfig.cfg', append = TRUE)
 	}
-	huntareas[,Nfarms:=lapply(.SD,function(x) length(!is.na(x))),by=refID, .SDcols = farmrefcols]  # Number of farms
-	huntareas[,NDiffarms:=lapply(.SD,function(x) length(unique(x))),by=refID, .SDcols = farmrefcols]  # Number of diff farms
-	temp = huntareas[, .N, by = Nfarms][, prop:=N/sum(N)]
-	surveyarea = data.table(Nfarms = 1:5, Prop = rnorm(5), ModelProp = rep(0,5))
+	temp = locations[, .N, by = Nfarms][, prop:=N/sum(N)]
+	surveyarea = data.table(Nfarms = 1:5, Prop = c(.309, .308, .204, .052, .128), ModelProp = rep(0,5))
 	proprows = match(temp$Nfarms, surveyarea$Nfarms)
 	surveyarea[proprows, ModelProp:=temp$prop]
 	huntingareafit = with(surveyarea, 1-sum((ModelProp-Prop)^2))
 	
-
 	# Calculate the overall model fit
 	OverallFit = distancefit + overlab + huntingareafit
 
