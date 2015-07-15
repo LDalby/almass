@@ -67,43 +67,55 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 {
-	hunterdist = fread('Hunter_Hunting_Locations.txt')
+	# Simulation results:
+	locations = fread('Hunter_Hunting_Locations.txt')
 	filename = paste(resultpath,'HuntingLocationsRun', counter, '.txt', sep ='')
-	write.table(hunterdist, file = filename, row.names = FALSE, sep = '\t')
+	write.table(locations, file = filename, row.names = FALSE, sep = '\t')
 
-	dist = rep(NA, nrow(hunterdist))
-	for (i in 1:nrow(hunterdist))
+	farms = fread('Hunter_Hunting_Locations_Farms.txt', skip = 1)
+	filename = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep ='')
+	write.table(farms, file = filename, row.names = FALSE, sep = '\t')
+	
+	idvars = c('HunterID','HunterType','HomeX','HomeY','NoFarmrefs')
+	dist = rep(NA, nrow(locations))
+	for (j in seq_along(locations[,HunterID])) 
 	{
-		temp = dist(rbind(as.numeric(hunterdist[i,c('homeX', 'homeY'), with = FALSE]),
-			as.numeric(hunterdist[i,c('FarmCentroidX', 'FarmCentroidY'), with = FALSE])))
-		dist[i] = temp
+		huntinglocs = melt(locations, id.vars = idvars)[HunterID == j-1 & !is.na(value)][,value]
+		temp = rep(NA, length(huntinglocs))
+		for (i in seq_along(huntinglocs))
+		{
+			thedist = dist(rbind(as.numeric(locations[i,.(HomeX, HomeY)]),
+				as.numeric(farms[FarmRef == huntinglocs[i],.(FarmCentroidX, FarmCentroidY)])))
+			temp[i] = thedist
+		}
+		dist[j] = min(temp)
 	}
-	hunterdist[, Dists:=dist/1000]
+	locations[, Dists:=dist/1000]
 
-	hunterdist[Dists < 1, Bin:=0]
-	hunterdist[Dists <= 10 & Dists >= 1, Bin:=10]
-	hunterdist[Dists <= 20 & Dists > 10, Bin:=20]
-	hunterdist[Dists <= 40 & Dists > 20, Bin:=40]
-	hunterdist[Dists <= 60 & Dists > 40, Bin:=60]
-	hunterdist[Dists <= 80 & Dists > 60, Bin:=80]
-	hunterdist[Dists <= 100 & Dists > 80, Bin:=100]
-	hunterdist[Dists <= 150 & Dists > 100, Bin:=150]
-	hunterdist[Dists <= 200 & Dists > 150, Bin:=200]
-	hunterdist[Dists > 200, Bin:=201]
+	locations[Dists < 1, Bin:=0]
+	locations[Dists <= 10 & Dists >= 1, Bin:=10]
+	locations[Dists <= 20 & Dists > 10, Bin:=20]
+	locations[Dists <= 40 & Dists > 20, Bin:=40]
+	locations[Dists <= 60 & Dists > 40, Bin:=60]
+	locations[Dists <= 80 & Dists > 60, Bin:=80]
+	locations[Dists <= 100 & Dists > 80, Bin:=100]
+	locations[Dists <= 150 & Dists > 100, Bin:=150]
+	locations[Dists <= 200 & Dists > 150, Bin:=200]
+	locations[Dists > 200, Bin:=201]
 
 	# The survey results:
 	huntersurvey = fread('HunterSurveyResultsDistance.csv')
 	# The simulation results needs to be binned manually and added to the survey data:
-	huntersurvey[Bin == 0, ModelRes:= length(hunterdist[Bin == 0, Bin])]
-	huntersurvey[Bin == 10, ModelRes:= length(hunterdist[Bin == 10, Bin])]
-	huntersurvey[Bin == 20, ModelRes:= length(hunterdist[Bin == 20, Bin])]
-	huntersurvey[Bin == 40, ModelRes:= length(hunterdist[Bin == 40, Bin])]
-	huntersurvey[Bin == 60, ModelRes:= length(hunterdist[Bin == 60, Bin])]
-	huntersurvey[Bin == 80, ModelRes:= length(hunterdist[Bin == 80, Bin])]
-	huntersurvey[Bin == 100, ModelRes:= length(hunterdist[Bin == 100, Bin])]
-	huntersurvey[Bin == 150, ModelRes:= length(hunterdist[Bin == 150, Bin])]
-	huntersurvey[Bin == 200, ModelRes:= length(hunterdist[Bin == 200, Bin])]
-	huntersurvey[Bin == 201, ModelRes:= length(hunterdist[Bin == 201, Bin])]
+	huntersurvey[Bin == 0, ModelRes:= length(locations[Bin == 0, Bin])]
+	huntersurvey[Bin == 10, ModelRes:= length(locations[Bin == 10, Bin])]
+	huntersurvey[Bin == 20, ModelRes:= length(locations[Bin == 20, Bin])]
+	huntersurvey[Bin == 40, ModelRes:= length(locations[Bin == 40, Bin])]
+	huntersurvey[Bin == 60, ModelRes:= length(locations[Bin == 60, Bin])]
+	huntersurvey[Bin == 80, ModelRes:= length(locations[Bin == 80, Bin])]
+	huntersurvey[Bin == 100, ModelRes:= length(locations[Bin == 100, Bin])]
+	huntersurvey[Bin == 150, ModelRes:= length(locations[Bin == 150, Bin])]
+	huntersurvey[Bin == 200, ModelRes:= length(locations[Bin == 200, Bin])]
+	huntersurvey[Bin == 201, ModelRes:= length(locations[Bin == 201, Bin])]
 
 	huntersurvey[, propSim:=ModelRes/sum(ModelRes)]
 	huntersurvey[, propSur:=RespondModelArea/sum(RespondModelArea)]
@@ -113,22 +125,16 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
     #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Density ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 	# Load the survey results
 	survey = fread('HunterSurveyResultsDensity.csv')
-	# Simulation results:
-	hunterdens = fread('Hunter_Hunting_Locations_Farms.txt', skip = 1)
-	# Save the results of the sim:
-	filename = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep ='')
-	write.table(hunterdens, file = filename, row.names = FALSE, sep = '\t')
 
-	hunterdens[,Numbers:=NoHunters/(Farmsize/10000)]
-	# hunterdens[,Numbers:=NoHunters/(AreaOpen/10000)]  # Not implemented in almass yet.
-	hunterdens[,Type:= 'Simulated']
-	simulated = hunterdens[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
+	farms[,Numbers:=NoHunters/(FarmArableSize/10000)]
+	farms[,Type:= 'Simulated']
+	simulated = farms[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
 	# Collect the survey and sim results:
 	density = rbind(survey, simulated)
 	# Asses the fit
 	overlab = round(CalcOverlab(density, species = 'Hunter'), 3)  #see ?CalcOverlab for documentation
 	# Find the maximum number of hunters on any farm:
-	maxhunters = max(hunterdens[,NoHunters])
+	maxhunters = max(farms[,NoHunters])
 	
 
 	# -------------------- Number of hunting areas -------------------- #
