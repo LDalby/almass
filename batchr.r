@@ -138,21 +138,24 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	
 
 	# -------------------- Number of hunting areas -------------------- #
-	farmrefcols = match('FarmRef1', names(locations)):match('FarmRef10', names(locations))
-	locations$Nfarms = apply(locations[,farmrefcols, with = FALSE], MARGIN = 1, FUN = function(x) sum(!is.na(x)))
-	if(!all.equal(locations[,NoFarmRefs], locations[,Nfarms]))
-	{
-		line = paste(Sys.Date(), ': Error in batch.r - inconsistent number of hunting areas')
-		write(line, 'TIALMaSSConfig.cfg', append = TRUE)
-	}
-	temp = locations[, .N, by = Nfarms][, prop:=N/sum(N)]
-	surveyarea = data.table(Nfarms = 1:5, Prop = c(.309, .308, .204, .052, .128), ModelProp = rep(0,5))
-	proprows = match(temp$Nfarms, surveyarea$Nfarms)
-	surveyarea[proprows, ModelProp:=temp$prop]
-	huntingareafit = with(surveyarea, 1-sum((ModelProp-Prop)^2))
+	# The number of hunting areas is hardcoded, so no need to test it. Have run one
+	# test and Chris appear to have gotten the numbers right.
+	# farmrefcols = match('FarmRef1', names(locations)):match('FarmRef10', names(locations))
+	# locations$Nfarms = apply(locations[,farmrefcols, with = FALSE], MARGIN = 1, FUN = function(x) sum(!is.na(x)))
+	# if(!all.equal(locations[,NoFarmRefs], locations[,Nfarms]))
+	# {
+	# 	line = paste(Sys.Date(), ': Error in batch.r - inconsistent number of hunting areas')
+	# 	write(line, 'TIALMaSSConfig.cfg', append = TRUE)
+	# }
+	# temp = locations[, .N, by = Nfarms][, prop:=N/sum(N)]
+	# surveyarea = data.table(Nfarms = 1:5, Prop = c(.309, .308, .204, .052, .128), ModelProp = rep(0,5))
+	# proprows = match(temp$Nfarms, surveyarea$Nfarms)
+	# surveyarea[proprows, ModelProp:=temp$prop]
+	# huntingareafit = with(surveyarea, 1-sum((ModelProp-Prop)^2))
+	# OverallFit = distancefit + overlab + huntingareafit
 	
 	# Calculate the overall model fit
-	OverallFit = distancefit + overlab + huntingareafit
+	OverallFit = distancefit + overlab
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	# Clean file for comments and empty lines:
