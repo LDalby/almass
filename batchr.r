@@ -27,12 +27,12 @@ library(stringr)
 #library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work- and results directory:
-setwd('d:/almass/WorkDirectories/HunterModelTesting/')  # The run directory
-resultpath = 'd:/almass/Results/GooseManagement/Hunter/RandomOpenMaxDensity/'  # Path where the results will be stored
+setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/BaseWD/')  # The run directory
+resultpath = 'd:/almass/Results/GooseManagement/Hunter/HunterTestingAug2015/'  # Path where the results will be stored
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
-runs = 120  # The number of runs
-params = 2  # The number of paramters being modified per run 
+runs = 10  # The number of runs
+params = 1  # The number of paramters being modified per run 
 lineno = seq(1, runs*params, params)
 
 # Figure out how far we have come
@@ -57,11 +57,11 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	line1 = paste(param, value, NA, NA, NA, NA, NA, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 	# @£$: Uncomment these when running the scenarios with two parameters:
-	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
-	value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
-	line2 = paste(param2, value2, NA, NA, NA, NA, NA, sep = '\t')
-	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
-}
+# 	# param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
+# 	# value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
+# 	# line2 = paste(param2, value2, NA, NA, NA, NA, NA, sep = '\t')
+# 	# write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+# }
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 
@@ -104,7 +104,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	locations[Dists > 200, Bin:=201]
 
 	# The survey results:
-	huntersurvey = fread('HunterSurveyResultsDistance.csv')
+	huntersurvey = fread('HunterSurveyResultsDistanceJuly2015.txt')
 	# The simulation results needs to be binned manually and added to the survey data:
 	huntersurvey[Bin == 0, ModelRes:= length(locations[Bin == 0, Bin])]
 	huntersurvey[Bin == 10, ModelRes:= length(locations[Bin == 10, Bin])]
@@ -118,7 +118,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	huntersurvey[Bin == 201, ModelRes:= length(locations[Bin == 201, Bin])]
 
 	huntersurvey[, propSim:=ModelRes/sum(ModelRes)]
-	huntersurvey[, propSur:=RespondModelArea/sum(RespondModelArea)]
+	huntersurvey[, propSur:=RespondTH_JM/sum(RespondTH_JM)]
 
 	distancefit = with(huntersurvey, 1-sum((propSim-propSur)^2))
 
@@ -167,10 +167,10 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 	# @£$: Uncomment these when running the scenarios with two parameters:
-	param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
-	value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
-	line2 = paste(param2, value2, distancefit, overlab, huntingareafit, maxhunters, OverallFit, sep = '\t')
-	write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	# param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
+	# value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
+	# line2 = paste(param2, value2, distancefit, overlab, huntingareafit, maxhunters, OverallFit, sep = '\t')
+	# write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 
 	# As the last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
