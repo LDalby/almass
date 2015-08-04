@@ -7,7 +7,7 @@ setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/BaseWD/')  # The ru
 
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
-runs = 10  # The number of runs
+runs = 5  # The number of runs
 numberofparams = 1  # The number of paramters being modified per run 
 lineno = seq(1, runs*numberofparams, numberofparams)
 

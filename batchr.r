@@ -31,7 +31,7 @@ setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/BaseWD/')  # The ru
 resultpath = 'd:/almass/Results/GooseManagement/Hunter/HunterTestingAug2015/'  # Path where the results will be stored
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
-runs = 10  # The number of runs
+runs = 5  # The number of runs
 params = 1  # The number of paramters being modified per run 
 lineno = seq(1, runs*params, params)
 
@@ -42,7 +42,7 @@ counter = as.numeric(readLines('counter.txt'))
 if(counter == 1 )
 {
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'HuntingAreaFit', 'MaxHunters', 'OverallFit', sep = '\t')
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -54,14 +54,14 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	lines = readLines('ParameterValues.txt')
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
-	line1 = paste(param, value, NA, NA, NA, NA, NA, sep = '\t')
+	line1 = paste(param, value, NA, NA, NA, NA, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 	# @£$: Uncomment these when running the scenarios with two parameters:
 # 	# param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
 # 	# value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
-# 	# line2 = paste(param2, value2, NA, NA, NA, NA, NA, sep = '\t')
+# 	# line2 = paste(param2, value2, NA, NA, NA, NA,  sep = '\t')
 # 	# write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
-# }
+ }
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 
@@ -126,7 +126,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	# Load the survey results
 	survey = fread('HunterSurveyResultsDensity.csv')
 
-	farms[,Numbers:=NoHunters/(FarmArableSize/10000)]
+	farms[,Numbers:=NoHunters/(FarmSize/10000)]
 	farms[,Type:= 'Simulated']
 	simulated = farms[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
 	# Collect the survey and sim results:
@@ -135,24 +135,6 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	overlab = round(CalcOverlab(density, species = 'Hunter'), 3)  #see ?CalcOverlab for documentation
 	# Find the maximum number of hunters on any farm:
 	maxhunters = max(farms[,NoHunters])
-	
-
-	# -------------------- Number of hunting areas -------------------- #
-	# The number of hunting areas is hardcoded, so no need to test it. Have run one
-	# test and Chris appear to have gotten the numbers right.
-	# farmrefcols = match('FarmRef1', names(locations)):match('FarmRef10', names(locations))
-	# locations$Nfarms = apply(locations[,farmrefcols, with = FALSE], MARGIN = 1, FUN = function(x) sum(!is.na(x)))
-	# if(!all.equal(locations[,NoFarmRefs], locations[,Nfarms]))
-	# {
-	# 	line = paste(Sys.Date(), ': Error in batch.r - inconsistent number of hunting areas')
-	# 	write(line, 'TIALMaSSConfig.cfg', append = TRUE)
-	# }
-	# temp = locations[, .N, by = Nfarms][, prop:=N/sum(N)]
-	# surveyarea = data.table(Nfarms = 1:5, Prop = c(.309, .308, .204, .052, .128), ModelProp = rep(0,5))
-	# proprows = match(temp$Nfarms, surveyarea$Nfarms)
-	# surveyarea[proprows, ModelProp:=temp$prop]
-	# huntingareafit = with(surveyarea, 1-sum((ModelProp-Prop)^2))
-	# OverallFit = distancefit + overlab + huntingareafit
 	
 	# Calculate the overall model fit
 	OverallFit = distancefit + overlab
