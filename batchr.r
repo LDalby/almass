@@ -24,6 +24,7 @@
 library(data.table)
 library(ralmass)
 library(stringr)
+library(reshape2)
 #library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work- and results directory:
