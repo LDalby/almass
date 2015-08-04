@@ -73,7 +73,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	filename = paste(resultpath,'HuntingLocationsRun', counter, '.txt', sep ='')
 	write.table(locations, file = filename, row.names = FALSE, sep = '\t')
 
-	farms = fread('Hunter_Hunting_Locations_Farms.txt', skip = 1)
+	farms = fread('Hunter_Hunting_Locations_Farms.txt')
 	filename = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep ='')
 	write.table(farms, file = filename, row.names = FALSE, sep = '\t')
 	
