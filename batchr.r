@@ -29,7 +29,7 @@ library(reshape2)
 
 # Setup work- and results directory:
 setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/BaseWD/')  # The run directory
-resultpath = 'd:/almass/Results/GooseManagement/Hunter/HunterTestingAug2015/'  # Path where the results will be stored
+resultpath = 'd:/almass/Results/GooseManagement/Hunter/HunterTestingAug2015/Random/'  # Path where the results will be stored
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
 runs = 5  # The number of runs
@@ -146,13 +146,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
-	line1 = paste(param, value, distancefit, overlab, huntingareafit, maxhunters, OverallFit, sep = '\t')
+	line1 = paste(param, value, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
 	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 	# @£$: Uncomment these when running the scenarios with two parameters:
 	# param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
 	# value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
-	# line2 = paste(param2, value2, distancefit, overlab, huntingareafit, maxhunters, OverallFit, sep = '\t')
+	# line2 = paste(param2, value2, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
 	# write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
 
 
