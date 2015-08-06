@@ -85,7 +85,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 		temp = rep(NA, length(huntinglocs))
 		for (i in seq_along(huntinglocs))
 		{
-			thedist = dist(rbind(as.numeric(locations[i,.(HomeX, HomeY)]),
+			thedist = dist(rbind(as.numeric(locations[HunterID == j-1,.(HomeX, HomeY)]),
 				as.numeric(farms[FarmRef == huntinglocs[i],.(FarmCentroidX, FarmCentroidY)])))
 			temp[i] = thedist
 		}
