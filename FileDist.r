@@ -2,7 +2,7 @@
 # Just handy when e.g. a new exe needs to distributed
 library(R.utils)
 
-# List the directories:
+# List the parent directory of all the work directories
 pathtodirs = 'd:/almass/WorkDirectories/Hunter/HunterTestingAug2015/'
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
