@@ -30,7 +30,7 @@ library(reshape2)
 #library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work directory:
-setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/BaseWD/')  # The run directory
+setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/WD0/')  # The run directory
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
 runs = 5  # The number of runs
