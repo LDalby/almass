@@ -29,7 +29,7 @@ library(reshape2)
 
 # Setup work- and results directory:
 setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/BaseWD/')  # The run directory
-resultpath = 'd:/almass/Results/GooseManagement/Hunter/HunterTestingAug2015/Random/'  # Path where the results will be stored
+resultpath = './Results/'  # Path where the results will be stored
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
 runs = 5  # The number of runs
