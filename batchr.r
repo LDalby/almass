@@ -1,23 +1,25 @@
 # Title: batchr
-# Date: June 12 2015
+# Date: Aug 7 2015
 # Author: Lars Dalby
 
 # This script will run two tests of the fit of simulation results to data from the hunter survey
 # as well as copy the results from almass and the Hunter_Params.txt to a specified location.
 # The results from all the runs in the batch file will be collected in the file
 # ParameterFittingResults.txt and stored together with the other files.
-# In each scenario, be sure to change the result path - otherwise we will overwrite previous
-# data.
 # If running a scenario where more than one parameter is being changed you need to uncomment
 # a couple of lines in two places. Do a text search on these three characteres @£$ and you will
 # see what to do.
 # Finally, remember to reset the counter to 1 before starting a scenario. This is done by 
-# opening the file counter.txt and changing the number to 1.
+# opening the file counter.txt and changing the number to 1. Alternatively, I you set this
+# all up by using the FileDist.r script, it should already be taken care of.
 #
 # Before running this script check that you have the following files in the run directory:
 # 1: counter.txt
 # 2: HunterSurveyResultsDensity.csv
-# 3: HunterSurveyResultsDistance.csv
+# 3: HunterSurveyResultsDistanceJuly2015.txt
+# 4: batch.r
+# 5: PreRunSetup.r
+# Again, if you used FileDist.r then this should be taken care of.
 # --------------------------------------------------------------------------------------------# 
 
 # Load the packages we're going to need:
