@@ -41,14 +41,14 @@ lineno = seq(1, runs*params, params)
 counter = as.numeric(readLines('counter.txt'))
 
 # If this is the first run, set up the results files make a copy of the parameter list
-if(counter == 1 )
+if(counter == 1)
 {
-	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
-	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
 	# Set up the results directory
 	dir.create('Results')
 	resultpath = './Results/'
+	# Set up the headers in first run
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
+	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
 }
@@ -60,12 +60,12 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
 	line1 = paste(param, value, NA, NA, NA, NA, sep = '\t')
-	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	write(line1, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	# @£$: Uncomment these when running the scenarios with two parameters:
 # 	# param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
 # 	# value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
 # 	# line2 = paste(param2, value2, NA, NA, NA, NA,  sep = '\t')
-# 	# write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+# 	# write(line2, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
  }
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
@@ -151,13 +151,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	param = word(lines[lineno[counter]], 1)  # Get the parameter name
 	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
 	line1 = paste(param, value, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
-	write(line1, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	write(line1, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 
 	# @£$: Uncomment these when running the scenarios with two parameters:
 	# param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
 	# value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
 	# line2 = paste(param2, value2, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
-	# write(line2, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''), append = TRUE)
+	# write(line2, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 
 
 	# As the last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
