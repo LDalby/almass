@@ -3,7 +3,7 @@
 # Author: Lars Dalby
 # Date: 23 June 2015
 
-setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/BaseWD/')  # The run directory
+setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/WD0/')  # The run directory
 
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
