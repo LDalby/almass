@@ -69,6 +69,11 @@ val = seq(-0.01, -0.2, length.out = 100)
 GenerateParams('CLOSESTFARMPROBPARAMONE (float)' = val, write = TRUE)
 
 # 9
+setwd(paste0(pathtodirs, dirs[10])) 
+val = seq(-0.01, -0.2, length.out = ?)
+val2 = seq(100, 1000, length.out = 10)
+GenerateParams('CLOSESTFARMPROBPARAMONE (float)' = val,
+ 'GOOSE_MINFORAGEOPENNESS (float)' = val2,  write = TRUE)
 
 # 10
 
