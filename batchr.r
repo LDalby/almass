@@ -27,9 +27,8 @@ library(stringr)
 library(reshape2)
 #library(slackr)  # Only needed if you want Slack to give you updates on progress
 
-# Setup work- and results directory:
+# Setup work directory:
 setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/BaseWD/')  # The run directory
-resultpath = './Results/'  # Path where the results will be stored
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
 runs = 5  # The number of runs
@@ -45,6 +44,9 @@ if(counter == 1 )
 	# Set up the headers in first run
 	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste(resultpath, 'ParameterFittingResults.txt', sep = ''))
+	# Set up the results directory
+	dir.create('Results')
+	resultpath = './Results/'
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
 }
