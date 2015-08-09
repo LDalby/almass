@@ -36,7 +36,8 @@ setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/WD0/')  # The run d
 runs = 5  # The number of runs
 params = 1  # The number of paramters being modified per run 
 lineno = seq(1, runs*params, params)
-
+# Path to the results:
+resultpath = './Results/'
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
 
@@ -45,7 +46,6 @@ if(counter == 1)
 {
 	# Set up the results directory
 	dir.create('Results')
-	resultpath = './Results/'
 	# Set up the headers in first run
 	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))

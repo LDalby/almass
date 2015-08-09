@@ -12,7 +12,7 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 # the batchr and prerunsetup file.
 file1 = 'c:/MSVC/ALMaSS_CmdLine/x64/Release/ALMaSS_CmdLine.exe' 
 file2 = 'C:/Users/lada/Git/almass/counter.txt' 
-file3 = 'C:/Users/lada/Git/almass/batchr.r'
+file3 = 'C:/Users/lada/Git/almass/batchr.r'	
 file4 = 'C:/Users/lada/Git/almass/ErrorFile.txt'
 # file5 = 'C:/Users/lada/Git/almass/PreRunSetup.r'
 
