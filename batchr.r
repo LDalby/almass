@@ -74,11 +74,11 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 {
 	# Simulation results:
 	locations = fread('Hunter_Hunting_Locations.txt')
-	filename = paste(resultpath,'HuntingLocationsRun', counter, '.txt', sep ='')
+	filename = paste0(resultpath,'HuntingLocationsRun', counter, '.txt')
 	write.table(locations, file = filename, row.names = FALSE, sep = '\t')
 
 	farms = fread('Hunter_Hunting_Locations_Farms.txt')
-	filename = paste(resultpath, 'HuntingLocationsFarmRun', counter, '.txt', sep ='')
+	filename = paste0(resultpath, 'HuntingLocationsFarmRun', counter, '.txt')
 	write.table(farms, file = filename, row.names = FALSE, sep = '\t')
 	
 	idvars = c('HunterID','HunterType','HomeX','HomeY','NoFarmrefs')
