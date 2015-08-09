@@ -33,9 +33,11 @@ library(reshape2)
 setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/WD0/')  # The run directory
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
-runs = 5  # The number of runs
 params = 1  # The number of paramters being modified per run 
+paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
+runs = nrow(paramvals)/params
 lineno = seq(1, runs*params, params)
+
 # Path to the results:
 resultpath = './Results/'
 # Figure out how far we have come
