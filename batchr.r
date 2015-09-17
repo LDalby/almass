@@ -34,7 +34,7 @@ library(reshape2)
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
-params = length(unique(paramvals[, 1, with = FALSE])) # The number of paramters being modified per run 
+params = nrow(unique(paramvals[, 1, with = FALSE])) # The number of paramters being modified per run 
 runs = nrow(paramvals)/params
 lineno = seq(1, runs*params, params)
 
