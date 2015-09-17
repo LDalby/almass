@@ -1,4 +1,4 @@
-# Cooy file to x number of directories
+# Copy file to x number of directories
 # Just handy when e.g. a new exe needs to distributed
 library(R.utils)
 
