@@ -1,6 +1,7 @@
 # Copy file to x number of directories
 # Just handy when e.g. a new exe needs to distributed
 library(R.utils)
+library(ralmass)
 
 # List the parent directory of all the work directories
 pathtodirs = 'd:/almass/WorkDirectories/Hunter/HunterTestingAug2015/'
@@ -22,13 +23,15 @@ filestodist = c(file1, file2, file3, file4)
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
 	for (j in seq_along(filestodist)) {
-		file.copy(filestodist[j], to = paste0(pathtodirs, dirs[i]), overwrite = TRUE)
+		wd = paste0(pathtodirs, dirs[i])
+		file.copy(filestodist[j], to = wd, overwrite = TRUE)
+		AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
+		AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 	}
 }
 
 #------ Below here we ditribute the different parameters ------#
 
-library(ralmass)
 # Distribute the paramter values to run:
 # Careful here - check the index - first in dirs is 0
 # 0
