@@ -29,12 +29,12 @@ library(stringr)
 library(reshape2)
 #library(slackr)  # Only needed if you want Slack to give you updates on progress
 
-# Setup work directory:
-setwd('d:/almass/WorkDirectories/Hunter/HunterTestingAug2015/WD0/')  # The run directory
+# Setup work directory (done automatically when distributing the files, therefore blank):
+
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
-params = 1  # The number of paramters being modified per run 
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
+params = length(unique(paramvals[, 1, with = FALSE])) # The number of paramters being modified per run 
 runs = nrow(paramvals)/params
 lineno = seq(1, runs*params, params)
 
