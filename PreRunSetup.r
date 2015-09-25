@@ -1,7 +1,7 @@
 # PreRunSetup
 # Script to copy lines to TIALMaSSConfig pre run
 # Author: Lars Dalby
-# Date: 23 June 2015
+# Date: 25 Sep 2015
 
 library(data.table)
 
@@ -16,21 +16,19 @@ lineno = seq(1, runs*numberofparams, numberofparams)
 
 # This is needed again as we this time read it in as single lines (and not as a data.table)
 params = readLines('ParameterValues.txt')
-                  
+
 counter = as.numeric(readLines('counter.txt'))
 if(counter == 1)
 {
-	write('#---------- Start auto change ----------#', 'TIALMaSSConfig.cfg', append = TRUE)
+	write(paste0('#----------- Start auto change ', Sys.time(), ' ----------#'), 'TIALMaSSConfig.cfg', append = TRUE)
 }
-write(params[lineno[counter]], 'TIALMaSSConfig.cfg', append = TRUE)
-if(numberofparams > 1)
+for (i in 1:numberofparams) 
 {
-	for (i in 2:numberofparams) 
-	{
-		write(params[lineno[counter]+1], 'TIALMaSSConfig.cfg', append = TRUE)
-	}
+	TheParam = params[lineno[counter]+(i-1)]
+	write(TheParam, 'TIALMaSSConfig.cfg', append = TRUE)
 }
+
 if(counter == runs)
 {
-	write('#----------- End auto change -----------#', 'TIALMaSSConfig.cfg', append = TRUE)
+	write(paste0('#----------- End auto change ', Sys.time(), ' -----------#'), 'TIALMaSSConfig.cfg', append = TRUE)
 }
