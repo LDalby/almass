@@ -1,16 +1,13 @@
 # Title: batchr
-# Date: Aug 7 2015
+# Date: Sep 25 2015
 # Author: Lars Dalby
 
 # This script will run two tests of the fit of simulation results to data from the hunter survey
 # as well as copy the results from almass and the Hunter_Params.txt to a specified location.
 # The results from all the runs in the batch file will be collected in the file
 # ParameterFittingResults.txt and stored together with the other files.
-# If running a scenario where more than one parameter is being changed you need to uncomment
-# a couple of lines in two places. Do a text search on these three characteres @£$ and you will
-# see what to do.
-# Finally, remember to reset the counter to 1 before starting a scenario. This is done by 
-# opening the file counter.txt and changing the number to 1. Alternatively, I you set this
+# Remember to reset the counter to 1 before starting a scenario. This is done by 
+# opening the file counter.txt and changing the number to 1. Alternatively, if you set this
 # all up by using the FileDist.r script, it should already be taken care of.
 #
 # Before running this script check that you have the following files in the run directory:
@@ -34,12 +31,13 @@ library(reshape2)
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
-params = nrow(unique(paramvals[, 1, with = FALSE])) # The number of paramters being modified per run 
-runs = nrow(paramvals)/params
-lineno = seq(1, runs*params, params)
+numberofparams = nrow(unique(paramvals[, 1, with = FALSE])) # The number of paramters being modified per run 
+runs = nrow(paramvals)/numberofparams
+lineno = seq(1, runs*numberofparams, numberofparams)
 
 # Path to the results:
 resultpath = './Results/'
+
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
 
@@ -59,16 +57,13 @@ if(counter == 1)
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 {
 	lines = readLines('ParameterValues.txt')
-	param = word(lines[lineno[counter]], 1)  # Get the parameter name
-	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
-	line1 = paste(param, value, NA, NA, NA, NA, sep = '\t')
-	write(line1, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
-	# @£$: Uncomment these when running the scenarios with two parameters:
-# 	# param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
-# 	# value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
-# 	# line2 = paste(param2, value2, NA, NA, NA, NA,  sep = '\t')
-# 	# write(line2, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
- }
+	for (i in 1:numberofparams) {
+		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
+		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
+		line = paste(param, value, NA, NA, NA, NA,  sep = '\t')
+		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+	}
+}
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
 
@@ -147,20 +142,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	OverallFit = distancefit + overlab
 
 	# Write out the results of the parameter fitting and prepare for next run:
-	# Clean file for comments and empty lines:
 	lines = readLines('ParameterValues.txt')
-
-	param = word(lines[lineno[counter]], 1)  # Get the parameter name
-	value = as.numeric(str_split(lines[lineno[counter]], '=')[[1]][2])  # Get the value
-	line1 = paste(param, value, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
-	write(line1, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
-
-	# @£$: Uncomment these when running the scenarios with two parameters:
-	# param2 = word(lines[lineno[counter]+1], 1)  # Get the parameter name
-	# value2 = as.numeric(str_split(lines[lineno[counter]+1], '=')[[1]][2])  # Get the value
-	# line2 = paste(param2, value2, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
-	# write(line2, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
-
+	for (i in 1:numberofparams) {
+		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
+		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
+		line = paste(param, value, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
+		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+	}
 
 	# As the last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
 	# We do this because almass might exit without distributing hunters. If that happens files from a previous
