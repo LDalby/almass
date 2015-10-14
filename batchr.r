@@ -47,7 +47,7 @@ if(counter == 1)
 	# Set up the results directory
 	dir.create('Results')
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'MaxHunters', 'OverallFit', sep = '\t')
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'LegalDensities', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -60,7 +60,10 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, NA, NA, NA, NA,  sep = '\t')
+		if(param == 'HUNTERS_MAXDENSITY') {
+			MaxDensity = value  # Store the parameter setting checking later
+		}
+		line = paste(param, value, NA, NA, NA, NA, NA,  sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 }
@@ -137,7 +140,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	overlab = round(CalcOverlab(density, species = 'Hunter'), 3)  #see ?CalcOverlab for documentation
 	# Find the maximum number of hunters on any farm:
 	maxhunters = max(farms[,NoHunters])
-	
+	# Was there any illegal densities?
+	AllLegal = CheckDensity(farms, MaxDensity)
 	# Calculate the overall model fit
 	OverallFit = distancefit + overlab
 
@@ -146,7 +150,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, distancefit, overlab, maxhunters, OverallFit, sep = '\t')
+		line = paste(param, value, distancefit, overlab, AllLegal, maxhunters, OverallFit, sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 
