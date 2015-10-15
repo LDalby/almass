@@ -173,6 +173,9 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 # slackrSetup(channel="@name", api_token = INSERT YOUR TOKEN)
 # slackr(paste(counter))
 
+# Report progress to console:
+cat(paste0('Run number ', counter, '\n'))
+
 # Very last thing is to update the counter:
 counter = counter+1  
 write(counter, file = 'counter.txt', append = FALSE)
