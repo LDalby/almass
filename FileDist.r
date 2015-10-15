@@ -4,7 +4,7 @@ library(R.utils)
 library(ralmass)
 
 # List the parent directory of all the work directories
-pathtodirs = 'd:/almass/WorkDirectories/Hunter/HunterTestingAug2015/'
+pathtodirs = 'e:/almass/WorkDirectories/Hunter/HunterTestingAug2015/'
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
 
