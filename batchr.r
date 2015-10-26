@@ -141,7 +141,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 
     #------------ Number of hunters per farm ------------#
 	# Load the survey results
-	survey = fread('e:/almass/WorkDirectories/Hunter/HunterSurveyResultsFarm.csv')
+	survey = fread('HunterSurveyResultsFarm.csv')
 	simulated = farms[NoHunters > 0, .(NoHunters, Type)]
 	setnames(simulated, old = 'NoHunters', new = 'Numbers')
 	no.hunters = rbind(survey, simulated)
