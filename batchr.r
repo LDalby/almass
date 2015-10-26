@@ -47,7 +47,7 @@ if(counter == 1)
 	# Set up the results directory
 	dir.create('Results')
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'NoFarmFit', 
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'NoHunterFit', 
 		'LegalDensities', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
