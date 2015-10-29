@@ -48,7 +48,7 @@ if(counter == 1)
 	dir.create('Results')
 	# Set up the headers in first run
 	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'NoHunterFit', 
-		'LegalDensities', 'MaxHunters', 'OverallFit', sep = '\t')
+		'NoHuntersFitOverlab', 'LegalDensities', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -61,7 +61,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, NA, NA, NA, NA, NA, NA,  sep = '\t')
+		line = paste(param, value, NA, NA, NA, NA, NA, NA, NA,  sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 }
@@ -109,17 +109,10 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	# The survey results:
 	huntersurvey = fread('HunterSurveyResultsDistanceJuly2015.txt')
 	# The simulation results needs to be binned manually and added to the survey data:
-	huntersurvey[Bin == 0, ModelRes:= length(locations[Bin == 0, Bin])]
-	huntersurvey[Bin == 10, ModelRes:= length(locations[Bin == 10, Bin])]
-	huntersurvey[Bin == 20, ModelRes:= length(locations[Bin == 20, Bin])]
-	huntersurvey[Bin == 40, ModelRes:= length(locations[Bin == 40, Bin])]
-	huntersurvey[Bin == 60, ModelRes:= length(locations[Bin == 60, Bin])]
-	huntersurvey[Bin == 80, ModelRes:= length(locations[Bin == 80, Bin])]
-	huntersurvey[Bin == 100, ModelRes:= length(locations[Bin == 100, Bin])]
-	huntersurvey[Bin == 150, ModelRes:= length(locations[Bin == 150, Bin])]
-	huntersurvey[Bin == 200, ModelRes:= length(locations[Bin == 200, Bin])]
-	huntersurvey[Bin == 201, ModelRes:= length(locations[Bin == 201, Bin])]
-
+	TheBins = c(0,10,20,40,60,80,100,150,200,201)
+	for (i in seq_along(TheBins)) {
+		huntersurvey[Bin == TheBins[i], ModelRes:= length(locations[Bin == TheBins[i], Bin])]
+	}
 	huntersurvey[, propSim:=ModelRes/sum(ModelRes)]
 	huntersurvey[, propSur:=RespondTH_JM/sum(RespondTH_JM)]
 
@@ -145,7 +138,25 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	simulated = farms[NoHunters > 0, .(NoHunters, Type)]
 	setnames(simulated, old = 'NoHunters', new = 'Numbers')
 	no.hunters = rbind(survey, simulated)
-	no.huntersFit = round(CalcOverlab(no.hunters, species = 'Hunter'), 3)
+	no.huntersFitOverlab = round(CalcOverlab(no.hunters, species = 'Hunter'), 3)
+	# Least squares
+	survey[, N:=.N, by = Numbers]
+	survey = unique(survey)
+	setnames(survey, old = 'Numbers', new = 'Bin')
+	bins = data.table('N' = c(0,0), 'Type' = rep('Fieldobs',2), 'Bin' = c(8, 12))
+	survey = rbind(survey, bins)
+	setkey(survey, Bin)
+	# The simulation results needs to be binned manually and added to the survey data:
+	for (i in 1:11) {
+	survey[Bin == i, ModelRes:= length(farms[NoHunters == i, NoHunters])]
+	}
+	survey[Bin == 12, ModelRes:= length(farms[NoHunters >= 12, NoHunters])]
+
+	survey[, propSim:=ModelRes/sum(ModelRes)]
+	survey[, propSur:=N/sum(N)]
+
+	no.huntersFit = with(survey, 1-sum((propSim-propSur)^2))
+
 	# Calculate the overall model fit
 	OverallFit = distancefit + overlab + no.huntersFit
 
@@ -158,8 +169,8 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 			AllLegal = CheckDensity(farms, value)
 		}
 		if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
-		line = paste(param, value, distancefit, overlab, no.huntersFit, AllLegal,
-		 maxhunters, OverallFit, sep = '\t')
+		line = paste(param, value, distancefit, overlab, no.huntersFit, no.huntersFitOverlab,
+		 AllLegal, maxhunters, OverallFit, sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 
