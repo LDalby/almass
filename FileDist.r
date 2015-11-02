@@ -58,8 +58,8 @@ val = seq(0, 2.2, length.out = 10)
 setwd(paste0(pathtodirs, dirs[6])) 
 GenerateParams('HUNTERS_MAXDENSITY' = val, write = TRUE)
 # 6
-val = seq(700, 1900, length.out = 13)
-val2 = seq(1.18, 2.5, length.out = 20)
+val = seq(100, 2000, length.out = 20)
+val2 = seq(0.1, 2.5, length.out = 25)
 setwd(paste0(pathtodirs, dirs[7])) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val,
 				 'HUNTERS_MAXDENSITY' = val2, write = TRUE)
@@ -74,7 +74,6 @@ setwd(paste0(pathtodirs, dirs[9]))
 val = seq(-0.001, -0.01, length.out = 100)
 GenerateParams('CLOSESTFARMPROBPARAMONE' = val, write = TRUE)
 EditBat(paste0(pathtodirs, dirs[9]))
-
 # 9
 setwd(paste0(pathtodirs, dirs[10])) 
 val = seq(-0.01, -0.2, length.out = ?)
