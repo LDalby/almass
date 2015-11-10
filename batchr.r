@@ -48,7 +48,8 @@ if(counter == 1)
 	dir.create('Results')
 	# Set up the headers in first run
 	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'NoHunterFit', 
-		'NoHuntersFitOverlab', 'LegalDensities', 'MaxHunters', 'OverallFit', sep = '\t')
+		'NoHuntersFitOverlab', 'MeanDiffNoHunt', 'LegalDensities', 'MaxHunters',
+		 'OverallFit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -61,7 +62,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, NA, NA, NA, NA, NA, NA, NA,  sep = '\t')
+		line = paste(param, value, NA, NA, NA, NA, NA, NA, NA, NA,  sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 }
@@ -135,10 +136,16 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
     #------------ Number of hunters per farm ------------#
 	# Load the survey results
 	survey = fread('HunterSurveyResultsFarm.csv')
+
 	simulated = farms[NoHunters > 0, .(NoHunters, Type)]
 	setnames(simulated, old = 'NoHunters', new = 'Numbers')
 	no.hunters = rbind(survey, simulated)
 	no.huntersFitOverlab = round(CalcOverlab(no.hunters, species = 'Hunter'), 3)
+	
+	# Difference in mean number of hunters per farm
+	avg.no.hunt = mean(survey[,Numbers])
+	avg.simulated = mean(simulated[,Numbers])
+	MeanDiffNoHunt = abs(avg.no.hunt - avg.simulated)
 	# Least squares
 	survey[, N:=.N, by = Numbers]
 	survey = unique(survey)
@@ -170,7 +177,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 		}
 		if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
 		line = paste(param, value, distancefit, overlab, no.huntersFit, no.huntersFitOverlab,
-		 AllLegal, maxhunters, OverallFit, sep = '\t')
+		 MeanDiffNoHunt, AllLegal, maxhunters, OverallFit, sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 

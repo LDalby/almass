@@ -80,6 +80,12 @@ val = seq(-0.01, -0.2, length.out = ?)
 val2 = seq(100, 1000, length.out = 10)
 GenerateParams('CLOSESTFARMPROBPARAMONE' = val,
  'GOOSE_MINFORAGEOPENNESS' = val2,  write = TRUE)
-
 # 10
+setwd(paste0(pathtodirs, dirs[11])) 
+val = seq(-0.0001, -0.01, length.out = 20)
+val2 = seq(500, 1400, length.out = 10)
+val3 = seq(0.1, 1.5, length.out = 10)
+GenerateParams('CLOSESTFARMPROBPARAMONE' = val,
+ 				'GOOSE_MINFORAGEOPENNESS' = val2, 
+ 				'HUNTERS_MAXDENSITY' = val3, write = TRUE)
 
