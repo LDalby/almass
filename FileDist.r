@@ -36,56 +36,58 @@ for (i in seq_along(dirs)) {
 # Careful here - check the index - first in dirs is 0
 # 0
 val = seq(100, 500, length.out = 5)
-setwd(paste0(pathtodirs, dirs[1]))  
+setwd(paste0(pathtodirs, 'WD0'))  
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
 # 1
-setwd(paste0(pathtodirs, dirs[2]))  # The first two in fact ignore these
+setwd(paste0(pathtodirs, 'WD1'))  # The first two in fact ignore these
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
 # 2 
 val = seq(100, 1000, length.out = 10)
-setwd(paste0(pathtodirs, dirs[3])) 
+setwd(paste0(pathtodirs, 'WD2')) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
 # 3
 val = seq(0, 2.2, length.out = 10)
-setwd(paste0(pathtodirs, dirs[4])) 
+setwd(paste0(pathtodirs, 'WD3')) 
 GenerateParams('HUNTERS_MAXDENSITY' = val, write = TRUE)
 # 4
 val = seq(100, 1000, length.out = 10)
-setwd(paste0(pathtodirs, dirs[5])) 
+setwd(paste0(pathtodirs, 'WD4')) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
 # 5
 val = seq(0, 2.2, length.out = 10)
-setwd(paste0(pathtodirs, dirs[6])) 
+setwd(paste0(pathtodirs, 'WD5')) 
 GenerateParams('HUNTERS_MAXDENSITY' = val, write = TRUE)
 # 6
 val = seq(100, 2000, length.out = 20)
 val2 = seq(0.1, 2.5, length.out = 25)
-setwd(paste0(pathtodirs, dirs[7])) 
+setwd(paste0(pathtodirs, 'WD6')) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val,
 				 'HUNTERS_MAXDENSITY' = val2, write = TRUE)
-EditBat(paste0(pathtodirs, dirs[7]))
+EditBat(paste0(pathtodirs, 'WD6'))
 # 7 same values as 6
-setwd(paste0(pathtodirs, dirs[8])) 
+setwd(paste0(pathtodirs, 'WD7')) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val,
 				 'HUNTERS_MAXDENSITY' = val2, write = TRUE)
-EditBat(paste0(pathtodirs, dirs[8]))
+EditBat(paste0(pathtodirs, 'WD7'))
 # 8
-setwd(paste0(pathtodirs, dirs[9])) 
+setwd(paste0(pathtodirs, 'WD8')) 
 val = seq(-0.001, -0.01, length.out = 100)
 GenerateParams('CLOSESTFARMPROBPARAMONE' = val, write = TRUE)
-EditBat(paste0(pathtodirs, dirs[9]))
+EditBat(paste0(pathtodirs, 'WD8'))
 # 9
-setwd(paste0(pathtodirs, dirs[10])) 
-val = seq(-0.01, -0.2, length.out = ?)
-val2 = seq(100, 1000, length.out = 10)
+setwd(paste0(pathtodirs, 'WD9')) 
+val = seq(-0.0001, -0.01, length.out = 20)
+val2 = seq(100, 2000, length.out = 20)
 GenerateParams('CLOSESTFARMPROBPARAMONE' = val,
  'GOOSE_MINFORAGEOPENNESS' = val2,  write = TRUE)
+EditBat(paste0(pathtodirs, 'WD9'))
 # 10
-setwd(paste0(pathtodirs, dirs[11])) 
+setwd(paste0(pathtodirs, 'WD10')) 
 val = seq(-0.0001, -0.01, length.out = 20)
 val2 = seq(500, 1400, length.out = 10)
 val3 = seq(0.1, 1.5, length.out = 10)
 GenerateParams('CLOSESTFARMPROBPARAMONE' = val,
  				'GOOSE_MINFORAGEOPENNESS' = val2, 
  				'HUNTERS_MAXDENSITY' = val3, write = TRUE)
+EditBat(paste0(pathtodirs, 'WD10'))
 
