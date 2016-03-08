@@ -1,8 +1,8 @@
-# Title: batchr
-# Date: Sep 25 2015
+# Title: goosebatchr
+# Updated: March 8th 2016
 # Author: Lars Dalby
 
-# This script will run two tests of the fit of simulation results to data from the hunter survey
+# This script will run tests of the fit of simulation results to field data on geese
 # as well as copy the results from almass and the Hunter_Params.txt to a specified location.
 # The results from all the runs in the batch file will be collected in the file
 # ParameterFittingResults.txt and stored together with the other files.
@@ -12,8 +12,8 @@
 #
 # Before running this script check that you have the following files in the run directory:
 # 1: counter.txt
-# 2: HunterSurveyResultsDensity.csv
-# 3: HunterSurveyResultsDistanceJuly2015.txt
+# 2:
+# 3:
 # 4: batch.r
 # 5: PreRunSetup.r
 # Again, if you used FileDist.r then this should be taken care of.
@@ -47,11 +47,10 @@ if(counter == 1)
 	# Set up the results directory
 	dir.create('Results')
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'NoHunterFit', 
-		'NoHuntersFitOverlab', 'MeanDiffNoHunt', 'LegalDensities', 'MaxHunters',
+	line = paste('Parameter', 'Value', 'WeightFit', 'FlockSizeFit', 'HabitatUseFit', 
 		 'OverallFit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
-	# Copy the Hunter params to the result folder for reference and checking
+	# Copy the Goose params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
 }
 
@@ -62,7 +61,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, NA, NA, NA, NA, NA, NA, NA, NA,  sep = '\t')
+		line = paste(param, value, NA, NA, NA, NA, sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 }
