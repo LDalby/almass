@@ -3,7 +3,7 @@
 # Author: Lars Dalby
 
 # This script will run tests of the fit of simulation results to field data on geese
-# as well as copy the results from almass and the Hunter_Params.txt to a specified location.
+# as well as copy the results from almass and the Goose_Params.txt to a specified location.
 # The results from all the runs in the batch file will be collected in the file
 # ParameterFittingResults.txt and stored together with the other files.
 # Remember to reset the counter to 1 before starting a scenario. This is done by 
@@ -50,8 +50,7 @@ if(counter == 1)
 	# Set up the results directory
 	dir.create('Results')
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'WeightFit', 'FlockSizeFit', 'FlockSizeFitTimed',
-		'HabitatUseFit',  'OverallFit', sep = '\t')
+	line = paste('Parameter', 'Value', 'FitType', 'Fit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Goose params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -64,7 +63,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, NA, NA, NA, NA, NA, sep = '\t')
+		line = paste(param, value, NA, NA, sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 }
@@ -74,6 +73,8 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 resultpath = 'c:/MSV/WorkDirectory/'
 forage = fread(paste(resultpath, 'GooseFieldForageData.txt', sep = ''))
 forage = fread('GooseFieldForageData.txt', showProgress = FALSE)
+forage = ClassifyHabitatUse(forage, species = 'goose')
+
 if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 {
 	# Field data:
@@ -118,7 +119,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	Weightfit = CalcWeightFit(mass, field)
 
 # --------------------------------------------------------------------------------------------#
-#                                    Habitat use                                              #
+#                                      Habitat use                                            #
 # --------------------------------------------------------------------------------------------#
 	FieldData = fread('HabitatUseAll2014.csv')
 	FieldData[HabitatUse == 'Stubble undersown', HabitatUse:='Grass']
@@ -153,18 +154,30 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	setkeyv(hb, c('Species', 'Month'))
 	
 	HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage)
-
+	HabMonths = nrow(unique(HabitatUseFit[, .(Month)]))
+	HabitatUseFit[, SeasonFit:=sum(Fit, na.rm = TRUE)/HabMonths, by = Species]
+	HabitatUseFit = unique(HabitatUseFit[, .(Species, SeasonFit)])
+	HabUsePF = HabitatUseFit[Species == 'Pinkfoot', SeasonFit]
+	HabUseGL = HabitatUseFit[Species == 'Greylag', SeasonFit]
+	HabUseBN = HabitatUseFit[Species == 'Barnacle', SeasonFit]
 	# Calculate the overall model fit
-	OverallFit = Weightfit + HabitatUseFit + FlockSizeFitTimed
+	PinkFootFit = Weightfit + HabUsePF + DegreeOverlapPT
+	GreylagFit = HabUseGL + DegreeOverlapGT
+	BarnacleFit = HabUseBN + DegreeOverlapBT
 
 	# Write out the results of the parameter fitting and prepare for next run:
+	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapPT,
+		 HabUsePF, HabUseGL, HabUseBN)
+	FitNames = c('Weightfit', 'DegreeOverlapPT', 'DegreeOverlapGT', 'DegreeOverlapPT',
+		 'HabUsePF', 'HabUseGL', 'HabUseBN')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, Weightfit, FlockSizeFit, FlockSizeFitTimed,
-		 HabitatUseFit, OverallFit, OverallFit, sep = '\t')
-		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+		for (j in seq_along(FitNames)) {
+			line = paste(param, value, FitNames[j], FitVect[j], sep = '\t')
+			write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+		}
 	}
 	# As the last thing we delete the goose output files
 	# We do this in case almass exits due to an error. If that happens files from a previous
