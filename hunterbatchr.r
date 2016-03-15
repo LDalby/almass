@@ -78,7 +78,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 
 	farms = fread('Hunter_Hunting_Locations_Farms.txt')
 	filename = paste0(resultpath, 'HuntingLocationsFarmRun', counter, '.txt')
-	write.table(farms, file = filename, row.names = FALSE, sep = '\t')
+	write.table(farms, file = filename, row.names = FALSE, quote = FALSE, sep = '\t')
 	
 	idvars = c('HunterID','HunterType','HomeX','HomeY','NoFarmrefs')
 	dist = rep(NA, nrow(locations))
