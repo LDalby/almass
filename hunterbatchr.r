@@ -72,7 +72,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 {
 	# Simulation results:
-	locations = fread('Hunter_Hunting_Locations.txt')
+	locations = fread('Hunter_Hunting_Locations.txt', skip = 1)  # Skip the counter
 	filename = paste0(resultpath,'HuntingLocationsRun', counter, '.txt')
 	write.table(locations, file = filename, row.names = FALSE, sep = '\t')
 
