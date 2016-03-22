@@ -48,7 +48,7 @@ if(counter == 1)
 	dir.create('Results')
 	# Set up the headers in first run
 	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'NoHunterFit', 
-		'NoHuntersFitOverlab', 'MeanDiffNoHunt', 'LegalDensities', 'MaxHunters',
+		'NoHuntersFitOverlap', 'MeanDiffNoHunt', 'LegalDensities', 'MaxHunters',
 		 'OverallFit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
@@ -72,13 +72,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 {
 	# Simulation results:
-	locations = fread('Hunter_Hunting_Locations.txt')
+	locations = fread('Hunter_Hunting_Locations.txt', skip = 1)  # Skip the counter
 	filename = paste0(resultpath,'HuntingLocationsRun', counter, '.txt')
 	write.table(locations, file = filename, row.names = FALSE, sep = '\t')
 
 	farms = fread('Hunter_Hunting_Locations_Farms.txt')
 	filename = paste0(resultpath, 'HuntingLocationsFarmRun', counter, '.txt')
-	write.table(farms, file = filename, row.names = FALSE, sep = '\t')
+	write.table(farms, file = filename, row.names = FALSE, quote = FALSE, sep = '\t')
 	
 	idvars = c('HunterID','HunterType','HomeX','HomeY','NoFarmrefs')
 	dist = rep(NA, nrow(locations))
@@ -129,7 +129,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	# Collect the survey and sim results:
 	density = rbind(survey, simulated)
 	# Asses the fit
-	overlab = round(CalcOverlab(density, species = 'Hunter'), 3)  #see ?CalcOverlab for documentation
+	overlap = round(CalcOverlap(density, species = 'Hunter'), 3)  #see ?CalcOverlap for documentation
 	# Find the maximum number of hunters on any farm:
 	maxhunters = max(farms[,NoHunters])
 
@@ -140,7 +140,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	simulated = farms[NoHunters > 0, .(NoHunters, Type)]
 	setnames(simulated, old = 'NoHunters', new = 'Numbers')
 	no.hunters = rbind(survey, simulated)
-	no.huntersFitOverlab = round(CalcOverlab(no.hunters, species = 'Hunter'), 3)
+	no.huntersFitOverlap = round(CalcOverlap(no.hunters, species = 'Hunter'), 3)
 	
 	# Difference in mean number of hunters per farm
 	avg.no.hunt = mean(survey[,Numbers])
@@ -165,7 +165,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	no.huntersFit = with(survey, 1-sum((propSim-propSur)^2))
 
 	# Calculate the overall model fit
-	OverallFit = distancefit + overlab + no.huntersFit
+	OverallFit = distancefit + overlap + no.huntersFit
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	lines = readLines('ParameterValues.txt')
@@ -176,7 +176,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 			AllLegal = CheckDensity(farms, value)
 		}
 		if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
-		line = paste(param, value, distancefit, overlab, no.huntersFit, no.huntersFitOverlab,
+		line = paste(param, value, distancefit, overlap, no.huntersFit, no.huntersFitOverlap,
 		 MeanDiffNoHunt, AllLegal, maxhunters, OverallFit, sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
