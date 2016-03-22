@@ -41,7 +41,7 @@ val = seq(100, 500, length.out = 5)
 setwd(paste0(pathtodirs, 'WD0'))  
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
 # 1
-setwd(paste0(pathtodirs, 'WD1'))  # The first two in fact ignore these
+setwd(paste0(pathtodirs, 'WD1'))
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
 # 2 
 val = seq(100, 1000, length.out = 10)
