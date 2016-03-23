@@ -109,16 +109,17 @@ setwd(wdpath)
 GenerateParams('GOOSE_ROOSTLEAVINGLIKELYHOOD' = val, write = TRUE)
 EditBat(wdpath)
 # Distance penalty
-val = seq(0, 100, length.out = 10)
-wdpath = paste0(pathtodirs, dirs[11])
+val = seq(0.001, 1, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[12])
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_DISTPENALTY' = val, write = TRUE)
 EditBat(wdpath)
-
-
-
-
-
+# Memory duration
+val = seq(0, 100, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[13])
+setwd(wdpath) 
+GenerateParams('GOOSE_MEM_MINMEMVALUE' = val, write = TRUE)
+EditBat(wdpath)
 
 # Hunter parameter fitting
 # Careful here - check the index - first in dirs is 0
