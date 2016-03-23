@@ -4,7 +4,7 @@ library(R.utils)
 library(ralmass)
 
 # List the parent directory of all the work directories
-pathtodirs = 'e:/almass/WorkDirectories/Hunter/HunterTestingMarch2016/'
+pathtodirs = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
 
@@ -14,13 +14,15 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 # file1 = 'c:/MSV/ALMaSS_CmdLine/x64/Release/ALMaSS_CmdLine.exe' 
 file1 = 'c:/MSV/ALMaSS_CmdLine/x64/Release/ALMaSS_CmdLine.exe' 
 file2 = 'C:/Users/lada/Git/almass/counter.txt' 
-file3 = 'C:/Users/lada/Git/almass/hunterbatchr.r'	
+file3 = 'C:/Users/lada/Git/almass/goosebatchr.r'	
 file4 = 'C:/Users/lada/Git/almass/ErrorFile.txt'
 file5 = 'C:/Users/lada/Git/almass/PreRunSetup.r'
+# Species specific things:
+file6 = 'o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv'
+file7 = 'o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv'
+file8 = 'o:/ST_GooseProject/Field data/observations_PG_01Jan2010-18Jan2016_API.xlsx'
 
-# filestodist = c(file1, file2, file3, file4, file5)
-filestodist = c(file2, file3, file4, file5)
-# filestodist = c(file1, file2, file3, file4)
+filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8)
 
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
@@ -28,13 +30,97 @@ for (i in seq_along(dirs)) {
 	for (j in seq_along(filestodist)) {
 		file.copy(filestodist[j], to = wd, overwrite = TRUE)
 	}
-	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'hunterbatchr.r') 
+	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 }
 
 #------ Below here we ditribute the different parameters ------#
 
 # Distribute the paramter values to run:
+# Goose parameter fitting
+# Openness
+val = seq(100, 2000, length.out = 5)
+wdpath = paste0(pathtodirs, dirs[1])
+setwd(wdpath) 
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
+EditBat(wdpath)
+# Following likelyhood
+val = seq(0, 10000, length.out = 10)
+val1 = seq(0, 10000, length.out = 10)
+val2 = seq(0, 10000, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[2])
+setwd(wdpath) 
+GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = val,
+			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = val1,
+			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = val2,
+			    write = TRUE)
+EditBat(wdpath)
+# Max appetite scaler
+val = seq(1, 10, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[3])
+setwd(wdpath) 
+GenerateParams('GOOSE_MAXAPPETITESCALER' = val, write = TRUE)
+EditBat(wdpath)
+# Max energy reserve proportion
+val = seq(1, 10, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[4])
+setwd(wdpath) 
+GenerateParams('GOOSE_MAXENERGYRESERVEPROPORTION' = val, write = TRUE)
+EditBat(wdpath)
+# The leaving threshold
+val = seq(0.5, 1.5, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[5])
+setwd(wdpath) 
+GenerateParams('GOOSE_LEAVINGTHRESHOLD' = val, write = TRUE)
+EditBat(wdpath)
+# Forage distance
+val = seq(5000, 20000, length.out = 10)
+val1 = seq(10000, 30000, length.out = 10)
+val2 = seq(1000, 10000, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[6])
+setwd(wdpath) 
+GenerateParams('GOOSE_FORAGEDIST_BN' = val,
+			   'GOOSE_FORAGEDIST_PF' = val1,
+			   'GOOSE_FORAGEDIST_GL' = val2,
+			    write = TRUE)
+EditBat(wdpath)
+# Min forage decay rate
+val = seq(0.9, 1, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[7])
+setwd(wdpath) 
+GenerateParams('GOOSE_MINFORAGEDECAYRATE' = val, write = TRUE)
+EditBat(wdpath)
+# Energy calibration
+val = seq(0.9, 1, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[8])
+setwd(wdpath) 
+GenerateParams('GOOSE_ENERGYCALIBRATION' = val, write = TRUE)
+EditBat(wdpath)
+# Goose feeding time
+val = seq(0.75, 1, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[9])
+setwd(wdpath) 
+GenerateParams('GOOSE_FEEDINGTIME' = val, write = TRUE)
+EditBat(wdpath)
+# Roost leaving likelyhood
+val = seq(0, 100, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[11])
+setwd(wdpath) 
+GenerateParams('GOOSE_ROOSTLEAVINGLIKELYHOOD' = val, write = TRUE)
+EditBat(wdpath)
+# Distance penalty
+val = seq(0, 100, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[11])
+setwd(wdpath) 
+GenerateParams('GOOSE_MEM_DISTPENALTY' = val, write = TRUE)
+EditBat(wdpath)
+
+
+
+
+
+
+# Hunter parameter fitting
 # Careful here - check the index - first in dirs is 0
 # 0
 val = seq(100, 500, length.out = 5)

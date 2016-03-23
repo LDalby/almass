@@ -3,7 +3,7 @@
 # Author: Lars Dalby
 
 # This script will run tests of the fit of simulation results to field data on geese
-# as well as copy the results from almass and the Goose_Params.txt to a specified location.
+# as well as copy the results from almass and the ParameterValues.txt to a specified location.
 # The results from all the runs in the batch file will be collected in the file
 # ParameterFittingResults.txt and stored together with the other files.
 # Remember to reset the counter to 1 before starting a scenario. This is done by 
@@ -92,9 +92,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	melted[, Type:='Simulated']
 	dists = rbind(melted, flocks)
 
-	DegreeOverlapB = round(CalcOverlab(dists, species = 'Barnacle'), digits = 2)
-	DegreeOverlapP = round(CalcOverlab(dists, species = 'Pinkfoot'), digits = 2)
-	DegreeOverlapG = round(CalcOverlab(dists, species = 'Greylag'), digits = 2)
+	DegreeOverlapB = round(CalcOverlap(dists, species = 'Barnacle'), digits = 2)
+	DegreeOverlapP = round(CalcOverlap(dists, species = 'Pinkfoot'), digits = 2)
+	DegreeOverlapG = round(CalcOverlap(dists, species = 'Greylag'), digits = 2)
 
 	# Simulation results - timed counts:
 	simflocks = forage[Geese > 0, .(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
@@ -104,9 +104,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	melted[, Type:='Simulated']
 	distsTimed = rbind(melted, flocks)
 	
-	DegreeOverlapBT = round(CalcOverlab(distsTimed, species = 'Barnacle'), digits = 2)
-	DegreeOverlapPT = round(CalcOverlab(distsTimed, species = 'Pinkfoot'), digits = 2)
-	DegreeOverlapGT = round(CalcOverlab(distsTimed, species = 'Greylag'), digits = 2)
+	DegreeOverlapBT = round(CalcOverlap(distsTimed, species = 'Barnacle'), digits = 2)
+	DegreeOverlapPT = round(CalcOverlap(distsTimed, species = 'Pinkfoot'), digits = 2)
+	DegreeOverlapGT = round(CalcOverlap(distsTimed, species = 'Greylag'), digits = 2)
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#

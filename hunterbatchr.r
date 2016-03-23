@@ -3,7 +3,7 @@
 # Author: Lars Dalby
 
 # This script will run two tests of the fit of simulation results to data from the hunter survey
-# as well as copy the results from almass and the Hunter_Params.txt to a specified location.
+# as well as copy the results from almass and the ParameterValues.txt to a specified location.
 # The results from all the runs in the batch file will be collected in the file
 # ParameterFittingResults.txt and stored together with the other files.
 # Remember to reset the counter to 1 before starting a scenario. This is done by 
