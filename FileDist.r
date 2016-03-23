@@ -120,6 +120,12 @@ wdpath = paste0(pathtodirs, dirs[13])
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = val, write = TRUE)
 EditBat(wdpath)
+# Grain decay rate
+val = seq(0.7, 1, length.out = 10)
+wdpath = paste0(pathtodirs, dirs[14])
+setwd(wdpath) 
+GenerateParams('GOOSE_GRAINDECAYRATE' = val, write = TRUE)
+EditBat(wdpath)
 
 # Hunter parameter fitting
 # Careful here - check the index - first in dirs is 0
