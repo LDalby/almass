@@ -127,31 +127,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	FieldData[, Prop:=N/NMTotal]
 	FieldData[rep(seq(.N),N), .(Month, HabitatUse, N, Species, NMTotal, Prop), by = Species]
 	
-	forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]
-	# Pinkfoot:
-	hbpf = forage[Month > 8 | Month == 1, .(Pinkfoot, HabitatUsePF, Month)]
-	hbpf[, Species:='Pinkfoot']
-	hbpf = hbpf[complete.cases(hbpf),]
-	setnames(hbpf, old = c('HabitatUsePF', 'Pinkfoot'), new = c('HabitatUse', 'N'))
-	# Greylag:
-	hbgl = forage[Month > 8 | Month == 1, .(Greylag, HabitatUseGL, Month)]
-	hbgl[, Species:='Greylag']
-	hbgl = hbgl[complete.cases(hbgl),]
-	setnames(hbgl, old = c('HabitatUseGL', 'Greylag'), new = c('HabitatUse', 'N'))
-	# Barnacle:
-	hbbn = forage[Month > 8 | Month == 1, .(Barnacle, HabitatUseBN, Month)]
-	hbbn[, Species:='Barnacle']
-	hbbn = hbbn[complete.cases(hbbn),]
-	setnames(hbbn, old = c('HabitatUseBN', 'Barnacle'), new = c('HabitatUse', 'N'))
-	# Full data:
-	hb = rbind(hbpf, hbbn, hbgl)
-	setkeyv(hb, c('Species', 'Month'))
-	
-	hb[, NMTotal:=sum(N), by = .(Month, Species)]
-	hb[, Prop:=N/NMTotal]
-	hb[, Month:=as.factor(Month)]
-	setkeyv(hb, c('Species', 'Month'))
-	
+	forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]  # origin can be anything - we only care about the month.
 	HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage)
 	HabMonths = nrow(unique(HabitatUseFit[, .(Month)]))
 	HabitatUseFit[, SeasonFit:=sum(Fit, na.rm = TRUE)/HabMonths, by = Species]
