@@ -39,7 +39,7 @@ for (i in seq_along(dirs)) {
 # Distribute the paramter values to run:
 # Goose parameter fitting
 # Openness
-val = seq(100, 2000, length.out = 5)
+val = round(seq(100, 2000, length.out = 10))
 wdpath = paste0(pathtodirs, dirs[1])
 setwd(wdpath) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)

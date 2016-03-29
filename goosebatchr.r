@@ -170,8 +170,16 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	}
 }
 # If you want updates:
-# slackrSetup(channel="@name", api_token = INSERT YOUR TOKEN)
-# slackr(paste(counter))
+if(counter == runs) 
+{
+token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
+slackrSetup(channel="@slackbot", api_token = token)
+slackr(paste(counter))
+library(ggplot2)
+res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
+p = ggplot(res, aes(Value, Fit)) + geom_line(aes(color = FitType)) + theme_bw()
+ggslackr(p)
+}
 
 # Report progress to console:
 cat(paste0('Run number ', counter, '\n'))
