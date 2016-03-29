@@ -70,13 +70,12 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 # --------------------------------------------------------------------------------------------#
 #                                    Flock sizes                                              #
 # --------------------------------------------------------------------------------------------#
-resultpath = 'c:/MSV/WorkDirectory/'
-forage = fread(paste(resultpath, 'GooseFieldForageData.txt', sep = ''))
-forage = fread('GooseFieldForageData.txt', showProgress = FALSE)
-forage = ClassifyHabitatUse(forage, species = 'goose')
 
 if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 {
+	dropcols = c("Polyref", "Openness", "Grain", "Maize", "Digestability", "VegPhase")
+	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
+	forage = ClassifyHabitatUse(forage, species = 'goose')
 	# Field data:
 	fieldobs = fread('fugledata_20150320_obs_clean.csv')
 	fieldobs = fread('o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv')
@@ -166,10 +165,10 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	BarnacleFit = HabUseBN + DegreeOverlapBT
 
 	# Write out the results of the parameter fitting and prepare for next run:
-	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapPT,
-		 HabUsePF, HabUseGL, HabUseBN)
-	FitNames = c('Weightfit', 'DegreeOverlapPT', 'DegreeOverlapGT', 'DegreeOverlapPT',
-		 'HabUsePF', 'HabUseGL', 'HabUseBN')
+	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
+		 HabUsePF, HabUseGL, HabUseBN, PinkFootFit, GreylagFit, BarnacleFit)
+	FitNames = c('Weightfit', 'DegreeOverlapPT', 'DegreeOverlapGT', 'DegreeOverlapBT',
+		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
