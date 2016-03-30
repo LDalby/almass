@@ -73,7 +73,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 
 if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 {
-	dropcols = c("Polyref", "Openness", "Grain", "Maize", "Digestability", "VegPhase")
+	dropcols = c("Polyref", "Openness", "Grain", "Maize", "Digestability")
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
 	forage = ClassifyHabitatUse(forage, species = 'goose')
 	# Field data:
@@ -109,7 +109,8 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
-	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE)
+	massdropcols = c("Energy", "MinForageRate")
+	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE, drop = massdropcols)
 	mass[,Day:=Day-365]
 	api = read_excel('observations_PG_01Jan2010-18Jan2016_API.xlsx')
 	api = as.data.table(api)
@@ -143,7 +144,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	# Write out the results of the parameter fitting and prepare for next run:
 	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
 		 HabUsePF, HabUseGL, HabUseBN, PinkFootFit, GreylagFit, BarnacleFit)
-	FitNames = c('Weightfit', 'DegreeOverlapPT', 'DegreeOverlapGT', 'DegreeOverlapBT',
+	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
@@ -169,21 +170,27 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 		file.remove("GooseFieldForageData.txt")
 	}
 }
-# If you want updates:
-if(counter == runs) 
-{
-token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
-slackrSetup(channel="@slackbot", api_token = token)
-slackr(paste(counter))
-library(ggplot2)
-res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
-p = ggplot(res, aes(Value, Fit)) + geom_line(aes(color = FitType)) + theme_bw()
-ggslackr(p)
-}
 
 # Report progress to console:
 cat(paste0('Run number ', counter, '\n'))
 
+# If you want updates:
+token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
+slackrSetup(channel="@slackbot", api_token = token)
+slackr(paste(counter))
+
 # Very last thing is to update the counter:
 counter = counter+1  
 write(counter, file = 'counter.txt', append = FALSE)
+
+# If you want the final plot:
+if(counter == runs) 
+{
+	token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
+	slackrSetup(channel="@slackbot", api_token = token)
+	library(ggplot2)
+	res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
+	p = ggplot(res, aes(Value, Fit), size = 1) + geom_line(aes(color = FitType)) +
+		scale_color_brewer(palette = "Set3") + theme_bw()
+	ggslackr(p)
+}
