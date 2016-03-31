@@ -24,8 +24,9 @@
 library(data.table)
 library(ralmass)
 library(stringr)
-library(lubridate)
+# library(lubridate)
 library(readxl)
+library(slackr)
 
 # library(slackr)  # Only needed if you want Slack to give you updates on progress
 
@@ -175,9 +176,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 cat(paste0('Run number ', counter, '\n'))
 
 # If you want updates:
-token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
+token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
 slackrSetup(channel="@slackbot", api_token = token)
-slackr(paste(counter))
+slackr(paste('Run', counter, Sys.time(), sep = ' '))
 
 # Very last thing is to update the counter:
 counter = counter+1  

@@ -11,7 +11,6 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
-# file1 = 'c:/MSV/ALMaSS_CmdLine/x64/Release/ALMaSS_CmdLine.exe' 
 file1 = 'c:/MSV/ALMaSS_CmdLine/x64/Release/ALMaSS_CmdLine.exe' 
 file2 = 'C:/Users/lada/Git/almass/counter.txt' 
 file3 = 'C:/Users/lada/Git/almass/goosebatchr.r'	
@@ -39,11 +38,11 @@ for (i in seq_along(dirs)) {
 # Distribute the paramter values to run:
 # Goose parameter fitting
 # Openness
-val = round(seq(100, 2000, length.out = 10))
+val = round(seq(0, 2000, length.out = 20))
 wdpath = paste0(pathtodirs, dirs[1])
 setwd(wdpath) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
-EditBat(wdpath)
+EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Following likelyhood
 val = seq(0, 10000, length.out = 10)
 val1 = seq(0, 10000, length.out = 10)
