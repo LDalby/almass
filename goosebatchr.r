@@ -26,16 +26,15 @@ library(ralmass)
 library(stringr)
 # library(lubridate)
 library(readxl)
-library(slackr)
 
-# library(slackr)  # Only needed if you want Slack to give you updates on progress
+library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work directory (done automatically when distributing the files, therefore blank):
 
-# To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
-# first of the parameters in each run (this approach is also used for single parameter scenarios):
+# To get the line number in the parameter list we make a vector of line numbers for the
+# first of the parameters in each run:
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
-numberofparams = nrow(unique(paramvals[, 1, with = FALSE])) # The number of paramters being modified per run 
+numberofparams = length(unique(paramvals[, V1])) # The number of paramters being modified per run 
 runs = nrow(paramvals)/numberofparams
 lineno = seq(1, runs*numberofparams, numberofparams)
 
