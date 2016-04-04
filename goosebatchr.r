@@ -136,6 +136,10 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	HabUsePF = HabitatUseFit[Species == 'Pinkfoot', SeasonFit]
 	HabUseGL = HabitatUseFit[Species == 'Greylag', SeasonFit]
 	HabUseBN = HabitatUseFit[Species == 'Barnacle', SeasonFit]
+
+# --------------------------------------------------------------------------------------------#
+#                                   Collect and write out                                     #
+# --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
 	PinkFootFit = Weightfit + HabUsePF + DegreeOverlapPT
 	GreylagFit = HabUseGL + DegreeOverlapGT
