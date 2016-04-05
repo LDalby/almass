@@ -38,54 +38,51 @@ for (i in seq_along(dirs)) {
 #------ Below here we ditribute the different parameters ------#
 #------ Hunter parameter fitting ------#
 # Careful here - check the index - first in dirs is 0
-# 0
-val = seq(100, 500, length.out = 5)
+openvals = seq(200, 1400, length.out = 6)
+densityvals = seq(0.1, 1.6, length.out = 6)
+probvals = seq(-0.0006, -0.0106, by = -0.001)
+
+# 0 - Random
 wdpath = paste0(pathtodirs, 'WD0')  
 setwd(wdpath)
-GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = openvals, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 0)
-# 1
+# 1 - Closest
 wdpath = paste0(pathtodirs, 'WD1')
 setwd(wdpath)
-GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = openvals, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 1)
-# 2 
-val = seq(100, 1000, length.out = 10)
+# 2 - RandomOpen
 wdpath = paste0(pathtodirs, 'WD2') 
 setwd(wdpath)
-GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = openvals, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 2)
-# 3
-val = seq(0, 2.2, length.out = 10)
+# 3 - RandomMaxDensity
 wdpath = paste0(pathtodirs, 'WD3') 
 setwd(wdpath)
-GenerateParams('HUNTERS_MAXDENSITY' = val, write = TRUE)
+GenerateParams('HUNTERS_MAXDENSITY' = densityvals, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 3)
-# 4
-val = seq(100, 1000, length.out = 10)
+# 4 - ClosestOpen
 wdpath = paste0(pathtodirs, 'WD4') 
 setwd(wdpath)
-GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = openvals, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 4)
 # 5
-val = seq(0, 2.2, length.out = 10)
 wdpath = paste0(pathtodirs, 'WD5') 
 setwd(wdpath)
-GenerateParams('HUNTERS_MAXDENSITY' = val, write = TRUE)
+GenerateParams('HUNTERS_MAXDENSITY' = densityvals, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 5)
 # 6
-val = seq(100, 2000, length.out = 20)
-val2 = seq(0.1, 2.5, length.out = 25)
 wdpath = paste0(pathtodirs, 'WD6')) 
 setwd(wdpath)
-GenerateParams('GOOSE_MINFORAGEOPENNESS' = val,
-				 'HUNTERS_MAXDENSITY' = val2, write = TRUE)
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = openvals,
+				 'HUNTERS_MAXDENSITY' = densityvals, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 6)
 # 7 same values as 6
@@ -95,31 +92,12 @@ GenerateParams('GOOSE_MINFORAGEOPENNESS' = val,
 				 'HUNTERS_MAXDENSITY' = val2, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 7)
-# 8
-wdpath = paste0(pathtodirs, 'WD8')) 
-setwd(wdpath)
-val = seq(-0.001, -0.01, length.out = 100)
-GenerateParams('CLOSESTFARMPROBPARAMONE' = val, write = TRUE)
-EditBat(wdpath)
-EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 8)
-# 9
-wdpath = paste0(pathtodirs, 'WD9')) 
-setwd(wdpath)
-val = seq(-0.0001, -0.01, length.out = 20)
-val2 = seq(100, 2000, length.out = 20)
-GenerateParams('CLOSESTFARMPROBPARAMONE' = val,
- 'GOOSE_MINFORAGEOPENNESS' = val2,  write = TRUE)
-EditBat(wdpath)
-EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 9)
 # 10
 wdpath = paste0(pathtodirs, 'WD10')) 
 setwd(wdpath)
-val = seq(-0.0001, -0.01, length.out = 20)
-val2 = seq(500, 1400, length.out = 10)
-val3 = seq(0.1, 1.5, length.out = 10)
-GenerateParams('CLOSESTFARMPROBPARAMONE' = val,
- 				'GOOSE_MINFORAGEOPENNESS' = val2, 
- 				'HUNTERS_MAXDENSITY' = val3, write = TRUE)
+GenerateParams('CLOSESTFARMPROBPARAMONE' = probvals,
+ 				'GOOSE_MINFORAGEOPENNESS' = openvals, 
+ 				'HUNTERS_MAXDENSITY' = densityvals, write = TRUE)
 EditBat(wdpath)
 EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 10)
 
