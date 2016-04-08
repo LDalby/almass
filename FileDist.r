@@ -20,8 +20,10 @@ file5 = 'C:/Users/lada/Git/almass/PreRunSetup.r'
 file6 = 'o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv'
 file7 = 'o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv'
 file8 = 'o:/ST_GooseProject/Field data/observations_PG_01Jan2010-18Jan2016_API.xlsx'
+file9 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/GooseRoosts.txt'
+file10 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/PfYoungDist.txt'
 
-filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8)
+filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10)
 
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
