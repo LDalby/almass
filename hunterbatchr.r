@@ -84,9 +84,11 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	
 	idvars = c('HunterID','HomeX','HomeY','NoFarmrefs')
 	dists = rep(NA, nrow(locations))
+	molten = data.table::melt(locations, id.vars = idvars)
+	molten = molten[complete.cases(molten)]
 	for (j in seq_along(locations[,HunterID])) 
 	{
-		huntinglocs = melt(locations, id.vars = idvars)[HunterID == j-1 & !is.na(value)][,value]
+		huntinglocs = molten[HunterID == j-1, value]
 		temp = rep(NA, length(huntinglocs))
 		for (i in seq_along(huntinglocs))
 		{
