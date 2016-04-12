@@ -74,7 +74,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	locations = fread('Hunter_Hunting_Locations.txt', skip = 1)  # Skip the counter
 	filename = paste0(resultpath,'HuntingLocationsRun', counter, '.txt')
 	write.table(locations, file = filename, row.names = FALSE, sep = '\t')
-	dropcols = c('HunterType', 'HuntingDays', 'WeekdayHunterChance', 'GooseLookChance', 'Efficiency',
+	dropcols = c( 'HuntingDays', 'WeekdayHunterChance', 'GooseLookChance', 'Efficiency',
 	"FarmRef6", "FarmRef7", "FarmRef8", "FarmRef9", "FarmRef10")  
 	locations[, (dropcols):=NULL]  # Don't need these - not used at the moment.
 
@@ -82,7 +82,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	filename = paste0(resultpath, 'HuntingLocationsFarmRun', counter, '.txt')
 	write.table(farms, file = filename, row.names = FALSE, quote = FALSE, sep = '\t')
 	
-	idvars = c('HunterID','HunterType','HomeX','HomeY','NoFarmrefs')
+	idvars = c('HunterID','HomeX','HomeY','NoFarmrefs')
 	dists = rep(NA, nrow(locations))
 	for (j in seq_along(locations[,HunterID])) 
 	{
