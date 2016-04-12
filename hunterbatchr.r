@@ -83,7 +83,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	write.table(farms, file = filename, row.names = FALSE, quote = FALSE, sep = '\t')
 	
 	idvars = c('HunterID','HunterType','HomeX','HomeY','NoFarmrefs')
-	dist = rep(NA, nrow(locations))
+	dists = rep(NA, nrow(locations))
 	for (j in seq_along(locations[,HunterID])) 
 	{
 		huntinglocs = melt(locations, id.vars = idvars)[HunterID == j-1 & !is.na(value)][,value]
@@ -94,9 +94,9 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 				as.numeric(farms[FarmRef == huntinglocs[i],.(FarmCentroidX, FarmCentroidY)])))
 			temp[i] = thedist
 		}
-		dist[j] = min(temp)
+		dists[j] = min(temp)
 	}
-	locations[, Dists:=dist/1000]
+	locations[, Dists:=dists/1000]
 
 	locations[Dists < 1, Bin:=0]
 	locations[Dists <= 10 & Dists >= 1, Bin:=10]
