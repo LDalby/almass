@@ -47,7 +47,7 @@ if(counter == 1)
 	dir.create('Results')
 	# Set up the headers in first run
 	line = paste('Openness', 'Density', 'Probability', 'DistanceFit', 'DensityFit',
-	 'NoHunterFit', 'LegalDensities', 'MaxHunters', sep = '\t')
+	 'DensityFitPval', 'NoHunterFit', 'LegalDensities', 'MaxHunters', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -67,7 +67,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 		if(param == 'HUNTERS_MAXDENSITY') density = value
 		if(param == 'CLOSESTFARMPROBPARAMONE') probability = value
 	}
-	line = paste(openness, density, probability, NA, NA, NA, NA, NA,  sep = '\t')
+	line = paste(openness, density, probability, NA, NA, NA, NA, NA, NA, sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 }
 
@@ -182,7 +182,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 		AllLegal = CheckDensity(farms, value)
 	}
 	if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
-	line = paste(openness, density, probability, distancefit, overlap, no.huntersFit, AllLegal, maxhunters, sep = '\t')
+	line = paste(openness, density, probability, distancefit, overlap, densitypval, no.huntersFit, AllLegal, maxhunters, sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 
 	# As the last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
