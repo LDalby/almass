@@ -132,13 +132,13 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	# Load the survey Results
 	survey = fread('HunterSurveyResultsDensity.csv')
 
-	farms[,Numbers:=NoHunters/(FarmSize/10000)]
+	farms[,Density:=NoHunters/(AreaOpenFields/10000)]  # Check that this is the right density calculation!
 	farms[,Type:= 'Simulated']
-	simulated = farms[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
+	simulated = farms[Density > 0, c('Density', 'Type'), with = FALSE]
 	# Collect the survey and sim results:
 	density = rbind(survey, simulated)
 	# Asses the fit using an non-parametric test:
-	densitypval = wilcox.test(Numbers ~ Type, data = density)$p.value
+	densitypval = wilcox.test(Density ~ Type, data = density)$p.value
 	# And then using the kernel density overlap:
 	overlap = round(CalcOverlap(density, species = 'Hunter'), 3)  #see ?CalcOverlap for documentation
 	# Find the maximum number of hunters on any farm:
@@ -179,7 +179,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 		if(param == 'CLOSESTFARMPROBPARAMONE') probability = value
 	}
 	if(param == 'HUNTERS_MAXDENSITY') {
-		AllLegal = CheckDensity(farms, value)
+		AllLegal = CheckDensity(data = farms, maxdensity = value, colname = 'Density')
 	}
 	if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
 	line = paste(openness, density, probability, distancefit, overlap, densitypval, no.huntersFit, AllLegal, maxhunters, sep = '\t')
