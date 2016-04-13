@@ -23,7 +23,6 @@
 library(data.table)
 library(ralmass)
 library(stringr)
-library(reshape2)
 #library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work directory (done automatically when distributing the files, therefore blank):
@@ -77,19 +76,24 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 {
 	# Simulation results:
-	locations = fread('Hunter_Hunting_Locations.txt', skip = 1)  # Skip the counter
+	dropcols = c("FarmRef6", "FarmRef7", "FarmRef8", "FarmRef9", "FarmRef10")  # Currently not in use
+	locations = fread('Hunter_Hunting_Locations.txt', skip = 1, drop = dropcols)  # Skip the counter and the dropcols
 	filename = paste0(resultpath,'HuntingLocationsRun', counter, '.txt')
 	write.table(locations, file = filename, row.names = FALSE, sep = '\t')
+	nullcols = c( 'HuntingDays', 'WeekdayHunterChance', 'GooseLookChance', 'Efficiency')  
+	locations[, (nullcols):=NULL]  # Don't need these - not used at the moment. (But they are stored...)
 
 	farms = fread('Hunter_Hunting_Locations_Farms.txt')
 	filename = paste0(resultpath, 'HuntingLocationsFarmRun', counter, '.txt')
 	write.table(farms, file = filename, row.names = FALSE, quote = FALSE, sep = '\t')
 	
-	idvars = c('HunterID','HunterType','HomeX','HomeY','NoFarmrefs')
-	dist = rep(NA, nrow(locations))
+	idvars = c('HunterID','HomeX','HomeY','NoFarmrefs')
+	dists = rep(NA, nrow(locations))
+	molten = data.table::melt(locations, id.vars = idvars)
+	molten = molten[complete.cases(molten)]
 	for (j in seq_along(locations[,HunterID])) 
 	{
-		huntinglocs = melt(locations, id.vars = idvars)[HunterID == j-1 & !is.na(value)][,value]
+		huntinglocs = molten[HunterID == j-1, value]
 		temp = rep(NA, length(huntinglocs))
 		for (i in seq_along(huntinglocs))
 		{
@@ -97,9 +101,9 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 				as.numeric(farms[FarmRef == huntinglocs[i],.(FarmCentroidX, FarmCentroidY)])))
 			temp[i] = thedist
 		}
-		dist[j] = min(temp)
+		dists[j] = min(temp)
 	}
-	locations[, Dists:=dist/1000]
+	locations[, Dists:=dists/1000]
 
 	locations[Dists < 1, Bin:=0]
 	locations[Dists <= 10 & Dists >= 1, Bin:=10]
@@ -133,7 +137,9 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	simulated = farms[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
 	# Collect the survey and sim results:
 	density = rbind(survey, simulated)
-	# Asses the fit
+	# Asses the fit using an non-parametric test:
+	densitypval = wilcox.test(Numbers ~ Type, data = density)$p.value
+	# And then using the kernel density overlap:
 	overlap = round(CalcOverlap(density, species = 'Hunter'), 3)  #see ?CalcOverlap for documentation
 	# Find the maximum number of hunters on any farm:
 	maxhunters = max(farms[,NoHunters])
