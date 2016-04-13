@@ -132,7 +132,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	# Load the survey Results
 	survey = fread('HunterSurveyResultsDensity.csv')
 
-	farms[,Density:=NoHunters/(AreaOpenFields/10000)]  # Check that this is the right density calculation!
+	farms[,Density:=NoHunters/(FarmSize/10000)]  # Check that this is the right density calculation!
 	farms[,Type:= 'Simulated']
 	simulated = farms[Density > 0, c('Density', 'Type'), with = FALSE]
 	# Collect the survey and sim results:
@@ -179,7 +179,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 		if(param == 'CLOSESTFARMPROBPARAMONE') probability = value
 	}
 	if(param == 'HUNTERS_MAXDENSITY') {
-		AllLegal = CheckDensity(data = farms, maxdensity = value, colname = 'Density')
+		AllLegal = CheckDensity(data = farms, maxdensity = value, colname = 'AreaOpenFields')
 	}
 	if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
 	line = paste(openness, density, probability, distancefit, overlap, densitypval, no.huntersFit, AllLegal, maxhunters, sep = '\t')
