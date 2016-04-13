@@ -46,8 +46,8 @@ if(counter == 1)
 	# Set up the results directory
 	dir.create('Results')
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'DensityFitPval', 'NoHunterFit',
-	 'LegalDensities', 'MaxHunters', 'OverallFit', sep = '\t')
+	line = paste('Openness', 'Density', 'Probability', 'DistanceFit', 'DensityFit',
+	 'DensityFitPval', 'NoHunterFit', 'LegalDensities', 'MaxHunters', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -60,9 +60,15 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, NA, NA, NA, NA, NA, NA, NA,  sep = '\t')
-		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+		openness = NA
+		density = NA
+		probability = NA
+		if(param == 'GOOSE_MINFORAGEOPENNESS') openness = value
+		if(param == 'HUNTERS_MAXDENSITY') density = value
+		if(param == 'CLOSESTFARMPROBPARAMONE') probability = value
 	}
+	line = paste(openness, density, probability, NA, NA, NA, NA, NA, NA, sep = '\t')
+	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 }
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ Distances ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤#
@@ -160,21 +166,24 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 
 	no.huntersFit = with(survey, 1-sum((propSim-propSur)^2))
 
-	# Calculate the overall model fit
-	OverallFit = distancefit + overlap + no.huntersFit
-
 	# Write out the results of the parameter fitting and prepare for next run:
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		if(param == 'HUNTERS_MAXDENSITY') {
-			AllLegal = CheckDensity(farms, value)
-		}
-		if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
-		line = paste(param, value, distancefit, overlap, densitypval, no.huntersFit, AllLegal, maxhunters, OverallFit, sep = '\t')
-		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+		openness = NA
+		density = NA
+		probability = NA
+		if(param == 'GOOSE_MINFORAGEOPENNESS') openness = value
+		if(param == 'HUNTERS_MAXDENSITY') density = value
+		if(param == 'CLOSESTFARMPROBPARAMONE') probability = value
 	}
+	if(param == 'HUNTERS_MAXDENSITY') {
+		AllLegal = CheckDensity(farms, value)
+	}
+	if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
+	line = paste(openness, density, probability, distancefit, overlap, densitypval, no.huntersFit, AllLegal, maxhunters, sep = '\t')
+	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 
 	# As the last thing we delete the Hunter_Hunting_Locations.txt Hunter_Hunting_Locations_Farms.txt
 	# We do this because almass might exit without distributing hunters. If that happens files from a previous
