@@ -23,7 +23,6 @@
 library(data.table)
 library(ralmass)
 library(stringr)
-library(reshape2)
 #library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work directory (done automatically when distributing the files, therefore blank):
@@ -47,8 +46,8 @@ if(counter == 1)
 	# Set up the results directory
 	dir.create('Results')
 	# Set up the headers in first run
-	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'NoHunterFit', 'LegalDensities', 'MaxHunters',
-		 'OverallFit', sep = '\t')
+	line = paste('Parameter', 'Value', 'DistanceFit', 'DensityFit', 'DensityFitPval', 'NoHunterFit',
+	 'LegalDensities', 'MaxHunters', 'OverallFit', sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Hunter params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
@@ -61,7 +60,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		line = paste(param, value, NA, NA, NA, NA, NA, NA,  sep = '\t')
+		line = paste(param, value, NA, NA, NA, NA, NA, NA, NA,  sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 }
@@ -71,12 +70,12 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 {
 	# Simulation results:
-	locations = fread('Hunter_Hunting_Locations.txt', skip = 1)  # Skip the counter
+	dropcols = c("FarmRef6", "FarmRef7", "FarmRef8", "FarmRef9", "FarmRef10")  # Currently not in use
+	locations = fread('Hunter_Hunting_Locations.txt', skip = 1, drop = dropcols)  # Skip the counter and the dropcols
 	filename = paste0(resultpath,'HuntingLocationsRun', counter, '.txt')
 	write.table(locations, file = filename, row.names = FALSE, sep = '\t')
-	dropcols = c( 'HuntingDays', 'WeekdayHunterChance', 'GooseLookChance', 'Efficiency',
-	"FarmRef6", "FarmRef7", "FarmRef8", "FarmRef9", "FarmRef10")  
-	locations[, (dropcols):=NULL]  # Don't need these - not used at the moment.
+	nullcols = c( 'HuntingDays', 'WeekdayHunterChance', 'GooseLookChance', 'Efficiency')  
+	locations[, (nullcols):=NULL]  # Don't need these - not used at the moment. (But they are stored...)
 
 	farms = fread('Hunter_Hunting_Locations_Farms.txt')
 	filename = paste0(resultpath, 'HuntingLocationsFarmRun', counter, '.txt')
@@ -132,7 +131,9 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 	simulated = farms[Numbers > 0, c('Numbers', 'Type'), with = FALSE]
 	# Collect the survey and sim results:
 	density = rbind(survey, simulated)
-	# Asses the fit
+	# Asses the fit using an non-parametric test:
+	densitypval = wilcox.test(Numbers ~ Type, data = density)$p.value
+	# And then using the kernel density overlap:
 	overlap = round(CalcOverlap(density, species = 'Hunter'), 3)  #see ?CalcOverlap for documentation
 	# Find the maximum number of hunters on any farm:
 	maxhunters = max(farms[,NoHunters])
@@ -171,7 +172,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 			AllLegal = CheckDensity(farms, value)
 		}
 		if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
-		line = paste(param, value, distancefit, overlap, no.huntersFit, AllLegal, maxhunters, OverallFit, sep = '\t')
+		line = paste(param, value, distancefit, overlap, densitypval, no.huntersFit, AllLegal, maxhunters, OverallFit, sep = '\t')
 		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 
