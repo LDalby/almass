@@ -4,44 +4,6 @@ library(R.utils)
 library(ralmass)
 
 # List the parent directory of all the work directories
-pathtodirs = 'u:/Hunter/'
-dirs = dir(pathtodirs)[-grep('BaseWD',dir(pathtodirs))]  # For this to work you can't have a bunch of crap sitting in
-						# in pathtodirs. Only the subdirectories
-
-# A common use for this would be to copy a fresh exe along with
-# resetting the counter, clearing the error file and copying
-# the batchr and prerunsetup file.
-file1 = 'o:/ST_GooseProject/ALMaSS/Executables/ALMaSS_CmdLine.exe' 
-file2 = 'C:/Users/lada/git/almass/counter.txt' 
-file3 = 'C:/Users/lada/git/almass/hunterbatchr.r'	
-file4 = 'C:/Users/lada/git/almass/ErrorFile.txt'
-file5 = 'C:/Users/lada/git/almass/PreRunSetup.r'
-# Species specific things:
-file6 = 'C:/Users/lada/git/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/HunterHomeLocations.txt'
-file7 = 'o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/HunterSurveyResultsDensity.csv'
-file8 = 'o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/HunterSurveyResultsDistanceJuly2015.txt'
-file9 = 'o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/HunterSurveyResultsFarm.csv'
-
-filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9)
-
-# We overwrite, so be sure you actually want to do this!
-for (i in seq_along(dirs)) {
-	wd = paste0(pathtodirs, dirs[i])
-	for (j in seq_along(filestodist)) {
-		file.copy(filestodist[j], to = wd, overwrite = TRUE)
-	}
-	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
-	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
-}
-
-#------ Below here we ditribute the different parameters ------#
-#------ Hunter parameter fitting ------#
-# Copy file to x number of directories
-# Just handy when e.g. a new exe needs to distributed
-library(R.utils)
-library(ralmass)
-
-# List the parent directory of all the work directories
 pathtodirs = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories

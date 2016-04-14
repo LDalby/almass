@@ -75,7 +75,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 {
 	dropcols = c("Polyref", "Openness", "Grain", "Maize", "Digestability")
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
-	forage = ClassifyHabitatUse(forage, species = 'goose')
+	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
 	# Field data:
 	fieldobs = fread('o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv')
 	flocks = fieldobs[Month %in% c(12,1) & Hour >= 11 & Hour <= 13,]  # todo: Why do we only use december and jan?
