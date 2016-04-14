@@ -179,7 +179,7 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 		if(param == 'CLOSESTFARMPROBPARAMONE') probability = value
 	}
 	if(param == 'HUNTERS_MAXDENSITY') {
-		AllLegal = CheckDensity(data = farms, maxdensity = value, colname = 'AreaOpenFields')
+		AllLegal = CheckDensity(data = farms, maxdensity = value, area = 'AreaOpenFields')
 	}
 	if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
 	line = paste(openness, density, probability, distancefit, overlap, densitypval, no.huntersFit, AllLegal, maxhunters, sep = '\t')
