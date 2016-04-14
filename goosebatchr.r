@@ -24,7 +24,6 @@
 library(data.table)
 library(ralmass)
 library(stringr)
-# library(lubridate)
 library(readxl)
 
 library(slackr)  # Only needed if you want Slack to give you updates on progress
@@ -108,7 +107,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
-	massdropcols = c("Energy", "MinForageRate")
+	massdropcols = c("Energy", "MinForageRate", 'FullTime')
 	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE, drop = massdropcols)
 	mass[,Day:=Day-365]
 	api = read_excel('observations_PG_01Jan2010-18Jan2016_API.xlsx')
@@ -121,7 +120,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 #                                      Habitat use                                            #
 # --------------------------------------------------------------------------------------------#
 	FieldData = fread('HabitatUseAll2014.csv')
-	FieldData[HabitatUse == 'Stubble undersown', HabitatUse:='Grass']
+	FieldData[HabitatUse == 'Stubble undersown', HabitatUse:='Stubble']
 	FieldData[HabitatUse == 'UnharvestedBarley', HabitatUse:='Stubble']
 	FieldData[, NMTotal:=sum(N), by=.(Month, Species)]
 	FieldData[, Prop:=N/NMTotal]
@@ -130,7 +129,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]  # origin can be anything - we only care about the month.
 	HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage)
 	HabMonths = nrow(unique(HabitatUseFit[, .(Month)]))
-	HabitatUseFit[, SeasonFit:=sum(Fit, na.rm = TRUE)/HabMonths, by = Species]
+	HabitatUseFit[, SeasonFit:=sum(Fit, na.rm = TRUE)/length(!is.na(Month)), by = Species]
 	HabitatUseFit = unique(HabitatUseFit[, .(Species, SeasonFit)])
 	HabUsePF = HabitatUseFit[Species == 'Pinkfoot', SeasonFit]
 	HabUseGL = HabitatUseFit[Species == 'Greylag', SeasonFit]
