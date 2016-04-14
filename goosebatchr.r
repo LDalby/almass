@@ -139,9 +139,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
-	PinkFootFit = Weightfit + HabUsePF + DegreeOverlapPT
-	GreylagFit = HabUseGL + DegreeOverlapGT
-	BarnacleFit = HabUseBN + DegreeOverlapBT
+	PinkFootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2
+	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2
+	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
@@ -179,20 +179,20 @@ cat(paste0('Run number ', counter, '\n'))
 # If you want updates:
 token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
 slackrSetup(channel="@slackbot", api_token = token)
-slackr(paste('Run', counter, Sys.time(), sep = ' '))
+# slackr(paste('Run', counter, Sys.time(), sep = ' '))
 
 # Very last thing is to update the counter:
 counter = counter+1  
 write(counter, file = 'counter.txt', append = FALSE)
 
-# If you want the final plot:
-if(counter == runs) 
+# If you plots for each run:
+if(counter > 1 & counter < runs) 
 {
 	token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
 	slackrSetup(channel="@slackbot", api_token = token)
 	library(ggplot2)
 	res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
-	p = ggplot(res, aes(Value, Fit), size = 1) + geom_line(aes(color = FitType)) +
-		scale_color_brewer(palette = "Set3") + theme_bw()
+	p = ggplot(res, aes(Value, Fit)) + geom_line(aes(color = FitType), size = 1) +
+		scale_color_brewer(palette = "Set3")
 	ggslackr(p)
 }
