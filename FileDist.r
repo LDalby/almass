@@ -40,7 +40,7 @@ for (i in seq_along(dirs)) {
 # Distribute the paramter values to run:
 # Goose parameter fitting
 # Openness
-val = round(seq(0, 2000, length.out = 10))
+val = round(seq(0, 500, length.out = 11))
 wdpath = paste0(pathtodirs, dirs[1])
 setwd(wdpath) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
@@ -57,7 +57,7 @@ GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = val,
 			    write = TRUE)
 EditBat(wdpath)
 # Max appetite scaler
-val = seq(1, 10, length.out = 10)
+val = seq(3.02, 9.06, length.out = 11)
 wdpath = paste0(pathtodirs, dirs[3])
 setwd(wdpath) 
 GenerateParams('GOOSE_MAXAPPETITESCALER' = val, write = TRUE)

@@ -89,9 +89,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	melted[, Type:='Simulated']
 	dists = rbind(melted, flocks)
 
-	DegreeOverlapB = round(CalcOverlap(dists, species = 'Barnacle'), digits = 2)
-	DegreeOverlapP = round(CalcOverlap(dists, species = 'Pinkfoot'), digits = 2)
-	DegreeOverlapG = round(CalcOverlap(dists, species = 'Greylag'), digits = 2)
+	DegreeOverlapB = round(CalcOverlap(dists, species = 'Barnacle'), digits = 4)
+	DegreeOverlapP = round(CalcOverlap(dists, species = 'Pinkfoot'), digits = 4)
+	DegreeOverlapG = round(CalcOverlap(dists, species = 'Greylag'), digits = 4)
 
 	# Simulation results - timed counts:
 	simflocks = forage[Geese > 0, .(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
@@ -101,9 +101,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	melted[, Type:='Simulated']
 	distsTimed = rbind(melted, flocks)
 	
-	DegreeOverlapBT = round(CalcOverlap(distsTimed, species = 'Barnacle'), digits = 2)
-	DegreeOverlapPT = round(CalcOverlap(distsTimed, species = 'Pinkfoot'), digits = 2)
-	DegreeOverlapGT = round(CalcOverlap(distsTimed, species = 'Greylag'), digits = 2)
+	DegreeOverlapBT = round(CalcOverlap(distsTimed, species = 'Barnacle'), digits = 4)
+	DegreeOverlapPT = round(CalcOverlap(distsTimed, species = 'Pinkfoot'), digits = 4)
+	DegreeOverlapGT = round(CalcOverlap(distsTimed, species = 'Greylag'), digits = 4)
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
@@ -179,20 +179,21 @@ cat(paste0('Run number ', counter, '\n'))
 # If you want updates:
 token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
 slackrSetup(channel="@slackbot", api_token = token)
-# slackr(paste('Run', counter, Sys.time(), sep = ' '))
+slackr(paste('Run', counter, Sys.time(), sep = ' '))
+
+# If you plots for each run:
+# if(counter > 1 & counter < runs) 
+# {
+# 	token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
+# 	slackrSetup(channel="@slackbot", api_token = token)
+# 	library(ggplot2)
+# 	res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
+# 	p = ggplot(res, aes(Value, Fit)) + geom_line(aes(color = FitType), size = 1) +
+# 		scale_color_brewer(palette = "Set3")
+# 	ggslackr(p)
+# }
 
 # Very last thing is to update the counter:
 counter = counter+1  
 write(counter, file = 'counter.txt', append = FALSE)
 
-# If you plots for each run:
-if(counter > 1 & counter < runs) 
-{
-	token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
-	slackrSetup(channel="@slackbot", api_token = token)
-	library(ggplot2)
-	res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
-	p = ggplot(res, aes(Value, Fit)) + geom_line(aes(color = FitType), size = 1) +
-		scale_color_brewer(palette = "Set3")
-	ggslackr(p)
-}
