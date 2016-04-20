@@ -57,12 +57,12 @@ if(counter == 1)
 if(length(grep("Hunter_Hunting_Locations.txt", dir())) == 0)
 {
 	lines = readLines('ParameterValues.txt')
+	openness = NA
+	density = NA
+	probability = NA
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		openness = NA
-		density = NA
-		probability = NA
 		if(param == 'GOOSE_MINFORAGEOPENNESS') openness = value
 		if(param == 'HUNTERS_MAXDENSITY') density = value
 		if(param == 'CLOSESTFARMPROBPARAMONE') probability = value
@@ -168,20 +168,20 @@ if(length(grep("Hunter_Hunting_Locations.txt", dir())) != 0)
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	lines = readLines('ParameterValues.txt')
+	openness = NA
+	density = NA
+	probability = NA
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
 		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		openness = NA
-		density = NA
-		probability = NA
-		if(param == 'GOOSE_MINFORAGEOPENNESS') openness = value
-		if(param == 'HUNTERS_MAXDENSITY') density = value
-		if(param == 'CLOSESTFARMPROBPARAMONE') probability = value
+		if(param == 'GOOSE_MINFORAGEOPENNESS') {openness = value}
+		if(param == 'HUNTERS_MAXDENSITY') {density = value}
+		if(param == 'CLOSESTFARMPROBPARAMONE') {probability = value}
 	}
 	if(param == 'HUNTERS_MAXDENSITY') {
 		AllLegal = CheckDensity(data = farms, maxdensity = value, area = 'AreaOpenFields')
 	}
-	if(param != 'HUNTERS_MAXDENSITY') AllLegal = NA
+	if(param != 'HUNTERS_MAXDENSITY'){ AllLegal = NA}
 	line = paste(openness, density, probability, distancefit, overlap, densitypval, no.huntersFit, AllLegal, maxhunters, sep = '\t')
 	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 

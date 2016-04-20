@@ -109,6 +109,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 # --------------------------------------------------------------------------------------------#
 	massdropcols = c("Energy", "MinForageRate", 'FullTime')
 	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE, drop = massdropcols)
+	mass = mass[GooseType %in% c('PF', 'PFNB'),]
 	mass[,Day:=Day-365]
 	api = read_excel('observations_PG_01Jan2010-18Jan2016_API.xlsx')
 	api = as.data.table(api)
@@ -184,13 +185,15 @@ slackr(paste('Run', counter, Sys.time(), sep = ' '))
 # If you plots for each run:
 # if(counter > 1 & counter < runs) 
 # {
-# 	token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
-# 	slackrSetup(channel="@slackbot", api_token = token)
-# 	library(ggplot2)
-# 	res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
-# 	p = ggplot(res, aes(Value, Fit)) + geom_line(aes(color = FitType), size = 1) +
-# 		scale_color_brewer(palette = "Set3")
-# 	ggslackr(p)
+	# token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
+	# slackrSetup(channel="@slackbot", api_token = token)
+	# library(ggplot2)
+	# res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
+	# res[, Type:='Individual']
+	# res[FitType %in% c('PinkFootFit', 'BarnacleFit', 'GreylagFit') , Type:='Overall']
+	# p = ggplot(res, aes(Value, Fit)) + geom_line(aes(color = FitType), size = 1) +
+	# 	scale_color_brewer(palette = "Set3") + facet_wrap(~Type, scales = 'free_y')
+	# ggslackr(p)
 # }
 
 # Very last thing is to update the counter:

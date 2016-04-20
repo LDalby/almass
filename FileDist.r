@@ -22,8 +22,9 @@ file7 = 'o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv'
 file8 = 'o:/ST_GooseProject/Field data/observations_PG_01Jan2010-18Jan2016_API.xlsx'
 file9 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/GooseRoosts.txt'
 file10 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/PfYoungDist.txt'
+file11 = 'C:/MSV/ALMaSS_inputs/GooseManagement/TIALMaSSConfig.cfg'
 
-filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10)
+filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10, File11)
 
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
@@ -40,10 +41,10 @@ for (i in seq_along(dirs)) {
 # Distribute the paramter values to run:
 # Goose parameter fitting
 # Openness
-val = round(seq(0, 500, length.out = 11))
+openval = round(seq(0, 1000, length.out = 21))
 wdpath = paste0(pathtodirs, dirs[1])
 setwd(wdpath) 
-GenerateParams('GOOSE_MINFORAGEOPENNESS' = val, write = TRUE)
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE)
 EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Following likelyhood
 val = seq(0, 10000, length.out = 10)
@@ -57,10 +58,10 @@ GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = val,
 			    write = TRUE)
 EditBat(wdpath)
 # Max appetite scaler
-val = seq(3.02, 9.06, length.out = 11)
+appetiteval = seq(3.02, 9.06, length.out = 11)
 wdpath = paste0(pathtodirs, dirs[3])
 setwd(wdpath) 
-GenerateParams('GOOSE_MAXAPPETITESCALER' = val, write = TRUE)
+GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE)
 EditBat(wdpath)
 # Max energy reserve proportion
 val = seq(1, 10, length.out = 10)
@@ -98,13 +99,13 @@ setwd(wdpath)
 GenerateParams('GOOSE_ENERGYCALIBRATION' = val, write = TRUE)
 EditBat(wdpath)
 # Goose feeding time
-val = seq(0.75, 1, length.out = 10)
+val = seq(0.6, 1, length.out = 11)
 wdpath = paste0(pathtodirs, dirs[9])
 setwd(wdpath) 
 GenerateParams('GOOSE_FEEDINGTIME' = val, write = TRUE)
 EditBat(wdpath)
 # Roost leaving likelyhood
-val = seq(0, 100, length.out = 10)
+val = seq(51, 200, length.out = 11)
 wdpath = paste0(pathtodirs, dirs[11])
 setwd(wdpath) 
 GenerateParams('GOOSE_ROOSTLEAVINGLIKELYHOOD' = val, write = TRUE)
@@ -115,17 +116,17 @@ wdpath = paste0(pathtodirs, dirs[12])
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_DISTPENALTY' = val, write = TRUE)
 EditBat(wdpath)
-# Memory duration
-val = seq(0, 100, length.out = 10)
+# Grain decay rate
+val = seq(0.9, 1, length.out = 11)
 wdpath = paste0(pathtodirs, dirs[13])
 setwd(wdpath) 
-GenerateParams('GOOSE_MEM_MINMEMVALUE' = val, write = TRUE)
+GenerateParams('GOOSE_GRAINDECAYRATE' = val, write = TRUE)
 EditBat(wdpath)
-# Grain decay rate
-val = seq(0.7, 1, length.out = 10)
+# Memory duration
+val = seq(0, 100, length.out = 10)
 wdpath = paste0(pathtodirs, dirs[14])
 setwd(wdpath) 
-GenerateParams('GOOSE_GRAINDECAYRATE' = val, write = TRUE)
+GenerateParams('GOOSE_MEM_MINMEMVALUE' = val, write = TRUE)
 EditBat(wdpath)
 
 #------ Hunter parameter fitting ------#
@@ -163,27 +164,27 @@ wdpath = paste0(pathtodirs, 'WD4')
 setwd(wdpath)
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openvals, write = TRUE, replicates = 10)
 EditBat(wdpath)
-EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 4)
+EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), config = 'HUNTERS_DISTRIBUTE_RULESET', value = 4)
 # 5
 wdpath = paste0(pathtodirs, 'WD5') 
 setwd(wdpath)
 GenerateParams('HUNTERS_MAXDENSITY' = densityvals, write = TRUE, replicates = 10)
 EditBat(wdpath)
-EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 5)
+EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), config = 'HUNTERS_DISTRIBUTE_RULESET', value = 5)
 # 6
 wdpath = paste0(pathtodirs, 'WD6')) 
 setwd(wdpath)
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openvals,
-				 'HUNTERS_MAXDENSITY' = densityvals, write = TRUE, replicates = 10)
+				 'HUNTERS_MAXDENSITY' = densityvals, write = FALSE, replicates = 10)
 EditBat(wdpath)
-EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 6)
+EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), config = 'HUNTERS_DISTRIBUTE_RULESET', value = 6)
 # 7 same values as 6
 wdpath = paste0(pathtodirs, 'WD7')) 
 setwd(wdpath)
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = val,
 				 'HUNTERS_MAXDENSITY' = val2, write = TRUE, replicates = 10)
 EditBat(wdpath)
-EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 7)
+EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), config = 'HUNTERS_DISTRIBUTE_RULESET', value = 7)
 # 10
 wdpath = paste0(pathtodirs, 'WD10')) 
 setwd(wdpath)
@@ -191,7 +192,7 @@ GenerateParams('CLOSESTFARMPROBPARAMONE' = probvals,
  				'GOOSE_MINFORAGEOPENNESS' = openvals, 
  				'HUNTERS_MAXDENSITY' = densityvals, write = TRUE, replicates = 10)
 EditBat(wdpath)
-EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), param = 'HUNTERS_DISTRIBUTE_RULESET', value = 10)
+EditConfig(file = paste0(wdpath, '/TIALMaSSConfig.cfg'), config = 'HUNTERS_DISTRIBUTE_RULESET', value = 10)
 
 
 
