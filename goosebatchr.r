@@ -137,18 +137,37 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	HabUseBN = HabitatUseFit[Species == 'Barnacle', SeasonFit]
 
 # --------------------------------------------------------------------------------------------#
+#                                  Distance from roost                                        #
+# --------------------------------------------------------------------------------------------#
+	# Field observations were subset and selected here:
+	# Currently 2015 data from months: 9,10,11,12,1,2 & 3
+	fieldobs = fread('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt')
+	sp = c('Pinkfoot', 'Barnacle', 'Greylag')
+	DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage, polyref = poly, species = sp, fieldobs = FALSE)
+	DistToNearestRoostSim[, Type:='Simulated']
+	DistToNearestRoostField = CalcDistToRoosts(roost = roost, fields = fieldobs, polyref = poly, species = sp, fieldobs = TRUE)
+	DistToNearestRoostField[, Type:='Fieldobs']
+	Distances = rbind(DistToNearestRoostSim[,.(Shortest, Species, Type)], DistToNearestRoostField[,.(Shortest, Species, Type)])
+
+	RoostDistFitGL = CalcOverlap(Distances, species = 'Greylag', metric = 'Shortest')
+	RoostDistFitPF = CalcOverlap(Distances, species = 'Pinkfoot', metric = 'Shortest')
+	RoostDistFitBN = CalcOverlap(Distances, species = 'Barnacle', metric = 'Shortest')
+
+# --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
-	PinkFootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2
-	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2
-	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2
+	PinkFootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2
+	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2
+	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
-		 HabUsePF, HabUseGL, HabUseBN, PinkFootFit, GreylagFit, BarnacleFit)
+		 HabUsePF, HabUseGL, HabUseBN, RoostDistFitPF, RoostDistFitGL, 
+		 RoostDistFitBN, PinkFootFit, GreylagFit, BarnacleFit)
 	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
-		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit')
+		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
+		 'RoostDistFitBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name

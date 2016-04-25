@@ -123,7 +123,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE)
 EditBat(wdpath)
 # Memory duration
-val = seq(0, 100, length.out = 10)
+val = seq(0, 100, length.out = 21)
 wdpath = paste0(pathtodirs, dirs[14])
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = val, write = TRUE)
