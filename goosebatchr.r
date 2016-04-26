@@ -125,11 +125,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	FieldData[HabitatUse == 'UnharvestedBarley', HabitatUse:='Stubble']
 	FieldData[, NMTotal:=sum(N), by=.(Month, Species)]
 	FieldData[, Prop:=N/NMTotal]
-	FieldData[rep(seq(.N),N), .(Month, HabitatUse, N, Species, NMTotal, Prop), by = Species]
 	
 	forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]  # origin can be anything - we only care about the month.
 	HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage)
-	HabMonths = nrow(unique(HabitatUseFit[, .(Month)]))
 	HabitatUseFit[, SeasonFit:=sum(Fit, na.rm = TRUE)/length(!is.na(Month)), by = Species]
 	HabitatUseFit = unique(HabitatUseFit[, .(Species, SeasonFit)])
 	HabUsePF = HabitatUseFit[Species == 'Pinkfoot', SeasonFit]

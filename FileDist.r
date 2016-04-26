@@ -1,6 +1,6 @@
 # Copy file to x number of directories
 # Just handy when e.g. a new exe needs to distributed
-library(R.utils)
+# library(R.utils)
 library(ralmass)
 
 # List the parent directory of all the work directories
@@ -24,7 +24,7 @@ file9 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/GooseRoosts.txt'
 file10 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/PfYoungDist.txt'
 file11 = 'C:/MSV/ALMaSS_inputs/GooseManagement/TIALMaSSConfig.cfg'
 
-filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10, File11)
+filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10, file11)
 
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
@@ -47,15 +47,15 @@ setwd(wdpath)
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE)
 EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Following likelyhood
-val = seq(0, 10000, length.out = 10)
-val1 = seq(0, 10000, length.out = 10)
-val2 = seq(0, 10000, length.out = 10)
+followingval = seq(0, 10000, length.out = 11)
+followingval1 = seq(0, 10000, length.out = 11)
+followingval2 = seq(0, 10000, length.out = 11)
 wdpath = paste0(pathtodirs, dirs[2])
 setwd(wdpath) 
-GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = val,
-			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = val1,
-			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = val2,
-			    write = TRUE)
+GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
+			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
+			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
+			    write = TRUE, expand = FALSE)
 EditBat(wdpath)
 # Max appetite scaler
 appetiteval = seq(3.02, 9.06, length.out = 11)
@@ -76,15 +76,14 @@ setwd(wdpath)
 GenerateParams('GOOSE_LEAVINGTHRESHOLD' = val, write = TRUE)
 EditBat(wdpath)
 # Forage distance
-val = seq(5000, 20000, length.out = 10)
-val1 = seq(10000, 30000, length.out = 10)
-val2 = seq(1000, 10000, length.out = 10)
+foragedistval = seq(1000, 20000, length.out = 11)
+foragedistval = c(foragedistval, 35000)
 wdpath = paste0(pathtodirs, dirs[6])
 setwd(wdpath) 
-GenerateParams('GOOSE_FORAGEDIST_BN' = val,
-			   'GOOSE_FORAGEDIST_PF' = val1,
-			   'GOOSE_FORAGEDIST_GL' = val2,
-			    write = TRUE)
+GenerateParams('GOOSE_FORAGEDIST_BN' = foragedistval,
+			   'GOOSE_FORAGEDIST_PF' = foragedistval,
+			   'GOOSE_FORAGEDIST_GL' = foragedistval,
+			    write = TRUE, expand = FALSE)
 EditBat(wdpath)
 # Min forage decay rate
 val = seq(0.9, 1, length.out = 10)
@@ -110,11 +109,11 @@ wdpath = paste0(pathtodirs, dirs[11])
 setwd(wdpath) 
 GenerateParams('GOOSE_ROOSTLEAVINGLIKELYHOOD' = val, write = TRUE)
 EditBat(wdpath)
-# Distance penalty
-val = seq(0.001, 1, length.out = 10)
-wdpath = paste0(pathtodirs, dirs[12])
+# Expected foraging time
+expectedval = seq(10, 240, length.out = 21)
+wdpath = paste0(pathtodirs, dirs[6])
 setwd(wdpath) 
-GenerateParams('GOOSE_MEM_DISTPENALTY' = val, write = TRUE)
+GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE)
 EditBat(wdpath)
 # Grain decay rate
 grainval = seq(0.9, 1, length.out = 21)
