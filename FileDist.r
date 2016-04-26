@@ -47,10 +47,10 @@ setwd(wdpath)
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE)
 EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Following likelyhood
-followingval = seq(0, 10000, length.out = 11)
-followingval1 = seq(0, 10000, length.out = 11)
-followingval2 = seq(0, 10000, length.out = 11)
-wdpath = paste0(pathtodirs, dirs[2])
+followingval = seq(0, 10000, length.out = 21)
+followingval1 = seq(0, 10000, length.out = 21)
+followingval2 = seq(0, 10000, length.out = 21)
+wdpath = paste0(pathtodirs, dirs[8])
 setwd(wdpath) 
 GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
 			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
@@ -76,9 +76,9 @@ setwd(wdpath)
 GenerateParams('GOOSE_LEAVINGTHRESHOLD' = val, write = TRUE)
 EditBat(wdpath)
 # Forage distance
-foragedistval = seq(1000, 20000, length.out = 11)
+foragedistval = seq(1000, 20000, length.out = 21)
 foragedistval = c(foragedistval, 35000)
-wdpath = paste0(pathtodirs, dirs[6])
+wdpath = paste0(pathtodirs, dirs[7])
 setwd(wdpath) 
 GenerateParams('GOOSE_FORAGEDIST_BN' = foragedistval,
 			   'GOOSE_FORAGEDIST_PF' = foragedistval,
