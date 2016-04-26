@@ -72,7 +72,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 
 if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 {
-	dropcols = c("Polyref", "Openness", "Grain", "Maize", "Digestability")
+	dropcols = c("Openness", "Grain", "Maize", "Digestability")
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
 	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
 	# Field data:
@@ -89,9 +89,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	melted[, Type:='Simulated']
 	dists = rbind(melted, flocks)
 
-	DegreeOverlapB = round(CalcOverlap(dists, species = 'Barnacle'), digits = 4)
-	DegreeOverlapP = round(CalcOverlap(dists, species = 'Pinkfoot'), digits = 4)
-	DegreeOverlapG = round(CalcOverlap(dists, species = 'Greylag'), digits = 4)
+	DegreeOverlapB = round(CalcOverlap(dists, species = 'Barnacle', metric = 'Numbers'), digits = 4)
+	DegreeOverlapP = round(CalcOverlap(dists, species = 'Pinkfoot', metric = 'Numbers'), digits = 4)
+	DegreeOverlapG = round(CalcOverlap(dists, species = 'Greylag', metric = 'Numbers'), digits = 4)
 
 	# Simulation results - timed counts:
 	simflocks = forage[Geese > 0, .(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
@@ -101,9 +101,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	melted[, Type:='Simulated']
 	distsTimed = rbind(melted, flocks)
 	
-	DegreeOverlapBT = round(CalcOverlap(distsTimed, species = 'Barnacle'), digits = 4)
-	DegreeOverlapPT = round(CalcOverlap(distsTimed, species = 'Pinkfoot'), digits = 4)
-	DegreeOverlapGT = round(CalcOverlap(distsTimed, species = 'Greylag'), digits = 4)
+	DegreeOverlapBT = round(CalcOverlap(distsTimed, species = 'Barnacle', metric = 'Numbers'), digits = 4)
+	DegreeOverlapPT = round(CalcOverlap(distsTimed, species = 'Pinkfoot', metric = 'Numbers'), digits = 4)
+	DegreeOverlapGT = round(CalcOverlap(distsTimed, species = 'Greylag', metric = 'Numbers'), digits = 4)
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
@@ -142,6 +142,8 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	# Field observations were subset and selected here:
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3
 	fieldobs = fread('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt')
+	roost = fread('GooseRoosts.txt', skip = 1)
+	poly = fread('Vejlerne2015_polyrefs_RenumFBHBOp.txt', skip = 1, verbose = FALSE)
 	sp = c('Pinkfoot', 'Barnacle', 'Greylag')
 	DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage, polyref = poly, species = sp, fieldobs = FALSE)
 	DistToNearestRoostSim[, Type:='Simulated']
@@ -210,7 +212,7 @@ slackr(paste('Run', counter, Sys.time(), sep = ' '))
 	# res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
 	# res[, Type:='Individual']
 	# res[FitType %in% c('PinkFootFit', 'BarnacleFit', 'GreylagFit') , Type:='Overall']
-	# p = ggplot(res, aes(Value, Fit)) + geom_line(aes(color = FitType), size = 1) +
+	# p = ggplot(res, aes(Value ,Fit)) + geom_line(aes(color = FitType), size = 1) +
 	# 	scale_color_brewer(palette = "Set3") + facet_wrap(~Type, scales = 'free_y')
 	# ggslackr(p)
 # }
