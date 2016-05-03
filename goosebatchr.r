@@ -76,11 +76,10 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
 	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
 	# Field data:
-	fieldobs = fread('o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv')
-	flocks = fieldobs[Month %in% c(12,1) & Hour >= 11 & Hour <= 13,]  # todo: Why do we only use december and jan?
-	flocks[, c('Month', 'Hour'):=NULL]
-	setcolorder(flocks, c('Species', 'Numbers', 'Type'))
-
+	# Currently 2015 data from months: 9,10,11,12,1,2 & 3. See o:\ST_GooseProject\R\ConvertObsToALMaSS.r
+	# for details on the data handling
+	flocks = fread('o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt')
+	
 	# Simulation results - max number on a day:
 	simflocks = forage[Geese > 0, .(Day, Barnacle, Pinkfoot, Greylag)]
 	melted = data.table::melt(simflocks, id.vars = 'Day', variable.name = 'Species', value.name = 'Numbers')
