@@ -36,6 +36,13 @@ for (i in seq_along(dirs)) {
 	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 }
+# Warning - the loop below will delete all Result directories 
+# So be really, really sure you want to do this!!!
+# for (i in seq_along(dirs)) {
+# 	wd = paste0(pathtodirs, dirs[i], '/Results')
+# 	unlink(wd, recursive = TRUE)
+# }
+
 
 #------ Below here we ditribute the different parameters ------#
 
@@ -84,10 +91,10 @@ setwd(wdpath)
 GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE)
 EditBat(wdpath)
 # Roost leaving likelyhood
-leavingnlikelyhoodval = round(seq(51, 200, length.out = 21))
+leavedistsdval = seq(1, 10, length.out = 10)
 wdpath = paste0(pathtodirs, 'WD8')
 setwd(wdpath) 
-GenerateParams('GOOSE_ROOSTLEAVINGLIKELYHOOD' = leavingnlikelyhoodval, write = TRUE)
+GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE)
 EditBat(wdpath)
 # Expected foraging time
 expectedval = round(seq(10, 240, length.out = 21))
