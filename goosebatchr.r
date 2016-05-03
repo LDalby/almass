@@ -18,7 +18,7 @@
 # 5: goosebatch.r
 # 6: PreRunSetup.r
 # Again, if you used FileDist.r then this should be taken care of.
-# --------------------------------------------------------------------------------------------# 
+# -------------------------------------------------------------------------------------------- # 
 
 # Load the packages we're going to need:
 library(data.table)
