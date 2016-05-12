@@ -17,19 +17,20 @@ file3 = 'C:/Users/lada/Git/almass/goosebatchr.r'
 file4 = 'C:/Users/lada/Git/almass/ErrorFile.txt'
 file5 = 'C:/Users/lada/Git/almass/PreRunSetup.r'
 # Species specific things:
-file6 = 'o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv'
+file6 = 'o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt'
 file7 = 'o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv'
 file8 = 'o:/ST_GooseProject/Field data/observations_PG_01Jan2010-18Jan2016_API.xlsx'
 file9 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/GooseRoosts.txt'
 file10 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/PfYoungDist.txt'
 file11 = 'C:/MSV/ALMaSS_inputs/GooseManagement/TIALMaSSConfig.cfg'
+file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
 
-filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10, file11)
+filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
+				file11, file12)
 
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
 	wd = paste0(pathtodirs, dirs[i])
-	wd = paste0(pathtodirs, 'WD11')
 	for (j in seq_along(filestodist)) {
 		file.copy(filestodist[j], to = wd, overwrite = TRUE)
 	}
@@ -91,7 +92,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE)
 EditBat(wdpath)
 # Roost leaving likelyhood
-leavedistsdval = seq(1, 10, length.out = 10)
+leavedistsdval = seq(10, 20, length.out = 10)
 wdpath = paste0(pathtodirs, 'WD8')
 setwd(wdpath) 
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE)
@@ -126,14 +127,15 @@ GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
 			    write = TRUE, expand = FALSE)
 EditBat(wdpath)
 # Forage distance
-foragedistval = round(seq(1000, 20000, length.out = 21))
-foragedistval = c(foragedistval, 35000)  # This effectively turns the cfg off.
+foragedistval = round(seq(1000, 5000, length.out = 5))
+# foragedistval = c(foragedistval, 35000)  # This effectively turns the cfg off.
 wdpath = paste0(pathtodirs, 'WD13')
 setwd(wdpath) 
-GenerateParams('GOOSE_FORAGEDIST_BN' = foragedistval,
-			   'GOOSE_FORAGEDIST_PF' = foragedistval,
-			   'GOOSE_FORAGEDIST_GL' = foragedistval,
-			    write = TRUE, expand = FALSE)
+GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, expand = FALSE)
+# GenerateParams('GOOSE_FORAGEDIST_BN' = foragedistval,
+# 			   'GOOSE_FORAGEDIST_PF' = foragedistval,
+# 			   'GOOSE_FORAGEDIST_GL' = foragedistval,
+# 			    write = TRUE, expand = FALSE)
 EditBat(wdpath)
 
 #------ Hunter parameter fitting ------#
