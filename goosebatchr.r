@@ -122,16 +122,15 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	FieldData = fread('HabitatUseAll2014.csv')
 	FieldData[HabitatUse == 'Stubble undersown', HabitatUse:='Stubble']
 	FieldData[HabitatUse == 'UnharvestedBarley', HabitatUse:='Stubble']
+	FieldData = FieldData[HabitatUse != 'Plowed',]
 	FieldData[, NMTotal:=sum(N), by=.(Month, Species)]
 	FieldData[, Prop:=N/NMTotal]
 	
 	forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]  # origin can be anything - we only care about the month.
 	HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage)
-	HabitatUseFit[, SeasonFit:=sum(Fit, na.rm = TRUE)/length(!is.na(Month)), by = Species]
-	HabitatUseFit = unique(HabitatUseFit[, .(Species, SeasonFit)])
-	HabUsePF = HabitatUseFit[Species == 'Pinkfoot', SeasonFit]
-	HabUseGL = HabitatUseFit[Species == 'Greylag', SeasonFit]
-	HabUseBN = HabitatUseFit[Species == 'Barnacle', SeasonFit]
+	HabUsePF = HabitatUseFit[Species == 'Pinkfoot', Fit]
+	HabUseGL = HabitatUseFit[Species == 'Greylag', Fit]
+	HabUseBN = HabitatUseFit[Species == 'Barnacle', Fit]
 
 # --------------------------------------------------------------------------------------------#
 #                                  Distance from roost                                        #
