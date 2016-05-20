@@ -152,20 +152,59 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	RoostDistFitBN = CalcOverlap(Distances, species = 'Barnacle', metric = 'Shortest')
 
 # --------------------------------------------------------------------------------------------#
+#                                  Numbers left at end                                        #
+# --------------------------------------------------------------------------------------------#
+	cfg = readLines('TIALMaSSConfig.cfg')
+	spfams = c('GOOSE_BNFAMILIES_STARTNOS','GOOSE_GLFAMILIES_STARTNOS','GOOSE_PFFAMILIES_STARTNOS')
+	spnb = c('GOOSE_BNNONBREEDERS_STARTNOS', 'GOOSE_GLNONBREEDERS_STARTNOS', 'GOOSE_PFNONBREEDERS_STARTNOS')
+	startnumbers = data.table(Species = c('Barnacle', 'Greylag', 'Pinkfoot'), Numbers = rep(-999, 3))
+	for (i in seq_along(spfams)) {
+		fams = cfg[grep(spfams[i], cfg)] 
+		famstrings = stringr::str_split(fams[1], '=')
+		families = as.numeric(stringr::str_trim(famstrings[[1]][2]))
+		nonbreeders = cfg[grep(spnb[i], cfg)]
+		nbstrings = stringr::str_split(nonbreeders[1], '=')
+		nonbreeders = as.numeric(stringr::str_trim(nbstrings[[1]][2]))
+		startnumbers[i, Numbers:=families+nonbreeders]
+	}
+	popn = fread('c:/MSV/WorkDirectory/GoosePopulationData.txt')
+	popn[,Day:=Day-365]
+
+	leavedate = cfg[grep('GOOSE_GL_LEAVINGDATESTART', cfg)] 
+	leavestrings = stringr::str_split(leavedate[1], '=')
+	leavedate = as.numeric(stringr::str_trim(leavestrings[[1]][2]))
+	numbers[Species == 'Greylag', EndNumbers:=popn[Day == 365+leavedate-1,GLNonBreeders]]
+	numbers[Species == 'Pinkfoot', EndNumbers:=popn[nrow(popn), PFNonBreeders]]
+	numbers[Species == 'Barnacle', EndNumbers:=popn[nrow(popn), BGNonBreeders]]
+	numbers[, PropAtEnd:=EndNumbers/StartNumbers]
+	PropAtEndGL = numbers[Species == 'Greylag', PropAtEnd]
+	PropAtEndPF = numbers[Species == 'Pinkfoot', PropAtEnd]
+	PropAtEndBN = numbers[Species == 'Barnacle', PropAtEnd]
+
+	gllos = GetLengthOfStay(config = cfg, species = 'Greylag')
+	PropDayInSimGL = popn[,list(GLNonBreeders=sum(GLNonBreeders != 0))]/gllos
+	bnlos = GetLengthOfStay(config = cfg, species = 'Barnacle')
+	PropDayInSimBN = popn[,list(BNNonBreeders=sum(BNNonBreeders != 0))]/bnlos
+	pflos = GetLengthOfStay(config = cfg, species = 'Pinkfoot')
+	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0))]/pflos
+
+# --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
-	PinkFootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2
-	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2
-	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2
+	PinkFootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2 + PropDayInSimPF^2
+	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2 + PropDayInSimGL^2
+	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2 + PropDayInSimBN^2
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
 		 HabUsePF, HabUseGL, HabUseBN, RoostDistFitPF, RoostDistFitGL, 
-		 RoostDistFitBN, PinkFootFit, GreylagFit, BarnacleFit)
+		 RoostDistFitBN, PinkFootFit, GreylagFit, BarnacleFit, PropAtEndPF, PropAtEndGL,
+		 PropAtEndBN, PropDayInSimPF, PropDayInSimGL, PropDayInSimBN)
 	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
-		 'RoostDistFitBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit')
+		 'RoostDistFitBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit', 'PropAtEndPF',
+		 'PropAtEndGL', 'PropAtEndBN')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
