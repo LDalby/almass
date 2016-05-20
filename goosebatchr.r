@@ -204,7 +204,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 		 'RoostDistFitBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit', 'PropAtEndPF',
-		 'PropAtEndGL', 'PropAtEndBN')
+		 'PropAtEndGL', 'PropAtEndBN', 'PropDayInSimPF', 'PropDayInSimGL', 'PropDayInSimBN')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
