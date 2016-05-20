@@ -155,17 +155,13 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 #                                  Numbers left at end                                        #
 # --------------------------------------------------------------------------------------------#
 	cfg = readLines('TIALMaSSConfig.cfg')
-	spfams = c('GOOSE_BNFAMILIES_STARTNOS','GOOSE_GLFAMILIES_STARTNOS','GOOSE_PFFAMILIES_STARTNOS')
 	spnb = c('GOOSE_BNNONBREEDERS_STARTNOS', 'GOOSE_GLNONBREEDERS_STARTNOS', 'GOOSE_PFNONBREEDERS_STARTNOS')
-	startnumbers = data.table(Species = c('Barnacle', 'Greylag', 'Pinkfoot'), Numbers = rep(-999, 3))
-	for (i in seq_along(spfams)) {
-		fams = cfg[grep(spfams[i], cfg)] 
-		famstrings = stringr::str_split(fams[1], '=')
-		families = as.numeric(stringr::str_trim(famstrings[[1]][2]))
+	numbers = data.table(Species = c('Barnacle', 'Greylag', 'Pinkfoot'), StartNumbers = rep(-999, 3))
+	for (i in seq_along(spnb)) {
 		nonbreeders = cfg[grep(spnb[i], cfg)]
 		nbstrings = stringr::str_split(nonbreeders[1], '=')
 		nonbreeders = as.numeric(stringr::str_trim(nbstrings[[1]][2]))
-		startnumbers[i, Numbers:=families+nonbreeders]
+		numbers[i, StartNumbers:=nonbreeders]
 	}
 	popn = fread('c:/MSV/WorkDirectory/GoosePopulationData.txt')
 	popn[,Day:=Day-365]
