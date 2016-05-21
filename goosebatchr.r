@@ -163,15 +163,20 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 		nonbreeders = as.numeric(stringr::str_trim(nbstrings[[1]][2]))
 		numbers[i, StartNumbers:=nonbreeders]
 	}
-	popn = fread('c:/MSV/WorkDirectory/GoosePopulationData.txt')
+	popn = fread('GoosePopulationData.txt')
 	popn[,Day:=Day-365]
 
 	leavedate = cfg[grep('GOOSE_GL_LEAVINGDATESTART', cfg)] 
 	leavestrings = stringr::str_split(leavedate[1], '=')
 	leavedate = as.numeric(stringr::str_trim(leavestrings[[1]][2]))
-	numbers[Species == 'Greylag', EndNumbers:=popn[Day == 365+leavedate-1,GLNonBreeders]]
+	if(popn[,list(Day=max(Day))] > (365+leavedate)) {
+		numbers[Species == 'Greylag', EndNumbers:=popn[Day == 365+leavedate-1,GLNonBreeders]]
+	}
+	if(popn[,list(Day=max(Day))] <= (365+leavedate)) {
+		numbers[Species == 'Greylag', EndNumbers:=popn[nrow(popn), GLNonBreeders]]
+	}
 	numbers[Species == 'Pinkfoot', EndNumbers:=popn[nrow(popn), PFNonBreeders]]
-	numbers[Species == 'Barnacle', EndNumbers:=popn[nrow(popn), BGNonBreeders]]
+	numbers[Species == 'Barnacle', EndNumbers:=popn[nrow(popn), BNNonBreeders]]
 	numbers[, PropAtEnd:=EndNumbers/StartNumbers]
 	PropAtEndGL = numbers[Species == 'Greylag', PropAtEnd]
 	PropAtEndPF = numbers[Species == 'Pinkfoot', PropAtEnd]
