@@ -39,10 +39,10 @@ for (i in seq_along(dirs)) {
 }
 # Warning - the loop below will delete all Result directories 
 # So be really, really sure you want to do this!!!
-# for (i in seq_along(dirs)) {
-# 	wd = paste0(pathtodirs, dirs[i], '/Results')
-# 	unlink(wd, recursive = TRUE)
-# }
+for (i in seq_along(dirs)) {
+	wd = paste0(pathtodirs, dirs[i], '/Results')
+	unlink(wd, recursive = TRUE)
+}
 
 
 #------ Below here we ditribute the different parameters ------#
@@ -56,7 +56,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE)
 EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Max appetite scaler
-appetiteval = seq(3.02, 9.06, length.out = 21)
+appetiteval = seq(0, 10, length.out = 21)
 wdpath = paste0(pathtodirs, 'WD2')
 setwd(wdpath) 
 GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE)
@@ -68,13 +68,13 @@ setwd(wdpath)
 GenerateParams('GOOSE_MAXENERGYRESERVEPROPORTION' = energyval, write = TRUE)
 EditBat(wdpath)
 # The leaving threshold
-leavingval = seq(1.0, 1.3, length.out = 21)
+leavingval = seq(1.0, 1.1, length.out = 21)
 wdpath = paste0(pathtodirs, 'WD4')
 setwd(wdpath) 
 GenerateParams('GOOSE_LEAVINGTHRESHOLD' = leavingval, write = TRUE)
 EditBat(wdpath)
 # After dark time
-afterdarkval = round(seq(0, 60, length.out = 21))
+afterdarkval = round(seq(0, 90, length.out = 21))
 wdpath = paste0(pathtodirs, 'WD5')
 setwd(wdpath) 
 GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE)
@@ -92,7 +92,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE)
 EditBat(wdpath)
 # Roost leaving likelyhood
-leavedistsdval = seq(10, 20, length.out = 10)
+leavedistsdval = seq(0, 30, length.out = 21)
 wdpath = paste0(pathtodirs, 'WD8')
 setwd(wdpath) 
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE)
@@ -116,9 +116,9 @@ setwd(wdpath)
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE)
 EditBat(wdpath)
 # Following likelyhood
-followingval = round(seq(8000, 10000, length.out = 21))
-followingval1 = round(seq(8000, 10000, length.out = 21))
-followingval2 = round(seq(8000, 10000, length.out = 21))
+followingval = round(seq(7000, 9000, length.out = 21))
+followingval1 = round(seq(7000, 9000, length.out = 21))
+followingval2 = round(seq(7000, 9000, length.out = 21))
 wdpath = paste0(pathtodirs, 'WD12')
 setwd(wdpath) 
 GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
@@ -127,7 +127,7 @@ GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
 			    write = TRUE, expand = FALSE)
 EditBat(wdpath)
 # Forage distance
-foragedistval = round(seq(1000, 5000, length.out = 5))
+foragedistval = round(seq(1000, 5000, length.out = 21))
 # foragedistval = c(foragedistval, 35000)  # This effectively turns the cfg off.
 wdpath = paste0(pathtodirs, 'WD13')
 setwd(wdpath) 

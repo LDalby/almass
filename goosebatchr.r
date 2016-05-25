@@ -158,17 +158,13 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	spnb = c('GOOSE_BNNONBREEDERS_STARTNOS', 'GOOSE_GLNONBREEDERS_STARTNOS', 'GOOSE_PFNONBREEDERS_STARTNOS')
 	numbers = data.table(Species = c('Barnacle', 'Greylag', 'Pinkfoot'), StartNumbers = rep(-999, 3))
 	for (i in seq_along(spnb)) {
-		nonbreeders = cfg[grep(spnb[i], cfg)]
-		nbstrings = stringr::str_split(nonbreeders[1], '=')
-		nonbreeders = as.numeric(stringr::str_trim(nbstrings[[1]][2]))
+		nonbreeders = GetParamValue(config = cfg, param = spnb[i])
 		numbers[i, StartNumbers:=nonbreeders]
 	}
 	popn = fread('GoosePopulationData.txt')
 	popn[,Day:=Day-365]
 
-	leavedate = cfg[grep('GOOSE_GL_LEAVINGDATESTART', cfg)] 
-	leavestrings = stringr::str_split(leavedate[1], '=')
-	leavedate = as.numeric(stringr::str_trim(leavestrings[[1]][2]))
+	leavedate = GetParamValue(config = cfg, param = 'GOOSE_GL_LEAVINGDATESTART')
 	if(popn[,list(Day=max(Day))] > (365+leavedate)) {
 		numbers[Species == 'Greylag', EndNumbers:=popn[Day == 365+leavedate-1,GLNonBreeders]]
 	}
