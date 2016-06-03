@@ -31,6 +31,7 @@ filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, f
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
 	wd = paste0(pathtodirs, dirs[i])
+	# wd = paste0(pathtodirs, 'WD15')
 	for (j in seq_along(filestodist)) {
 		file.copy(filestodist[j], to = wd, overwrite = TRUE)
 	}
@@ -92,7 +93,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE)
 EditBat(wdpath)
 # Roost leaving likelyhood
-leavedistsdval = seq(0, 30, length.out = 21)
+leavedistsdval = round(seq(0, 30, length.out = 21))
 wdpath = paste0(pathtodirs, 'WD8')
 setwd(wdpath) 
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE)
@@ -149,7 +150,7 @@ following = GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
 			    write = FALSE, expand = FALSE, replicates = 1)
 following = as.character(following$Params)
 
-leavedistsdval = seq(0, 30, length.out = 15)
+leavedistsdval = round(seq(0, 30, length.out = 15))
 leave = GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = FALSE)
 leave = as.character(leave$Params)
 
