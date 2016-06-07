@@ -196,7 +196,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 		variable.name = 'Species', value.name = 'Numbers')
 	melted = melted[Numbers != 0,]
 	melted[,Type:='Simulated']
-	full = rbind(goobservedopen, melted[,.(Openness, Species, Type)])
+	full = rbind(observedopen, melted[,.(Openness, Species, Type)])
 	
 	OpenOverlapGL = CalcOverlap(full[Species == 'Greylag',], species = 'greylag', metric = 'Openness')	
 	OpenOverlapPF = CalcOverlap(full[Species == 'Pinkfoot',], species = 'Pinkfoot', metric = 'Openness')	
