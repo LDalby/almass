@@ -24,6 +24,10 @@ file9 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/GooseRoosts.txt'
 file10 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/PfYoungDist.txt'
 file11 = 'C:/MSV/ALMaSS_inputs/GooseManagement/TIALMaSSConfig.cfg'
 file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
+# Landscape:
+# file13 = 'C:/MSV/WorkDirectory/VejlerneOpenMay2016PolyRef.txt'
+# file14 = 'C:/MSV/WorkDirectory/VejlerneOpenMay2016.lsb'
+# file15 = 'C:/MSV/WorkDirectory/VejlerneOpenMay2016FarmRef.txt'
 
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				file11, file12)
@@ -38,12 +42,16 @@ for (i in seq_along(dirs)) {
 	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 }
+# Store the results from previous round of fitting:
+# StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
 # Warning - the loop below will delete all Result directories 
 # So be really, really sure you want to do this!!!
-# for (i in seq_along(dirs)) {
-# 	wd = paste0(pathtodirs, dirs[i], '/Results')
-# 	unlink(wd, recursive = TRUE)
-# }
+for (i in seq_along(dirs)) {
+	wd = paste0(pathtodirs, dirs[i], '/Results')
+	unlink(wd, recursive = TRUE)
+}
+
+
 
 
 #------ Below here we ditribute the different parameters ------#
@@ -51,61 +59,61 @@ for (i in seq_along(dirs)) {
 # Distribute the paramter values to run:
 # Goose parameter fitting
 # Openness
-openval = round(seq(0, 1000, length.out = 21))
+openval = round(seq(50, 150, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD1')
 setwd(wdpath) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE)
 EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Max appetite scaler
-appetiteval = seq(0, 10, length.out = 21)
+appetiteval = seq(0, 5, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD2')
 setwd(wdpath) 
 GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE)
 EditBat(wdpath)
 # Max energy reserve proportion
-energyval = seq(0.1, 0.3, length.out = 21)
+energyval = seq(0.15, 0.25, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD3')
 setwd(wdpath) 
 GenerateParams('GOOSE_MAXENERGYRESERVEPROPORTION' = energyval, write = TRUE)
 EditBat(wdpath)
 # The leaving threshold
-leavingval = seq(1.0, 1.1, length.out = 21)
+leavingval = seq(1.0, 1.1, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD4')
 setwd(wdpath) 
 GenerateParams('GOOSE_LEAVINGTHRESHOLD' = leavingval, write = TRUE)
 EditBat(wdpath)
 # After dark time
-afterdarkval = round(seq(0, 90, length.out = 21))
+afterdarkval = round(seq(0, 90, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD5')
 setwd(wdpath) 
 GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE)
 EditBat(wdpath) 
 # Min forage decay rate
-foragedecayval = seq(0.95, 1, length.out = 21)
+foragedecayval = seq(0.995, 1, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD6')
 setwd(wdpath) 
 GenerateParams('GOOSE_MINFORAGEDECAYRATE' = foragedecayval, write = TRUE)
 EditBat(wdpath)
 # Goose feeding time
-feedingval = seq(0.65, 0.9, length.out = 21)
+feedingval = seq(0.7, 0.85, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD7')
 setwd(wdpath) 
 GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE)
 EditBat(wdpath)
 # Roost leaving likelyhood
-leavedistsdval = round(seq(0, 30, length.out = 21))
+leavedistsdval = round(seq(0, 30, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD8')
 setwd(wdpath) 
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE)
 EditBat(wdpath)
 # Expected foraging time
-expectedval = round(seq(10, 240, length.out = 21))
+expectedval = round(seq(10, 240, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD9')
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE)
 EditBat(wdpath)
 # Grain decay rate
-grainval = seq(0.975, 1, length.out = 21)
+grainval = seq(0.975, 1, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD10')
 setwd(wdpath) 
 GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE)
@@ -117,9 +125,9 @@ setwd(wdpath)
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE)
 EditBat(wdpath)
 # Following likelyhood
-followingval = round(seq(6000, 9000, length.out = 21))
-followingval1 = round(seq(6000, 9000, length.out = 21))
-followingval2 = round(seq(6000, 9000, length.out = 21))
+followingval = round(seq(6000, 9000, length.out = 11))
+followingval1 = round(seq(6000, 9000, length.out = 11))
+followingval2 = round(seq(6000, 9000, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD12')
 setwd(wdpath) 
 GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
@@ -128,7 +136,7 @@ GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
 			    write = TRUE, expand = FALSE)
 EditBat(wdpath)
 # Forage distance
-foragedistval = round(seq(1000, 5000, length.out = 21))
+foragedistval = round(seq(1000, 3000, length.out = 11))
 # foragedistval = c(foragedistval, 35000)  # This effectively turns the cfg off.
 wdpath = paste0(pathtodirs, 'WD13')
 setwd(wdpath) 

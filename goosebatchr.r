@@ -72,7 +72,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 
 if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 {
-	dropcols = c("Openness", "Grain", "Maize", "Digestability")
+	dropcols = c("Grain", "Maize", "Digestability")
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
 	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
 	# Field data:
@@ -186,22 +186,41 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0))]/pflos
 
 # --------------------------------------------------------------------------------------------#
+#                                 Openness distribution                                       #
+# --------------------------------------------------------------------------------------------#
+	observedopen = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/ObservedOpenness.txt')
+	sim = forage[, .(Day, Polyref, Openness, BarnacleTimed, PinkfootTimed, GreylagTimed)]
+	setnames(sim, old = c('BarnacleTimed', 'PinkfootTimed', 'GreylagTimed'),
+				 new = c('Barnacle', 'Pinkfoot', 'Greylag'))
+	melted = melt(sim, id.vars = c('Day', 'Polyref', 'Openness'),
+		variable.name = 'Species', value.name = 'Numbers')
+	melted = melted[Numbers != 0,]
+	melted[,Type:='Simulated']
+	full = rbind(goobservedopen, melted[,.(Openness, Species, Type)])
+	
+	OpenOverlapGL = CalcOverlap(full[Species == 'Greylag',], species = 'greylag', metric = 'Openness')	
+	OpenOverlapPF = CalcOverlap(full[Species == 'Pinkfoot',], species = 'Pinkfoot', metric = 'Openness')	
+	OpenOverlapBN = CalcOverlap(full[Species == 'Barnacle',], species = 'Barnacle', metric = 'Openness')	
+
+# --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
-	PinkFootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2 + PropDayInSimPF^2
-	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2 + PropDayInSimGL^2
-	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2 + PropDayInSimBN^2
+	PinkFootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2 + PropDayInSimPF^2 + OpenOverlapPF^2
+	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2 + PropDayInSimGL^2 + OpenOverlapGL^2
+	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2 + PropDayInSimBN^2 + OpenOverlapBN^2
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
 		 HabUsePF, HabUseGL, HabUseBN, RoostDistFitPF, RoostDistFitGL, 
 		 RoostDistFitBN, PinkFootFit, GreylagFit, BarnacleFit, PropAtEndPF, PropAtEndGL,
-		 PropAtEndBN, PropDayInSimPF, PropDayInSimGL, PropDayInSimBN)
+		 PropAtEndBN, PropDayInSimPF, PropDayInSimGL, PropDayInSimBN, OpenOverlapGL, OpenOverlapPF,
+		 OpenOverlapBN)
 	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 		 'RoostDistFitBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit', 'PropAtEndPF',
-		 'PropAtEndGL', 'PropAtEndBN', 'PropDayInSimPF', 'PropDayInSimGL', 'PropDayInSimBN')
+		 'PropAtEndGL', 'PropAtEndBN', 'PropDayInSimPF', 'PropDayInSimGL', 'PropDayInSimBN', 
+		 'OpennessFitGL', 'OpennessFitPF','OpennessFitBN')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
