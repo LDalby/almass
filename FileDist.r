@@ -46,10 +46,10 @@ for (i in seq_along(dirs)) {
 # StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
 # Warning - the loop below will delete all Result directories 
 # So be really, really sure you want to do this!!!
-for (i in seq_along(dirs)) {
-	wd = paste0(pathtodirs, dirs[i], '/Results')
-	unlink(wd, recursive = TRUE)
-}
+# for (i in seq_along(dirs)) {
+# 	wd = paste0(pathtodirs, dirs[i], '/Results')
+# 	unlink(wd, recursive = TRUE)
+# }
 
 
 
@@ -59,7 +59,7 @@ for (i in seq_along(dirs)) {
 # Distribute the paramter values to run:
 # Goose parameter fitting
 # Openness
-openval = round(seq(50, 150, length.out = 11))
+openval = round(seq(0, 100, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD1')
 setwd(wdpath) 
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE)
@@ -113,13 +113,13 @@ setwd(wdpath)
 GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE)
 EditBat(wdpath)
 # Grain decay rate
-grainval = seq(0.975, 1, length.out = 11)
+grainval = seq(0.985, 1, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD10')
 setwd(wdpath) 
 GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE)
 EditBat(wdpath)
 # Memory duration
-memoryval = 0:20
+memoryval = seq(0, 20, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD11')
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE)
