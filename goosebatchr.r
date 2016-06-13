@@ -205,21 +205,22 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 # --------------------------------------------------------------------------------------------#
 #                          Huntingbag - ONLY USED IN FULL MODEL                               #
 # --------------------------------------------------------------------------------------------#
-	bag = fread('o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/THS_JAM_Goosehunters_2013.csv')
-	bag = bag[!is.na(ABMhunter),.(ABMhunter, Greylag, Pinkfeet)]
-	setnames(bag, old = 'Pinkfeet', new = 'Pinkfoot')
-	bag = melt(bag, id.vars = 'ABMhunter', measure.vars = c('Greylag', 'Pinkfoot'), variable.name = 'Species', value.name = 'NoShot')
-	bag[, Type:='Fieldobs']
+	# Remember to handle these fits when writing out and summarizing 
+	#bag = fread('o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/THS_JAM_Goosehunters_2013.csv')
+	# bag = bag[!is.na(ABMhunter),.(ABMhunter, Greylag, Pinkfeet)]
+	# setnames(bag, old = 'Pinkfeet', new = 'Pinkfoot')
+	# bag = melt(bag, id.vars = 'ABMhunter', measure.vars = c('Greylag', 'Pinkfoot'), variable.name = 'Species', value.name = 'NoShot')
+	# bag[, Type:='Fieldobs']
 	
-	simbag = fread('c:/MSV/WorkDirectory/HuntingBagRecord.txt')
-	simbag[, Species:=sapply(GameType, ConvertGameType)]
-	simbag[, NoShot:=.N, by = c('Species', 'HunterRef')]
-	sim = unique(simbag[, .(HunterRef, Species, NoShot)])
-	sim[, Type:='Simulated']
-	full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], sim[, .(Species, NoShot, Type)])
+	# simbag = fread('HuntingBagRecord.txt')
+	# simbag[, Species:=sapply(GameType, ConvertGameType)]
+	# simbag[, NoShot:=.N, by = c('Species', 'HunterRef')]
+	# sim = unique(simbag[, .(HunterRef, Species, NoShot)])
+	# sim[, Type:='Simulated']
+	# full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], sim[, .(Species, NoShot, Type)])
 	
-	GLBagOverlap = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
-	PFBagOverlap = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
+	# GLBagOverlap = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
+	# PFBagOverlap = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
 
 
 # --------------------------------------------------------------------------------------------#
