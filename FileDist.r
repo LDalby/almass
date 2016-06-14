@@ -44,8 +44,8 @@ for (i in seq_along(dirs)) {
 }
 # Store the results from previous round of fitting:
 # StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
-# Warning - the loop below will delete all Result directories 
-# So be really, really sure you want to do this!!!
+# # Warning - the loop below will delete all Result directories 
+# # So be really, really sure you want to do this!!!
 # for (i in seq_along(dirs)) {
 # 	wd = paste0(pathtodirs, dirs[i], '/Results')
 # 	unlink(wd, recursive = TRUE)
@@ -107,7 +107,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE)
 EditBat(wdpath)
 # Expected foraging time
-expectedval = round(seq(10, 240, length.out = 11))
+expectedval = round(seq(150, 350, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD9')
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE)
