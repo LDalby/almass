@@ -31,27 +31,28 @@ file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
 
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				file11, file12)
-
+HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
+dirs = dirs[c(1:5, 8:15)]  # Exclude the scenarios
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
 	wd = paste0(pathtodirs, dirs[i])
 	# wd = paste0(pathtodirs, 'WD15')
 	for (j in seq_along(filestodist)) {
 		file.copy(filestodist[j], to = wd, overwrite = TRUE)
+		file.copy(HHL, to = file.path(wd, 'Hunter_Hunting_Locations.txt'),
+		 overwrite = TRUE)
 	}
 	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 }
 # Store the results from previous round of fitting:
 # StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
-# # Warning - the loop below will delete all Result directories 
-# # So be really, really sure you want to do this!!!
-# for (i in seq_along(dirs)) {
-# 	wd = paste0(pathtodirs, dirs[i], '/Results')
-# 	unlink(wd, recursive = TRUE)
-# }
-
-
+# Warning - the loop below will delete all Result directories 
+# So be really, really sure you want to do this!!!
+for (i in seq_along(dirs)) {
+	wd = paste0(pathtodirs, dirs[i], '/Results')
+	unlink(wd, recursive = TRUE)
+}
 
 
 #------ Below here we ditribute the different parameters ------#
@@ -65,7 +66,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE)
 EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Max appetite scaler
-appetiteval = seq(0, 5, length.out = 11)
+appetiteval = seq(0, 10, length.out = 21)
 wdpath = paste0(pathtodirs, 'WD2')
 setwd(wdpath) 
 GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE)
@@ -89,7 +90,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE)
 EditBat(wdpath) 
 # Min forage decay rate
-foragedecayval = seq(0.995, 1, length.out = 11)
+foragedecayval = seq(0.0, 1, length.out = 21)
 wdpath = paste0(pathtodirs, 'WD6')
 setwd(wdpath) 
 GenerateParams('GOOSE_MINFORAGEDECAYRATE' = foragedecayval, write = TRUE)
@@ -107,7 +108,7 @@ setwd(wdpath)
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE)
 EditBat(wdpath)
 # Expected foraging time
-expectedval = round(seq(150, 350, length.out = 11))
+expectedval = round(seq(60, 350, length.out = 21))
 wdpath = paste0(pathtodirs, 'WD9')
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE)
