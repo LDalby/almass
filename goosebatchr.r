@@ -155,7 +155,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 #                                  Numbers left at end                                        #
 # --------------------------------------------------------------------------------------------#
 	cfg = readLines('TIALMaSSConfig.cfg')
-	spnb = c('GOOSE_BNNONBREEDERS_STARTNOS', 'GOOSE_GLNONBREEDERS_STARTNOS', 'GOOSE_PFNONBREEDERS_STARTNOS')
+	spnb = c('GOOSE_BN_NONBREEDERS_STARTNOS', 'GOOSE_GL_NONBREEDERS_STARTNOS', 'GOOSE_PF_NONBREEDERS_STARTNOS')
 	numbers = data.table(Species = c('Barnacle', 'Greylag', 'Pinkfoot'), StartNumbers = rep(-999, 3))
 	for (i in seq_along(spnb)) {
 		nonbreeders = GetParamValue(config = cfg, param = spnb[i])
@@ -268,12 +268,13 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 }
 
 # Report progress to console:
-cat(paste0('Run number ', counter, '\n'))
+report = paste0(basename(getwd()), ' - run number ', counter, '\n')
+cat(report)
 
 # If you want updates:
 token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
-slackrSetup(channel="@slackbot", api_token = token)
-slackr(paste('Run', counter, Sys.time(), sep = ' '))
+slackrSetup(channel="@lars", api_token = token)
+slackr(paste(report, Sys.time(), sep = ' '))
 
 # If you plots for each run:
 # if(counter > 1 & counter < runs) 
