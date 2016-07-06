@@ -207,8 +207,11 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
 	PinkfootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2 + PropDayInSimPF^2
+	PinkfootFit = PinkfootFit/5
 	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2 + PropDayInSimGL^2 
+	GreylagFit = GreylagFit/4
 	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2 + PropDayInSimBN^2
+	BarnacleFit = BarnacleFit/4
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
