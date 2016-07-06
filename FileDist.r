@@ -33,7 +33,7 @@ filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, f
 				file11, file12)
 HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
 dirs = dirs[c(1:5, 8:15)]  # Exclude the scenarios
-dirs = c('WD1')
+# dirs = c('WD1')
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
 	wd = paste0(pathtodirs, dirs[i])
@@ -61,34 +61,34 @@ for (i in seq_along(dirs)) {
 # Distribute the paramter values to run:
 # Goose parameter fitting
 # Openness
-openval = round(seq(0, 100, length.out = 3))
+openval = round(seq(0, 100, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD1')
 setwd(wdpath) 
-GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE, replicates = 3)
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE, replicates = 5)
 EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Max appetite scaler
-appetiteval = seq(0, 10, length.out = 21)
+appetiteval = seq(1, 7, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD2')
 setwd(wdpath) 
-GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE)
+GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # Max energy reserve proportion
 energyval = seq(0.15, 0.25, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD3')
 setwd(wdpath) 
-GenerateParams('GOOSE_MAXENERGYRESERVEPROPORTION' = energyval, write = TRUE)
+GenerateParams('GOOSE_MAXENERGYRESERVEPROPORTION' = energyval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # The leaving threshold
 leavingval = seq(1.0, 1.1, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD4')
 setwd(wdpath) 
-GenerateParams('GOOSE_LEAVINGTHRESHOLD' = leavingval, write = TRUE)
+GenerateParams('GOOSE_LEAVINGTHRESHOLD' = leavingval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # After dark time
 afterdarkval = round(seq(0, 90, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD5')
 setwd(wdpath) 
-GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE)
+GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE, replicates = 5)
 EditBat(wdpath) 
 # Min forage decay rate
 foragedecayval = seq(0.0, 1, length.out = 21)

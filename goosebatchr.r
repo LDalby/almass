@@ -167,19 +167,19 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 # --------------------------------------------------------------------------------------------#
 #                                 Openness distribution                                       #
 # --------------------------------------------------------------------------------------------#
-	observedopen = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/ObservedOpenness.txt')
-	sim = forage[, .(Day, Polyref, Openness, BarnacleTimed, PinkfootTimed, GreylagTimed)]
-	setnames(sim, old = c('BarnacleTimed', 'PinkfootTimed', 'GreylagTimed'),
-				 new = c('Barnacle', 'Pinkfoot', 'Greylag'))
-	melted = melt(sim, id.vars = c('Day', 'Polyref', 'Openness'),
-		variable.name = 'Species', value.name = 'Numbers')
-	melted = melted[Numbers != 0,]
-	melted[,Type:='Simulated']
-	full = rbind(observedopen, melted[,.(Openness, Species, Type)])
+	# observedopen = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/ObservedOpenness.txt')
+	# sim = forage[, .(Day, Polyref, Openness, BarnacleTimed, PinkfootTimed, GreylagTimed)]
+	# setnames(sim, old = c('BarnacleTimed', 'PinkfootTimed', 'GreylagTimed'),
+	# 			 new = c('Barnacle', 'Pinkfoot', 'Greylag'))
+	# melted = melt(sim, id.vars = c('Day', 'Polyref', 'Openness'),
+	# 	variable.name = 'Species', value.name = 'Numbers')
+	# melted = melted[Numbers != 0,]
+	# melted[,Type:='Simulated']
+	# full = rbind(observedopen, melted[,.(Openness, Species, Type)])
 	
-	OpenOverlapGL = CalcOverlap(full[Species == 'Greylag',], species = 'greylag', metric = 'Openness')	
-	OpenOverlapPF = CalcOverlap(full[Species == 'Pinkfoot',], species = 'Pinkfoot', metric = 'Openness')	
-	OpenOverlapBN = CalcOverlap(full[Species == 'Barnacle',], species = 'Barnacle', metric = 'Openness')	
+	# OpenOverlapGL = CalcOverlap(full[Species == 'Greylag',], species = 'greylag', metric = 'Openness')	
+	# OpenOverlapPF = CalcOverlap(full[Species == 'Pinkfoot',], species = 'Pinkfoot', metric = 'Openness')	
+	# OpenOverlapBN = CalcOverlap(full[Species == 'Barnacle',], species = 'Barnacle', metric = 'Openness')	
 
 # --------------------------------------------------------------------------------------------#
 #                          Huntingbag - ONLY USED IN FULL MODEL                               #
@@ -217,11 +217,11 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
 		 HabUsePF, HabUseGL, HabUseBN, RoostDistFitPF, RoostDistFitGL, 
 		 RoostDistFitBN, PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF,
-		  PropDayInSimGL, PropDayInSimBN, OpenOverlapGL, OpenOverlapPF, OpenOverlapBN)
+		  PropDayInSimGL, PropDayInSimBN)
 	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 		 'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
-		  'PropDayInSimGL', 'PropDayInSimBN', 'OpennessFitGL', 'OpennessFitPF','OpennessFitBN')
+		  'PropDayInSimGL', 'PropDayInSimBN')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
@@ -264,7 +264,7 @@ cat(report)
 	# library(ggplot2)
 	# res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
 	# res[, Type:='Individual']
-	# res[FitType %in% c('PinkFootFit', 'BarnacleFit', 'GreylagFit') , Type:='Overall']
+	# res[FitType %in% c('PinkfootFit', 'BarnacleFit', 'GreylagFit') , Type:='Overall']
 	# p = ggplot(res, aes(Value ,Fit)) + geom_line(aes(color = FitType), size = 1) +
 	# 	scale_color_brewer(palette = "Set3") + facet_wrap(~Type, scales = 'free_y')
 	# ggslackr(p)
