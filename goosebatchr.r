@@ -26,7 +26,7 @@ library(ralmass)
 library(stringr)
 library(readxl)
 
-library(slackr)  # Only needed if you want Slack to give you updates on progress
+# library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work directory (done automatically when distributing the files, therefore blank):
 
@@ -106,7 +106,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
-	massdropcols = c("Energy", "MinForageRate", 'FullTime')
+	massdropcols = c("BodyCondition", "MinForageRate", 'FullTime')
 	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE, drop = massdropcols)
 	mass = mass[GooseType %in% c('PF', 'PFNB'),]
 	mass[,Day:=Day-365]
@@ -155,29 +155,8 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 #                                  Numbers left at end                                        #
 # --------------------------------------------------------------------------------------------#
 	cfg = readLines('TIALMaSSConfig.cfg')
-	spnb = c('GOOSE_BN_NONBREEDERS_STARTNOS', 'GOOSE_GL_NONBREEDERS_STARTNOS', 'GOOSE_PF_NONBREEDERS_STARTNOS')
-	numbers = data.table(Species = c('Barnacle', 'Greylag', 'Pinkfoot'), StartNumbers = rep(-999, 3))
-	for (i in seq_along(spnb)) {
-		nonbreeders = GetParamValue(config = cfg, param = spnb[i])
-		numbers[i, StartNumbers:=nonbreeders]
-	}
 	popn = fread('GoosePopulationData.txt')
 	popn[,Day:=Day-365]
-
-	leavedate = GetParamValue(config = cfg, param = 'GOOSE_GL_LEAVINGDATESTART')
-	if(popn[,list(Day=max(Day))] > (365+leavedate)) {
-		numbers[Species == 'Greylag', EndNumbers:=popn[Day == 365+leavedate-1,GLNonBreeders]]
-	}
-	if(popn[,list(Day=max(Day))] <= (365+leavedate)) {
-		numbers[Species == 'Greylag', EndNumbers:=popn[nrow(popn), GLNonBreeders]]
-	}
-	numbers[Species == 'Pinkfoot', EndNumbers:=popn[nrow(popn), PFNonBreeders]]
-	numbers[Species == 'Barnacle', EndNumbers:=popn[nrow(popn), BNNonBreeders]]
-	numbers[, PropAtEnd:=EndNumbers/StartNumbers]
-	PropAtEndGL = numbers[Species == 'Greylag', PropAtEnd]
-	PropAtEndPF = numbers[Species == 'Pinkfoot', PropAtEnd]
-	PropAtEndBN = numbers[Species == 'Barnacle', PropAtEnd]
-
 	gllos = GetLengthOfStay(config = cfg, species = 'Greylag')
 	PropDayInSimGL = popn[,list(GLNonBreeders=sum(GLNonBreeders != 0))]/gllos
 	bnlos = GetLengthOfStay(config = cfg, species = 'Barnacle')
@@ -206,7 +185,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 #                          Huntingbag - ONLY USED IN FULL MODEL                               #
 # --------------------------------------------------------------------------------------------#
 	# Remember to handle these fits when writing out and summarizing 
-	#bag = fread('o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/THS_JAM_Goosehunters_2013.csv')
+	# bag = fread('o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/THS_JAM_Goosehunters_2013.csv')
 	# bag = bag[!is.na(ABMhunter),.(ABMhunter, Greylag, Pinkfeet)]
 	# setnames(bag, old = 'Pinkfeet', new = 'Pinkfoot')
 	# bag = melt(bag, id.vars = 'ABMhunter', measure.vars = c('Greylag', 'Pinkfoot'), variable.name = 'Species', value.name = 'NoShot')
@@ -227,21 +206,19 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
-	PinkFootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2 + PropDayInSimPF^2 + OpenOverlapPF^2
-	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2 + PropDayInSimGL^2 + OpenOverlapGL^2
-	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2 + PropDayInSimBN^2 + OpenOverlapBN^2
+	PinkfootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2 + PropDayInSimPF^2
+	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2 + PropDayInSimGL^2 
+	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2 + PropDayInSimBN^2
 
 	# Write out the results of the parameter fitting and prepare for next run:
 	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
 		 HabUsePF, HabUseGL, HabUseBN, RoostDistFitPF, RoostDistFitGL, 
-		 RoostDistFitBN, PinkFootFit, GreylagFit, BarnacleFit, PropAtEndPF, PropAtEndGL,
-		 PropAtEndBN, PropDayInSimPF, PropDayInSimGL, PropDayInSimBN, OpenOverlapGL, OpenOverlapPF,
-		 OpenOverlapBN)
+		 RoostDistFitBN, PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF,
+		  PropDayInSimGL, PropDayInSimBN, OpenOverlapGL, OpenOverlapPF, OpenOverlapBN)
 	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
-		 'RoostDistFitBN', 'PinkFootFit', 'GreylagFit', 'BarnacleFit', 'PropAtEndPF',
-		 'PropAtEndGL', 'PropAtEndBN', 'PropDayInSimPF', 'PropDayInSimGL', 'PropDayInSimBN', 
-		 'OpennessFitGL', 'OpennessFitPF','OpennessFitBN')
+		 'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
+		  'PropDayInSimGL', 'PropDayInSimBN', 'OpennessFitGL', 'OpennessFitPF','OpennessFitBN')
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
@@ -272,9 +249,9 @@ report = paste0(basename(getwd()), ' - run number ', counter, '\n')
 cat(report)
 
 # If you want updates:
-token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
-slackrSetup(channel="@lars", api_token = token)
-slackr(paste(report, Sys.time(), sep = ' '))
+# token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
+# slackrSetup(channel="@lars", api_token = token)
+# slackr(paste(Sys.time(), report, sep = ' '))
 
 # If you plots for each run:
 # if(counter > 1 & counter < runs) 

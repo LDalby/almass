@@ -33,6 +33,7 @@ filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, f
 				file11, file12)
 HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
 dirs = dirs[c(1:5, 8:15)]  # Exclude the scenarios
+dirs = c('WD1')
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
 	wd = paste0(pathtodirs, dirs[i])
@@ -49,10 +50,10 @@ for (i in seq_along(dirs)) {
 # StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
 # Warning - the loop below will delete all Result directories 
 # So be really, really sure you want to do this!!!
-for (i in seq_along(dirs)) {
-	wd = paste0(pathtodirs, dirs[i], '/Results')
-	unlink(wd, recursive = TRUE)
-}
+# for (i in seq_along(dirs)) {
+# 	wd = paste0(pathtodirs, dirs[i], '/Results')
+# 	unlink(wd, recursive = TRUE)
+# }
 
 
 #------ Below here we ditribute the different parameters ------#
@@ -60,10 +61,10 @@ for (i in seq_along(dirs)) {
 # Distribute the paramter values to run:
 # Goose parameter fitting
 # Openness
-openval = round(seq(0, 100, length.out = 11))
+openval = round(seq(0, 100, length.out = 3))
 wdpath = paste0(pathtodirs, 'WD1')
 setwd(wdpath) 
-GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE)
+GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE, replicates = 3)
 EditBat(wdpath)  # Inserts the right number of runs from the file written with GenerateParams above  
 # Max appetite scaler
 appetiteval = seq(0, 10, length.out = 21)
@@ -120,15 +121,15 @@ setwd(wdpath)
 GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE)
 EditBat(wdpath)
 # Memory duration
-memoryval = seq(0, 20, length.out = 11)
+memoryval = seq(0, 30, length.out = 21)
 wdpath = paste0(pathtodirs, 'WD11')
 setwd(wdpath) 
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE)
 EditBat(wdpath)
 # Following likelyhood
-followingval = round(seq(6000, 9000, length.out = 11))
-followingval1 = round(seq(6000, 9000, length.out = 11))
-followingval2 = round(seq(6000, 9000, length.out = 11))
+followingval = round(seq(5000, 10000, length.out = 21))
+followingval1 = round(seq(5000, 10000, length.out = 21))
+followingval2 = round(seq(5000, 10000, length.out = 21))
 wdpath = paste0(pathtodirs, 'WD12')
 setwd(wdpath) 
 GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
