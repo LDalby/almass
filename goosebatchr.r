@@ -161,7 +161,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 # --------------------------------------------------------------------------------------------#
 	cfg = readLines('TIALMaSSConfig.cfg')
 	popn = fread('GoosePopulationData.txt')
-	popn[Day:=Day-365]
+	popn[,Day:=Day-365]
 	gllos = GetLengthOfStay(config = cfg, species = 'Greylag')
 	bnlos = GetLengthOfStay(config = cfg, species = 'Barnacle')
 	pflos = GetLengthOfStay(config = cfg, species = 'Pinkfoot')

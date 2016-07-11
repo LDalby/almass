@@ -117,7 +117,7 @@ foragedistval = round(seq(1000, 3000, length.out = 11))
 wdpath = file.path(pathtodirs, 'WD13')
 GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
 
-# Set the edit the bat and ini files to match the parameters set above:
+# Set the edit the bat, ini and cfg files to match the parameters set above:
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditBat(wd)
