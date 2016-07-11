@@ -32,17 +32,16 @@ file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				file11, file12)
 HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
-dirs = dirs[c(1:5, 8:15)]  # Exclude the scenarios
+rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
+rots = file.path(rot, dir(rot))
+filestodist = c(filestodist, rots)
+dirs = dirs[c(8:15)]  # Exclude the scenarios
 # dirs = c('WD1')
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
 	wd = paste0(pathtodirs, dirs[i])
-	# wd = paste0(pathtodirs, 'WD15')
-	for (j in seq_along(filestodist)) {
-		file.copy(filestodist[j], to = wd, overwrite = TRUE)
-		file.copy(HHL, to = file.path(wd, 'Hunter_Hunting_Locations.txt'),
-		 overwrite = TRUE)
-	}
+	file.copy(filestodist, to = wd, overwrite = TRUE)
+	file.copy(HHL, to = file.path(wd, 'Hunter_Hunting_Locations.txt'), overwrite = TRUE)
 	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 }
@@ -91,58 +90,58 @@ setwd(wdpath)
 GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE, replicates = 5)
 EditBat(wdpath) 
 # Min forage decay rate
-foragedecayval = seq(0.0, 1, length.out = 21)
+foragedecayval = seq(0.0, 1, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD6')
 setwd(wdpath) 
-GenerateParams('GOOSE_MINFORAGEDECAYRATE' = foragedecayval, write = TRUE)
+GenerateParams('GOOSE_MINFORAGEDECAYRATE' = foragedecayval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # Goose feeding time
 feedingval = seq(0.7, 0.85, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD7')
 setwd(wdpath) 
-GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE)
+GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # Roost leaving likelyhood
 leavedistsdval = round(seq(0, 30, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD8')
 setwd(wdpath) 
-GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE)
+GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # Expected foraging time
-expectedval = round(seq(60, 350, length.out = 21))
+expectedval = round(seq(60, 350, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD9')
 setwd(wdpath) 
-GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE)
+GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # Grain decay rate
 grainval = seq(0.985, 1, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD10')
 setwd(wdpath) 
-GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE)
+GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # Memory duration
-memoryval = seq(0, 30, length.out = 21)
+memoryval = seq(0, 30, length.out = 11)
 wdpath = paste0(pathtodirs, 'WD11')
 setwd(wdpath) 
-GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE)
+GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, replicates = 5)
 EditBat(wdpath)
 # Following likelyhood
-followingval = round(seq(5000, 10000, length.out = 21))
-followingval1 = round(seq(5000, 10000, length.out = 21))
-followingval2 = round(seq(5000, 10000, length.out = 21))
+followingval = round(seq(5000, 10000, length.out = 11))
+followingval1 = round(seq(5000, 10000, length.out = 11))
+followingval2 = round(seq(5000, 10000, length.out = 11))
 wdpath = paste0(pathtodirs, 'WD12')
 setwd(wdpath) 
 GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
 			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
 			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
-			    write = TRUE, expand = FALSE)
+			    write = TRUE, expand = FALSE, replicates = 5)
 EditBat(wdpath)
 # Forage distance
 foragedistval = round(seq(1000, 3000, length.out = 11))
 # foragedistval = c(foragedistval, 35000)  # This effectively turns the cfg off.
 wdpath = paste0(pathtodirs, 'WD13')
 setwd(wdpath) 
-GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, expand = FALSE)
+GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, expand = FALSE, replicates = 5)
 # GenerateParams('GOOSE_FORAGEDIST_BN' = foragedistval,
 # 			   'GOOSE_FORAGEDIST_PF' = foragedistval,
 # 			   'GOOSE_FORAGEDIST_GL' = foragedistval,
