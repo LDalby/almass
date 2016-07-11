@@ -35,7 +35,7 @@ HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locat
 rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
 rots = file.path(rot, dir(rot))
 filestodist = c(filestodist, rots)
-dirs = dirs[c(8:15)]  # Exclude the scenarios
+dirs = dirs[c(1:13)]  # Exclude the scenarios
 # dirs = c('WD1')
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
@@ -46,11 +46,11 @@ for (i in seq_along(dirs)) {
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 }
 # Store the results from previous round of fitting:
-# StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
+StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
 # Warning - the loop below will delete all Result directories 
 # So be really, really sure you want to do this!!!
 # for (i in seq_along(dirs)) {
-# 	wd = paste0(pathtodirs, dirs[i], '/Results')
+# 	wd = file.path(pathtodirs, dirs[i], 'Results')
 # 	unlink(wd, recursive = TRUE)
 # }
 
@@ -122,6 +122,7 @@ for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditBat(wd)
 	EditIni(WorkDir = wd, Model = 'goose', NYear = 5)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg', config = 'GOOSE_MODELEXITDAY', value = 60+6*365)
 }
 
 # ------ Scenarios ----- #
