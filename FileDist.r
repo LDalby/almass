@@ -49,10 +49,10 @@ for (i in seq_along(dirs)) {
 StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
 # Warning - the loop below will delete all Result directories 
 # So be really, really sure you want to do this!!!
-# for (i in seq_along(dirs)) {
-# 	wd = file.path(pathtodirs, dirs[i], 'Results')
-# 	unlink(wd, recursive = TRUE)
-# }
+for (i in seq_along(dirs)) {
+	wd = file.path(pathtodirs, dirs[i], 'Results')
+	unlink(wd, recursive = TRUE)
+}
 
 
 #------ Below here we ditribute the different parameters ------#
@@ -121,8 +121,9 @@ GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpat
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditBat(wd)
-	EditIni(WorkDir = wd, Model = 'goose', NYear = 5)
-	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg', config = 'GOOSE_MODELEXITDAY', value = 60+6*365)
+	years = 5
+	EditIni(WorkDir = wd, Model = 'goose', NYear = years)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+60+years*365)
 }
 
 # ------ Scenarios ----- #

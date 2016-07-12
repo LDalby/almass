@@ -72,7 +72,8 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 
 if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 {
-	dropcols = c("Grain", "Maize", "Digestability")
+	dropcols = c('Openness', 'Grain', 'Maize', 'GrassPinkfoot', 'GrassGreylag',
+	 'GrassBarnacle', 'VegHeight', 'Digestability')
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
 	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
 	# Field data:
@@ -96,20 +97,18 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 		DegreeOverlapPT[i] = round(CalcOverlap(distsTimed, species = 'Pinkfoot', metric = 'Numbers'), digits = 4)
 		DegreeOverlapGT[i] = round(CalcOverlap(distsTimed, species = 'Greylag', metric = 'Numbers'), digits = 4)
 	}
+
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
-	massdropcols = c("BodyCondition", "MinForageRate", 'FullTime')
+	massdropcols = c('BodyCondition', 'MinForageRate', 'FullTime', 'FlightNumber', 'FlightDistance')
 	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE, drop = massdropcols)
 	mass = mass[GooseType %in% c('PF', 'PFNB'),]
 	mass[,Day:=Day-365]
-	api = read_excel('observations_PG_01Jan2010-18Jan2016_API.xlsx')
-	api = as.data.table(api)
-	api = api[SEXE == 'M']
-	field = CleanAPIData(api)
+	api = fread('APIdata.txt')
 	Weightfit = NA
 	for (i in seq_along(seasons)) {
-		Weightfit[i] = CalcWeightFit(mass[SeasonNumber == seasons[i]], field)
+		Weightfit[i] = CalcWeightFit(mass[SeasonNumber == seasons[i],], api)
 	}
 
 # --------------------------------------------------------------------------------------------#
@@ -126,7 +125,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	HabUseBN = NA
 	forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]  # origin can be anything - we only care about the month.
 	for (i in seq_along(seasons)) {
-		HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage[SeasonNumber == seasons[i]])
+		HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage[SeasonNumber == seasons[i],])
 		HabUsePF[i] = HabitatUseFit[Species == 'Pinkfoot', Fit]
 		HabUseGL[i] = HabitatUseFit[Species == 'Greylag', Fit]
 		HabUseBN[i] = HabitatUseFit[Species == 'Barnacle', Fit]
@@ -156,6 +155,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 		RoostDistFitPF[i] = CalcOverlap(Distances, species = 'Pinkfoot', metric = 'Shortest')
 		RoostDistFitBN[i] = CalcOverlap(Distances, species = 'Barnacle', metric = 'Shortest')
 	}
+
 # --------------------------------------------------------------------------------------------#
 #                                  Numbers left at end                                        #
 # --------------------------------------------------------------------------------------------#
@@ -165,14 +165,9 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	gllos = GetLengthOfStay(config = cfg, species = 'Greylag')
 	bnlos = GetLengthOfStay(config = cfg, species = 'Barnacle')
 	pflos = GetLengthOfStay(config = cfg, species = 'Pinkfoot')
-	PropDayInSimGL = NA
-	PropDayInSimBN = NA
-	PropDayInSimPF = NA
-	for (i in seq_along(seasons)) {
-		PropDayInSimGL[i] = popn[SeasonNumber == seasons[i], ,list(GLNonBreeders=sum(GLNonBreeders != 0))]/gllos
-		PropDayInSimBN[i] = popn[SeasonNumber == seasons[i], ,list(BNNonBreeders=sum(BNNonBreeders != 0))]/bnlos
-		PropDayInSimPF[i] = popn[SeasonNumber == seasons[i], ,list(PFNonBreeders=sum(PFNonBreeders != 0))]/pflos
-	}
+	PropDayInSimGL = popn[,list(GLNonBreeders=sum(GLNonBreeders != 0)/gllos), by = SeasonNumber][,GLNonBreeders]
+	PropDayInSimBN = popn[,list(BNNonBreeders=sum(BNNonBreeders != 0)/bnlos), by = SeasonNumber][,BNNonBreeders]
+	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0)/pflos), by = SeasonNumber][,PFNonBreeders]
 
 # --------------------------------------------------------------------------------------------#
 #                                 Openness distribution                                       #
