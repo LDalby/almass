@@ -24,7 +24,6 @@
 library(data.table)
 library(ralmass)
 library(stringr)
-library(readxl)
 
 # library(slackr)  # Only needed if you want Slack to give you updates on progress
 
@@ -72,49 +71,44 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 
 if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 {
-	dropcols = c("Grain", "Maize", "Digestability")
+	dropcols = c('Openness', 'Grain', 'Maize', 'GrassPinkfoot', 'GrassGreylag',
+	 'GrassBarnacle', 'VegHeight', 'Digestability')
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
 	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
 	# Field data:
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3. See o:\ST_GooseProject\R\ConvertObsToALMaSS.r
 	# for details on the data handling
 	flocks = fread('o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt')
-	
-	# Simulation results - max number on a day:
-	simflocks = forage[Geese > 0, .(Day, Barnacle, Pinkfoot, Greylag)]
-	melted = data.table::melt(simflocks, id.vars = 'Day', variable.name = 'Species', value.name = 'Numbers')
-	melted = melted[Numbers != 0,]
-	melted[, Day:=NULL]
-	melted[, Type:='Simulated']
-	dists = rbind(melted, flocks)
-
-	DegreeOverlapB = round(CalcOverlap(dists, species = 'Barnacle', metric = 'Numbers'), digits = 4)
-	DegreeOverlapP = round(CalcOverlap(dists, species = 'Pinkfoot', metric = 'Numbers'), digits = 4)
-	DegreeOverlapG = round(CalcOverlap(dists, species = 'Greylag', metric = 'Numbers'), digits = 4)
-
+	seasons = unique(forage[, SeasonNumber])
+	DegreeOverlapBT = NA
+	DegreeOverlapPT = NA
+	DegreeOverlapGT = NA
+	for (i in seq_along(seasons)) {
 	# Simulation results - timed counts:
-	simflocks = forage[Geese > 0, .(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
-	melted = data.table::melt(simflocks, id.vars = 'Day', variable.name = 'Species', value.name = 'Numbers')
-	melted = melted[Numbers != 0,]
-	melted[ ,Day:=NULL]
-	melted[, Type:='Simulated']
-	distsTimed = rbind(melted, flocks)
-	
-	DegreeOverlapBT = round(CalcOverlap(distsTimed, species = 'Barnacle', metric = 'Numbers'), digits = 4)
-	DegreeOverlapPT = round(CalcOverlap(distsTimed, species = 'Pinkfoot', metric = 'Numbers'), digits = 4)
-	DegreeOverlapGT = round(CalcOverlap(distsTimed, species = 'Greylag', metric = 'Numbers'), digits = 4)
+		simflocks = forage[Geese > 0 & SeasonNumber == seasons[i], .(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
+		melted = data.table::melt(simflocks, id.vars = 'Day', variable.name = 'Species', value.name = 'Numbers')
+		melted = melted[Numbers != 0,]
+		melted[ ,Day:=NULL]
+		melted[, Type:='Simulated']
+		distsTimed = rbind(melted, flocks)
+
+		DegreeOverlapBT[i] = round(CalcOverlap(distsTimed, species = 'Barnacle', metric = 'Numbers'), digits = 4)
+		DegreeOverlapPT[i] = round(CalcOverlap(distsTimed, species = 'Pinkfoot', metric = 'Numbers'), digits = 4)
+		DegreeOverlapGT[i] = round(CalcOverlap(distsTimed, species = 'Greylag', metric = 'Numbers'), digits = 4)
+	}
+
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
-	massdropcols = c("BodyCondition", "MinForageRate", 'FullTime')
+	massdropcols = c('BodyCondition', 'MinForageRate', 'FullTime', 'FlightNumber', 'FlightDistance')
 	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE, drop = massdropcols)
 	mass = mass[GooseType %in% c('PF', 'PFNB'),]
 	mass[,Day:=Day-365]
-	api = read_excel('observations_PG_01Jan2010-18Jan2016_API.xlsx')
-	api = as.data.table(api)
-	api = api[SEXE == 'M']
-	field = CleanAPIData(api)
-	Weightfit = CalcWeightFit(mass, field)
+	api = fread('APIdata.txt')
+	Weightfit = NA
+	for (i in seq_along(seasons)) {
+		Weightfit[i] = CalcWeightFit(mass[SeasonNumber == seasons[i],], api)
+	}
 
 # --------------------------------------------------------------------------------------------#
 #                                      Habitat use                                            #
@@ -125,12 +119,16 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	FieldData = FieldData[HabitatUse != 'Plowed',]
 	FieldData[, NMTotal:=sum(N), by=.(Month, Species)]
 	FieldData[, Prop:=N/NMTotal]
-	
+	HabUsePF = NA
+	HabUseGL = NA
+	HabUseBN = NA
 	forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]  # origin can be anything - we only care about the month.
-	HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage)
-	HabUsePF = HabitatUseFit[Species == 'Pinkfoot', Fit]
-	HabUseGL = HabitatUseFit[Species == 'Greylag', Fit]
-	HabUseBN = HabitatUseFit[Species == 'Barnacle', Fit]
+	for (i in seq_along(seasons)) {
+		HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage[SeasonNumber == seasons[i],])
+		HabUsePF[i] = HabitatUseFit[Species == 'Pinkfoot', Fit]
+		HabUseGL[i] = HabitatUseFit[Species == 'Greylag', Fit]
+		HabUseBN[i] = HabitatUseFit[Species == 'Barnacle', Fit]
+	}
 
 # --------------------------------------------------------------------------------------------#
 #                                  Distance from roost                                        #
@@ -141,15 +139,21 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	roost = fread('GooseRoosts.txt', skip = 1)
 	poly = fread('Vejlerne2015_polyrefs_RenumFBHBOp.txt', skip = 1, verbose = FALSE)
 	sp = c('Pinkfoot', 'Barnacle', 'Greylag')
-	DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage, polyref = poly, species = sp, fieldobs = FALSE)
-	DistToNearestRoostSim[, Type:='Simulated']
+	
 	DistToNearestRoostField = CalcDistToRoosts(roost = roost, fields = fieldobs, polyref = poly, species = sp, fieldobs = TRUE)
 	DistToNearestRoostField[, Type:='Fieldobs']
-	Distances = rbind(DistToNearestRoostSim[,.(Shortest, Species, Type)], DistToNearestRoostField[,.(Shortest, Species, Type)])
+	RoostDistFitGL = NA
+	RoostDistFitPF = NA
+	RoostDistFitBN = NA
+	for (i in seq_along(seasons)) {
+		DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage[SeasonNumber == seasons[i],], polyref = poly, species = sp, fieldobs = FALSE)
+		DistToNearestRoostSim[, Type:='Simulated']
+		Distances = rbind(DistToNearestRoostSim[,.(Shortest, Species, Type)], DistToNearestRoostField[,.(Shortest, Species, Type)])
 
-	RoostDistFitGL = CalcOverlap(Distances, species = 'Greylag', metric = 'Shortest')
-	RoostDistFitPF = CalcOverlap(Distances, species = 'Pinkfoot', metric = 'Shortest')
-	RoostDistFitBN = CalcOverlap(Distances, species = 'Barnacle', metric = 'Shortest')
+		RoostDistFitGL[i] = CalcOverlap(Distances, species = 'Greylag', metric = 'Shortest')
+		RoostDistFitPF[i] = CalcOverlap(Distances, species = 'Pinkfoot', metric = 'Shortest')
+		RoostDistFitBN[i] = CalcOverlap(Distances, species = 'Barnacle', metric = 'Shortest')
+	}
 
 # --------------------------------------------------------------------------------------------#
 #                                  Numbers left at end                                        #
@@ -158,11 +162,11 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	popn = fread('GoosePopulationData.txt')
 	popn[,Day:=Day-365]
 	gllos = GetLengthOfStay(config = cfg, species = 'Greylag')
-	PropDayInSimGL = popn[,list(GLNonBreeders=sum(GLNonBreeders != 0))]/gllos
 	bnlos = GetLengthOfStay(config = cfg, species = 'Barnacle')
-	PropDayInSimBN = popn[,list(BNNonBreeders=sum(BNNonBreeders != 0))]/bnlos
 	pflos = GetLengthOfStay(config = cfg, species = 'Pinkfoot')
-	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0))]/pflos
+	PropDayInSimGL = popn[,list(GLNonBreeders=sum(GLNonBreeders != 0)/gllos), by = SeasonNumber][,GLNonBreeders]
+	PropDayInSimBN = popn[,list(BNNonBreeders=sum(BNNonBreeders != 0)/bnlos), by = SeasonNumber][,BNNonBreeders]
+	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0)/pflos), by = SeasonNumber][,PFNonBreeders]
 
 # --------------------------------------------------------------------------------------------#
 #                                 Openness distribution                                       #
@@ -192,45 +196,51 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	# bag[, Type:='Fieldobs']
 	
 	# simbag = fread('HuntingBagRecord.txt')
+
 	# simbag[, Species:=sapply(GameType, ConvertGameType)]
 	# simbag[, NoShot:=.N, by = c('Species', 'HunterRef')]
 	# sim = unique(simbag[, .(HunterRef, Species, NoShot)])
 	# sim[, Type:='Simulated']
-	# full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], sim[, .(Species, NoShot, Type)])
-	
-	# GLBagOverlap = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
-	# PFBagOverlap = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
+	# GLBagOverlap = NA 
+	# PFBagOverlap = NA 
+	# for (i in seq_along(seasons)) {
+	# 	full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], sim[SeasonNumber == seasons[i], .(Species, NoShot, Type)])
+	# 	GLBagOverlap[i] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
+	# 	PFBagOverlap[i] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
+	# }
 
 
 # --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
-	PinkfootFit = Weightfit^2 + HabUsePF^2 + DegreeOverlapPT^2 + RoostDistFitPF^2 + PropDayInSimPF^2
-	PinkfootFit = PinkfootFit/5
-	GreylagFit = HabUseGL^2 + DegreeOverlapGT^2 + RoostDistFitGL^2 + PropDayInSimGL^2 
-	GreylagFit = GreylagFit/4
-	BarnacleFit = HabUseBN^2 + DegreeOverlapBT^2 + RoostDistFitBN^2 + PropDayInSimBN^2
-	BarnacleFit = BarnacleFit/4
+	for (k in seq_along(seasons)) {
+		PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2
+		PinkfootFit = PinkfootFit/5
+		GreylagFit = HabUseGL[k]^2 + DegreeOverlapGT[k]^2 + RoostDistFitGL[k]^2 + PropDayInSimGL[k]^2 
+		GreylagFit = GreylagFit/4
+		BarnacleFit = HabUseBN[k]^2 + DegreeOverlapBT[k]^2 + RoostDistFitBN[k]^2 + PropDayInSimBN[k]^2
+		BarnacleFit = BarnacleFit/4
 
 	# Write out the results of the parameter fitting and prepare for next run:
-	FitVect = c(Weightfit, DegreeOverlapPT, DegreeOverlapGT, DegreeOverlapBT,
-		 HabUsePF, HabUseGL, HabUseBN, RoostDistFitPF, RoostDistFitGL, 
-		 RoostDistFitBN, PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF,
-		  PropDayInSimGL, PropDayInSimBN)
-	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
-		 'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
-		 'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
-		  'PropDayInSimGL', 'PropDayInSimBN')
-	lines = readLines('ParameterValues.txt')
-	for (i in 1:numberofparams) {
-		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
-		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
-		for (j in seq_along(FitNames)) {
-			line = paste(param, value, FitNames[j], FitVect[j], sep = '\t')
-			write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+		FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
+			HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
+			RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
+			PropDayInSimGL[k], PropDayInSimBN[k])
+		FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
+			'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
+			'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
+			'PropDayInSimGL', 'PropDayInSimBN')
+		lines = readLines('ParameterValues.txt')
+		for (i in 1:numberofparams) {
+			param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
+			value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
+			for (j in seq_along(FitNames)) {
+				line = paste(param, value, FitNames[j], FitVect[j], sep = '\t')
+				write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+			}
 		}
-	}
+	}	
 	# As the last thing we delete the goose output files
 	# We do this in case almass exits due to an error. If that happens files from a previous
 	# run might still be sitting in the run directory and we would simply analyze these as if they were the new 
