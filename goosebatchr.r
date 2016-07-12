@@ -24,7 +24,6 @@
 library(data.table)
 library(ralmass)
 library(stringr)
-library(readxl)
 
 # library(slackr)  # Only needed if you want Slack to give you updates on progress
 
@@ -226,7 +225,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	# Write out the results of the parameter fitting and prepare for next run:
 		FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
 			HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
-			RoostDistFitBN[k], PinkfootFit[k], GreylagFit[k], BarnacleFit[k], PropDayInSimPF[k],
+			RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
 			PropDayInSimGL[k], PropDayInSimBN[k])
 		FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 			'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 

@@ -19,7 +19,7 @@ file5 = 'C:/Users/lada/Git/almass/PreRunSetup.r'
 # Species specific things:
 file6 = 'o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt'
 file7 = 'o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv'
-file8 = 'o:/ST_GooseProject/Field data/observations_PG_01Jan2010-18Jan2016_API.xlsx'
+file8 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/APIdata.txt'
 file9 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/GooseRoosts.txt'
 file10 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/PfYoungDist.txt'
 file11 = 'C:/MSV/ALMaSS_inputs/GooseManagement/TIALMaSSConfig.cfg'
@@ -32,9 +32,9 @@ file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				file11, file12)
 HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
-rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
-rots = file.path(rot, dir(rot))
-filestodist = c(filestodist, rots)
+# rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
+# rots = file.path(rot, dir(rot))
+# filestodist = c(filestodist, rots)
 dirs = dirs[c(1:13)]  # Exclude the scenarios
 # dirs = c('WD1')
 # We overwrite, so be sure you actually want to do this!
@@ -46,7 +46,7 @@ for (i in seq_along(dirs)) {
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 }
 # Store the results from previous round of fitting:
-StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
+# StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
 # Warning - the loop below will delete all Result directories 
 # So be really, really sure you want to do this!!!
 for (i in seq_along(dirs)) {
@@ -122,8 +122,8 @@ for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditBat(wd)
 	years = 5
-	EditIni(WorkDir = wd, Model = 'goose', NYear = years)
-	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+60+years*365)
+	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
 }
 
 # ------ Scenarios ----- #
