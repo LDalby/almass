@@ -32,21 +32,23 @@ file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				file11, file12)
 HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
+weather = 'Vejlerne2009-2014.pre'
+pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
 # rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
 # rots = file.path(rot, dir(rot))
 # filestodist = c(filestodist, rots)
-dirs = dirs[c(1:13)]  # Exclude the scenarios
-# dirs = c('WD1')
 # We overwrite, so be sure you actually want to do this!
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	file.copy(filestodist, to = wd, overwrite = TRUE)
 	file.copy(HHL, to = file.path(wd, 'Hunter_Hunting_Locations.txt'), overwrite = TRUE)
+	file.copy(pre, to = file.path(wd, weather), overwrite = TRUE)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = weather)
 	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
 }
 # Store the results from previous round of fitting:
-# StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
+StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
 # Warning - the loop below will delete all Result directories 
 # So be really, really sure you want to do this!!!
 for (i in seq_along(dirs)) {
@@ -60,39 +62,39 @@ for (i in seq_along(dirs)) {
 # Goose parameter fitting
 # Openness
 openval = round(seq(0, 100, length.out = 11))
-wdpath = file.path(pathtodirs, 'WD1')
+wdpath = file.path(pathtodirs, 'WD01')
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE, path = wdpath)
 # Max appetite scaler
 appetiteval = seq(1, 7, length.out = 11)
-wdpath = file.path(pathtodirs, 'WD2')
+wdpath = file.path(pathtodirs, 'WD02')
 GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE, path = wdpath)
 # Max energy reserve proportion
 energyval = seq(0.15, 0.25, length.out = 11)
-wdpath = file.path(pathtodirs, 'WD3')
+wdpath = file.path(pathtodirs, 'WD03')
 GenerateParams('GOOSE_MAXENERGYRESERVEPROPORTION' = energyval, write = TRUE, path = wdpath)
 # The leaving threshold
 leavingval = seq(1.0, 1.1, length.out = 11)
-wdpath = file.path(pathtodirs, 'WD4')
+wdpath = file.path(pathtodirs, 'WD04')
 GenerateParams('GOOSE_LEAVINGTHRESHOLD' = leavingval, write = TRUE, path = wdpath)
 # After dark time
 afterdarkval = round(seq(0, 90, length.out = 11))
-wdpath = file.path(pathtodirs, 'WD5')
+wdpath = file.path(pathtodirs, 'WD05')
 GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE, path = wdpath)
 # Min forage decay rate
 foragedecayval = seq(0.0, 1, length.out = 11)
-wdpath = file.path(pathtodirs, 'WD6')
+wdpath = file.path(pathtodirs, 'WD06')
 GenerateParams('GOOSE_MINFORAGEDECAYRATE' = foragedecayval, write = TRUE, path = wdpath)
 # Goose feeding time
 feedingval = seq(0.7, 0.85, length.out = 11)
-wdpath = file.path(pathtodirs, 'WD7')
+wdpath = file.path(pathtodirs, 'WD07')
 GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE, path = wdpath)
 # Roost leaving likelyhood
 leavedistsdval = round(seq(0, 30, length.out = 11))
-wdpath = file.path(pathtodirs, 'WD8')
+wdpath = file.path(pathtodirs, 'WD08')
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE, path = wdpath)
 # Expected foraging time
 expectedval = round(seq(60, 350, length.out = 11))
-wdpath = file.path(pathtodirs, 'WD9')
+wdpath = file.path(pathtodirs, 'WD09')
 GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE, path = wdpath)
 # Grain decay rate
 grainval = seq(0.985, 1, length.out = 11)
@@ -128,48 +130,48 @@ for (i in seq_along(dirs)) {
 
 # ------ Scenarios ----- #
 # Following likelyhood and SD of roost leave times
-followingval = round(seq(6500, 8500, length.out = 15))
-followingval1 = round(seq(6500, 8500, length.out = 15))
-followingval2 = round(seq(6500, 8500, length.out = 15))
-following = GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
-			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
-			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
-			    write = FALSE, expand = FALSE, replicates = 1)
-following = as.character(following$Params)
+# followingval = round(seq(6500, 8500, length.out = 15))
+# followingval1 = round(seq(6500, 8500, length.out = 15))
+# followingval2 = round(seq(6500, 8500, length.out = 15))
+# following = GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
+# 			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
+# 			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
+# 			    write = FALSE, expand = FALSE, replicates = 1)
+# following = as.character(following$Params)
 
-leavedistsdval = round(seq(0, 30, length.out = 15))
-leave = GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = FALSE)
-leave = as.character(leave$Params)
+# leavedistsdval = round(seq(0, 30, length.out = 15))
+# leave = GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = FALSE)
+# leave = as.character(leave$Params)
 
-TheFinalList = vector('list', length(leave))
-TheList = vector('list', length(followingval))
+# TheFinalList = vector('list', length(leave))
+# TheList = vector('list', length(followingval))
 
-params = 3
-runs = length(followingval)
-from = seq(params-(params-1),(params*runs)-(params-1), by = params)
-to = seq(params,params*runs, by = params)
+# params = 3
+# runs = length(followingval)
+# from = seq(params-(params-1),(params*runs)-(params-1), by = params)
+# to = seq(params,params*runs, by = params)
 
-for (i in seq_along(followingval)) {
-	TheList[[i]] = following[from[i]:to[i]]
-}
-for (j in seq_along(leave)) {
-	TheFinalList[[j]] = unlist(lapply(TheList, FUN = append, leave[j]))
-}
-df = data.frame('Params' = unlist(TheFinalList) )
-wdpath = paste0(pathtodirs, 'WD14')
-setwd(wdpath) 
-write.table(df, file = paste(wdpath,'ParameterValues.txt', sep = '/'), sep = '\t', quote = FALSE,
-			row.names = FALSE, col.names = FALSE)
-EditBat(wdpath)
-# Feeding time, max appetite scaler and max energy reserve proportion
-feedingval = seq(0.7, 0.85, length.out = 8)
-appetiteval = seq(0, 5, length.out = 8)
-energyval = seq(0.15, 0.25, length.out = 8)
-wdpath = paste0(pathtodirs, 'WD15')
-setwd(wdpath) 
-GenerateParams('GOOSE_FEEDINGTIME' = feedingval, 'GOOSE_MAXENERGYRESERVEPROPORTION' = energyval,
-'GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE)
-EditBat(wdpath)
+# for (i in seq_along(followingval)) {
+# 	TheList[[i]] = following[from[i]:to[i]]
+# }
+# for (j in seq_along(leave)) {
+# 	TheFinalList[[j]] = unlist(lapply(TheList, FUN = append, leave[j]))
+# }
+# df = data.frame('Params' = unlist(TheFinalList) )
+# wdpath = paste0(pathtodirs, 'WD14')
+# setwd(wdpath) 
+# write.table(df, file = paste(wdpath,'ParameterValues.txt', sep = '/'), sep = '\t', quote = FALSE,
+# 			row.names = FALSE, col.names = FALSE)
+# EditBat(wdpath)
+# # Feeding time, max appetite scaler and max energy reserve proportion
+# feedingval = seq(0.7, 0.85, length.out = 8)
+# appetiteval = seq(0, 5, length.out = 8)
+# energyval = seq(0.15, 0.25, length.out = 8)
+# wdpath = paste0(pathtodirs, 'WD15')
+# setwd(wdpath) 
+# GenerateParams('GOOSE_FEEDINGTIME' = feedingval, 'GOOSE_MAXENERGYRESERVEPROPORTION' = energyval,
+# 'GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE)
+# EditBat(wdpath)
 
 #------ Hunter parameter fitting ------#
 # Careful here - check the index - first in dirs is 0
