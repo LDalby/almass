@@ -74,6 +74,8 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	dropcols = c('Openness', 'Grain', 'Maize', 'GrassPinkfoot', 'GrassGreylag',
 	 'GrassBarnacle', 'VegHeight', 'Digestability')
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
+	forage[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
+	forage = forage[data.table::month(Date) %in% c(9:12,1:3)]
 	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
 	# Field data:
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3. See o:\ST_GooseProject\R\ConvertObsToALMaSS.r
@@ -104,6 +106,8 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE, drop = massdropcols)
 	mass = mass[GooseType %in% c('PF', 'PFNB'),]
 	mass[,Day:=Day-365]
+	mass = mass[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
+	mass = mass[data.table::month(Date) %in% c(9:12,1:3)]
 	api = fread('APIdata.txt')
 	Weightfit = NA
 	for (i in seq_along(seasons)) {
