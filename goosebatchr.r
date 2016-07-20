@@ -212,7 +212,19 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	# 	GLBagOverlap[i] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
 	# 	PFBagOverlap[i] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
 	# }
-
+	# GLBagOverlap = NA
+	# PFBagOverlap = NA
+	# totalbagpf = NA
+	# totalbaggl = NA
+	# for (m in seq_along(seasons)) {
+	# 	tmp = sim[SeasonNumber == m,]
+	# 	full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], tmp[, .(Species, NoShot, Type)])
+	# 	full[, TotalBag:=sum(NoShot), by = c('Species', 'Type')]
+	# 	GLBagOverlap[m] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
+	# 	PFBagOverlap[m] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
+	# 	totalbagpf[m] = full[Species == 'Pinkfoot' & Type == 'Simulated', unique(TotalBag)]
+	# 	totalbaggl[m] = full[Species == 'Greylag' & Type == 'Simulated', unique(TotalBag)]
+	# }
 
 # --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
