@@ -193,48 +193,49 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 #                          Huntingbag - ONLY USED IN FULL MODEL                               #
 # --------------------------------------------------------------------------------------------#
 	# Remember to handle these fits when writing out and summarizing 
-	# bag = fread('o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/THS_JAM_Goosehunters_2013.csv')
-	# bag = bag[!is.na(ABMhunter),.(ABMhunter, Greylag, Pinkfeet)]
-	# setnames(bag, old = 'Pinkfeet', new = 'Pinkfoot')
-	# bag = melt(bag, id.vars = 'ABMhunter', measure.vars = c('Greylag', 'Pinkfoot'), variable.name = 'Species', value.name = 'NoShot')
-	# bag[, Type:='Fieldobs']
+	bag = fread('o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/THS_JAM_Goosehunters_2013.csv')
+	bag = bag[!is.na(ABMhunter),.(ABMhunter, Greylag, Pinkfeet)]
+	setnames(bag, old = 'Pinkfeet', new = 'Pinkfoot')
+	bag = melt(bag, id.vars = 'ABMhunter', measure.vars = c('Greylag', 'Pinkfoot'), variable.name = 'Species', value.name = 'NoShot')
+	bag[, Type:='Fieldobs']
 	
-	# simbag = fread('HuntingBagRecord.txt')
+	simbag = fread('HuntingBagRecord.txt')
 
-	# simbag[, Species:=sapply(GameType, ConvertGameType)]
-	# simbag[, NoShot:=.N, by = c('Species', 'HunterRef')]
-	# sim = unique(simbag[, .(HunterRef, Species, NoShot)])
-	# sim[, Type:='Simulated']
-	# GLBagOverlap = NA 
-	# PFBagOverlap = NA 
-	# for (i in seq_along(seasons)) {
-	# 	full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], sim[SeasonNumber == seasons[i], .(Species, NoShot, Type)])
-	# 	GLBagOverlap[i] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
-	# 	PFBagOverlap[i] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
-	# }
-	# GLBagOverlap = NA
-	# PFBagOverlap = NA
-	# totalbagpf = NA
-	# totalbaggl = NA
-	# for (m in seq_along(seasons)) {
-	# 	tmp = sim[SeasonNumber == m,]
-	# 	full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], tmp[, .(Species, NoShot, Type)])
-	# 	full[, TotalBag:=sum(NoShot), by = c('Species', 'Type')]
-	# 	GLBagOverlap[m] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
-	# 	PFBagOverlap[m] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
-	# 	totalbagpf[m] = full[Species == 'Pinkfoot' & Type == 'Simulated', unique(TotalBag)]
-	# 	totalbaggl[m] = full[Species == 'Greylag' & Type == 'Simulated', unique(TotalBag)]
-	# }
+	simbag[, Species:=sapply(GameType, ConvertGameType)]
+	simbag[, NoShot:=.N, by = c('Species', 'HunterRef')]
+	sim = unique(simbag[, .(HunterRef, Species, NoShot)])
+	sim[, Type:='Simulated']
+	GLBagOverlap = NA 
+	PFBagOverlap = NA 
+	for (i in seq_along(seasons)) {
+		full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], sim[SeasonNumber == seasons[i], .(Species, NoShot, Type)])
+		GLBagOverlap[i] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
+		PFBagOverlap[i] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
+	}
+	GLBagOverlap = NA
+	PFBagOverlap = NA
+	totalbagpf = NA
+	totalbaggl = NA
+	for (m in seq_along(seasons)) {
+		tmp = sim[SeasonNumber == m,]
+		full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], tmp[, .(Species, NoShot, Type)])
+		full[, TotalBag:=sum(NoShot), by = c('Species', 'Type')]
+		GLBagOverlap[m] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
+		PFBagOverlap[m] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
+		totalbagpf[m] = full[Species == 'Pinkfoot' & Type == 'Simulated', unique(TotalBag)]
+		totalbaggl[m] = full[Species == 'Greylag' & Type == 'Simulated', unique(TotalBag)]
+	}
 
 # --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
 	for (k in seq_along(seasons)) {
-		PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2
-		PinkfootFit = PinkfootFit/5
-		GreylagFit = HabUseGL[k]^2 + DegreeOverlapGT[k]^2 + RoostDistFitGL[k]^2 + PropDayInSimGL[k]^2 
-		GreylagFit = GreylagFit/4
+		# Full model runs:
+		PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2 + PFBagOverlap[k]^2
+		PinkfootFit = PinkfootFit/6
+		GreylagFit = HabUseGL[k]^2 + DegreeOverlapGT[k]^2 + RoostDistFitGL[k]^2 + PropDayInSimGL[k]^2 + GLBagOverlap[k]^2
+		GreylagFit = GreylagFit/5
 		BarnacleFit = HabUseBN[k]^2 + DegreeOverlapBT[k]^2 + RoostDistFitBN[k]^2 + PropDayInSimBN[k]^2
 		BarnacleFit = BarnacleFit/4
 
@@ -242,11 +243,28 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 		FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
 			HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
 			RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
-			PropDayInSimGL[k], PropDayInSimBN[k])
+			PropDayInSimGL[k], PropDayInSimBN[k], PFBagOverlap[k], GLBagOverlap[k])
 		FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 			'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 			'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
-			'PropDayInSimGL', 'PropDayInSimBN')
+			'PropDayInSimGL', 'PropDayInSimBN', 'PFBagOverlap', 'GLBagOverlap')
+	# Goose-only runs:
+	# 	PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2
+	# 	PinkfootFit = PinkfootFit/5
+	# 	GreylagFit = HabUseGL[k]^2 + DegreeOverlapGT[k]^2 + RoostDistFitGL[k]^2 + PropDayInSimGL[k]^2 
+	# 	GreylagFit = GreylagFit/4
+	# 	BarnacleFit = HabUseBN[k]^2 + DegreeOverlapBT[k]^2 + RoostDistFitBN[k]^2 + PropDayInSimBN[k]^2
+	# 	BarnacleFit = BarnacleFit/4
+
+	# # Write out the results of the parameter fitting and prepare for next run:
+	# 	FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
+	# 		HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
+	# 		RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
+	# 		PropDayInSimGL[k], PropDayInSimBN[k])
+	# 	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
+	# 		'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
+	# 		'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
+	# 		'PropDayInSimGL', 'PropDayInSimBN')
 		lines = readLines('ParameterValues.txt')
 		for (i in 1:numberofparams) {
 			param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
