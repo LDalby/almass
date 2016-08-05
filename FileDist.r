@@ -31,7 +31,8 @@ file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
 
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				file11, file12)
-HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
+# HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
+HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_Eff33_05-07-2016.txt'
 weather = 'Vejlerne2013-2014.pre'
 pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
 # rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
@@ -126,9 +127,25 @@ for (i in seq_along(dirs)) {
 	years = 5
 	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')
 }
 
-# ------ Scenarios ----- #
+# Goose project scenarios
+# No barnacle geese:
+wdpath = file.path(pathtodirs, 'WD14')
+GenerateParams('GOOSE_BN_STARTNOS' = 0, replicates = 10, write = TRUE, path = wdpath)
+GenerateParams('GOOSE_BN_SPRING_MIG_NOS' = 0, replicates = 10, write = TRUE, path = wdpath)
+# Double barnacle geese:
+wdpath = file.path(pathtodirs, 'WD15')
+GenerateParams('GOOSE_BN_STARTNOS' = 5600*2, replicates = 10, write = TRUE, path = wdpath)
+GenerateParams('GOOSE_BN_SPRING_MIG_NOS' = 8960*2, replicates = 10, write = TRUE, path = wdpath)
+# Double greylag geese:
+wdpath = file.path(pathtodirs, 'WD16')
+GenerateParams('GOOSE_GL_STARTNOS' = 8960*2, replicates = 10, write = TRUE, path = wdpath)
+GenerateParams('GOOSE_GL_SPRING_MIG_NOS' = 2240*2, replicates = 10, write = TRUE, path = wdpath)
+
+
+# ------ Multiparam Scenarios ----- #
 # Following likelyhood and SD of roost leave times
 # followingval = round(seq(6500, 8500, length.out = 15))
 # followingval1 = round(seq(6500, 8500, length.out = 15))
