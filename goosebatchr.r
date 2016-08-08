@@ -203,7 +203,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 
 	simbag[, Species:=sapply(GameType, ConvertGameType)]
 	simbag[, NoShot:=.N, by = list(Species, HunterRef)]
-	sim = unique(simbag[, .(HunterRef, Species, NoShot)])
+	sim = unique(simbag[, .(HunterRef, Species, NoShot, SeasonNumber)])
 	sim[, Type:='Simulated']
 	GLBagOverlap = NA 
 	PFBagOverlap = NA 
