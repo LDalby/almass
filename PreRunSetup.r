@@ -25,7 +25,17 @@ if(counter == 1)
 for (i in 1:numberofparams) 
 {
 	TheParam = params[lineno[counter]+(i-1)]
-	write(TheParam, 'TIALMaSSConfig.cfg', append = TRUE)
+	stri = GetParamString(TheParam)
+	specialhunt = c('HuntingDays', 'WeekdayHunterChance', 'GooseLookChance', 'Efficiency')
+	if(stri %in% specialhunt) {
+		theval = GetParamValue(TheParam)
+		hhl = fread('Hunter_Hunting_Locations')
+		EditHunterInput(hhl, column = stri, change = theval)
+	}
+	if(!stri %in% specialhunt) 
+	{
+		write(TheParam, 'TIALMaSSConfig.cfg', append = TRUE)
+	}
 }
 
 if(counter == runs)
