@@ -4,7 +4,7 @@
 # Date: 25 Sep 2015
 
 library(data.table)
-
+library(ralmass)
 # Setup work directory (done automatically when distributing the files, therefore blank):
 
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
