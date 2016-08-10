@@ -248,8 +248,8 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 		FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 			'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 			'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
-			'PropDayInSimGL', 'PropDayInSimBN', 'PFBagOverlap', 'GLBagOverlap', 'PFTotalBag',
-			'GLTotalBag')
+			'PropDayInSimGL', 'PropDayInSimBN', 'BagOverlapPF', 'BagOverlapGL', 'TotalBagPF',
+			'TotalBagGL')
 	# Goose-only runs:
 	# 	PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2
 	# 	PinkfootFit = PinkfootFit/5
