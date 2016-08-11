@@ -55,7 +55,7 @@ if(counter == 1)
 }
 
 # If there the simulation was terminated before writing results (should not happen):
-if(length(grep("GooseFieldForageData.txt", dir())) == 0)
+if(!file.exists("GooseFieldForageData.txt"))
 {
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
@@ -69,7 +69,7 @@ if(length(grep("GooseFieldForageData.txt", dir())) == 0)
 #                                    Flock sizes                                              #
 # --------------------------------------------------------------------------------------------#
 
-if(length(grep("GooseFieldForageData.txt", dir())) != 0)
+if(file.exists("GooseFieldForageData.txt"))
 {
 	dropcols = c('Openness', 'Grain', 'Maize', 'GrassPinkfoot', 'GrassGreylag',
 	 'GrassBarnacle', 'VegHeight', 'Digestability')
