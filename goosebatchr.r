@@ -49,7 +49,7 @@ if(counter == 1)
 	dir.create('Results')
 	# Set up the headers in first run
 	line = paste('Parameter', 'Value', 'FitType', 'Fit', sep = '\t')
-	write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'))
+	write(line, file = file.path(resultpath, 'ParameterFittingResults.txt'))
 	# Copy the Goose params to the result folder for reference and checking
 	file.copy('ParameterValues.txt', resultpath, copy.date = TRUE)
 }
@@ -59,10 +59,10 @@ if(!file.exists("GooseFieldForageData.txt"))
 {
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
-		param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
-		value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
+		param = GetParamString(config = lines[lineno[counter]+(i-1)])    # Get the parameter name
+		value = GetParamValue(lines[lineno[counter]+(i-1)], param)  # Get the value
 		line = paste(param, value, NA, NA, sep = '\t')
-		write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+		write(line, file = file.path(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
 }
 # --------------------------------------------------------------------------------------------#
@@ -275,11 +275,11 @@ if(file.exists("GooseFieldForageData.txt"))
 	# 		'PropDayInSimGL', 'PropDayInSimBN')
 		lines = readLines('ParameterValues.txt')
 		for (i in 1:numberofparams) {
-			param = word(lines[lineno[counter]+(i-1)], 1)  # Get the parameter name
-			value = as.numeric(str_split(lines[lineno[counter]+(i-1)], '=')[[1]][2])  # Get the value
+			param = GetParamString(config = lines[lineno[counter]+(i-1)])    # Get the parameter name
+			value = GetParamValue(lines[lineno[counter]+(i-1)], param)  # Get the value
 			for (j in seq_along(FitNames)) {
 				line = paste(param, value, FitNames[j], FitVect[j], sep = '\t')
-				write(line, file = paste0(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
+				write(line, file = file.path(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 			}
 		}
 	}	
