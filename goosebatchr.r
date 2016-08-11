@@ -129,9 +129,15 @@ if(length(grep("GooseFieldForageData.txt", dir())) != 0)
 	forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]  # origin can be anything - we only care about the month.
 	for (i in seq_along(seasons)) {
 		HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage[SeasonNumber == seasons[i],])
-		HabUsePF[i] = HabitatUseFit[Species == 'Pinkfoot', Fit]
-		HabUseGL[i] = HabitatUseFit[Species == 'Greylag', Fit]
-		HabUseBN[i] = HabitatUseFit[Species == 'Barnacle', Fit]
+		if(length(HabitatUseFit[Species == 'Pinkfoot', Fit]) > 0 ){
+			HabUsePF[i] = HabitatUseFit[Species == 'Pinkfoot', Fit]
+		} else(HabUsePF[i] = 0)
+		if(length(HabitatUseFit[Species == 'Greylag', Fit]) > 0 ){
+			HabUseGL[i] = HabitatUseFit[Species == 'Greylag', Fit]
+		} else(HabUseGL[i] = 0)
+		if(length(HabitatUseFit[Species == 'Barnacle', Fit]) > 0 ){
+			HabUseBN[i] = HabitatUseFit[Species == 'Barnacle', Fit]
+		} else (HabUseBN[i] = 0)
 	}
 
 # --------------------------------------------------------------------------------------------#
