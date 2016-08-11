@@ -288,12 +288,12 @@ if(file.exists("GooseFieldForageData.txt"))
 	# run might still be sitting in the run directory and we would simply analyze these as if they were the new 
 	# run and get results identical to the previous run
 
-	if(length(grep("GooseEnergeticsData.txt", dir())) > 0)
+	if(file.exists("GooseEnergeticsData.txt"))
 	{
 		file.remove("GooseEnergeticsData.txt")
 	}
 
-	if(length(grep("GooseFieldForageData.txt", dir())) > 0)
+	if(file.exists("GooseFieldForageData.txt"))
 	{
 		file.remove("GooseFieldForageData.txt")
 	}
