@@ -1,13 +1,14 @@
 # Copy file to x number of directories
 # Just handy when e.g. a new exe needs to distributed
-# library(R.utils)
+library(data.table)
 library(ralmass)
 
 # List the parent directory of all the work directories
 pathtodirs = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
-# dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
+dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
+dirs = c("WD23", "WD24", "WD25", "WD26", "WD27")
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -131,27 +132,37 @@ for (i in seq_along(dirs)) {
 }
 
 # Goose project scenarios
-
+years = 10
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
+	EditIni(WorkDir = wdpath, Model = 'goose', NYear = years+1)
 }
 # No barnacle geese:
 wdpath = file.path(pathtodirs, 'WD20')
-EditIni(WorkDir = wdpath, Model = 'goose', NYear = years+1)
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'GOOSE_BN_STARTNOS', value = 0)
 EditConfig(file = tialmasspath, config = 'GOOSE_BN_SPRING_MIG_NOS', value = 0)
 # Double barnacle geese:
 wdpath = file.path(pathtodirs, 'WD21')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
-EditConfig(file = tialmasspath, config = 'GOOSE_BN_STARTNOS', value = 5600*2)
-EditConfig(file = tialmasspath, config = 'GOOSE_BN_SPRING_MIG_NOS', value = 8960*2)
+param = 'GOOSE_BN_STARTNOS'
+tialmass = readLines(tialmasspath)
+cfgval = GetParamValue(config = tialmass, param = param) 
+EditConfig(file = tialmasspath, config = param , value = cfgval*2)
+param = 'GOOSE_BN_SPRING_MIG_NOS'
+cfgval = GetParamValue(config = tialmass, param = param)
+EditConfig(file = tialmasspath, config = param, value = cfgval*2)
 # Double greylag geese:
 wdpath = file.path(pathtodirs, 'WD22')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
-EditConfig(file = tialmasspath, config = 'GOOSE_GL_STARTNOS', value = 8960*2)
-EditConfig(file = tialmasspath, config = 'GOOSE_GL_SPRING_MIG_NOS', value = 2240*2)
+param = 'GOOSE_GL_STARTNOS'
+tialmass = readLines(tialmasspath)
+cfgval = GetParamValue(config = tialmass, param = param) 
+EditConfig(file = tialmasspath, config = param , value = cfgval*2)
+param = 'GOOSE_GL_SPRING_MIG_NOS'
+cfgval = GetParamValue(config = tialmass, param = param)
+EditConfig(file = tialmasspath, config = param, value = cfgval*2)
 # January hunting
 wdpath = file.path(pathtodirs, 'WD23')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
@@ -159,14 +170,14 @@ EditConfig(file = tialmasspath, config = 'GOOSE_OPENSEASON_END', value = 31)
 # Increase in efficiency
 wdpath = file.path(pathtodirs, 'WD24')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
-hhl = fread(file.path(wdpath, 'Hunter_Hunting_Locations.txt'))
-EditHunterInput(hhl, column = 'Efficiency', change = 0.66)
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(hhlpath, column = 'Efficiency', change = 0.66)
 # Only hunt once per week
 wdpath = file.path(pathtodirs, 'WD25')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'HUNTER_REFRACTIONPERIOD', value = 7)
-hhl = fread(file.path(wdpath, 'Hunter_Hunting_Locations.txt'))
-EditHunterInput(hhl, column = 'WeekdayHunterChance', change = 1.0, weekbehav = 2)  # This sets all hunters to be refraction period hunters
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(hhlpath, column = 'WeekdayHunterChance', change = 1.0, weekbehav = 2)  # This sets all hunters to be refraction period hunters
 # Teaming up of hunters
 # NOTE: Number of hunters needs to be halved.
 wdpath = file.path(pathtodirs, 'WD26')
@@ -175,8 +186,8 @@ EditConfig(file = tialmasspath, config = 'HUNTER_MAGAZINECAPACITY', value = 4)
 # All hunters checkers:
 wdpath = file.path(pathtodirs, 'WD27')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
-hhl = fread(file.path(wdpath, 'Hunter_Hunting_Locations.txt'))
-EditHunterInput(hhl, column = 'GooseLookChance', change = 1.0)
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(hhlpath, column = 'GooseLookChance', change = 1.0)
 
 
 
