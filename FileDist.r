@@ -138,7 +138,7 @@ for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')
-	EditIni(WorkDir = wdpath, Model = 'goose', NYear = years+1)
+	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
 }
 # No barnacle geese:
 wdpath = file.path(pathtodirs, 'WD20')
@@ -202,7 +202,11 @@ wdpath = file.path(pathtodirs, 'WD27')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
 EditHunterInput(hhlpath, column = 'GooseLookChance', change = 1.0)
-
+# Baseline
+wdpath = file.path(pathtodirs, 'WD28')
+df = data.table('foo' = 'Baseline')
+write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
+			row.names = FALSE, col.names = FALSE)
 
 
 
