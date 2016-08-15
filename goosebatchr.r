@@ -71,9 +71,7 @@ if(!file.exists("GooseFieldForageData.txt"))
 
 if(file.exists("GooseFieldForageData.txt"))
 {
-	dropcols = c('Openness', 'Grain', 'Maize', 'GrassPinkfoot', 'GrassGreylag',
-	 'GrassBarnacle', 'VegHeight', 'Digestability')
-	forage = fread('GooseFieldForageData.txt', showProgress = FALSE, drop = dropcols)
+	forage = fread('GooseFieldForageData.txt', showProgress = FALSE)
 	forage[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
 	forage = forage[data.table::month(Date) %in% c(9:12,1:3)]
 	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
@@ -102,8 +100,7 @@ if(file.exists("GooseFieldForageData.txt"))
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
-	massdropcols = c('BodyCondition', 'MinForageRate', 'FullTime', 'FlightNumber', 'FlightDistance')
-	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE, drop = massdropcols)
+	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE)
 	mass = mass[GooseType %in% c('PF', 'PFNB'),]
 	mass[,Day:=Day-365]
 	mass = mass[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
