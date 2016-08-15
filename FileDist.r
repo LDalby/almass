@@ -8,7 +8,7 @@ pathtodirs = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
 dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
-dirs = c("WD23", "WD24", "WD25", "WD26", "WD27")
+# dirs = c("WD23", "WD24", "WD25", "WD26", "WD27")
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -130,8 +130,9 @@ for (i in seq_along(dirs)) {
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')
 }
-
+# ----
 # Goose project scenarios
+# ----
 years = 10
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
@@ -144,6 +145,9 @@ wdpath = file.path(pathtodirs, 'WD20')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'GOOSE_BN_STARTNOS', value = 0)
 EditConfig(file = tialmasspath, config = 'GOOSE_BN_SPRING_MIG_NOS', value = 0)
+df = data.table('foo' = 'Barnacle x 0')
+write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
+			row.names = FALSE, col.names = FALSE)
 # Double barnacle geese:
 wdpath = file.path(pathtodirs, 'WD21')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
@@ -154,6 +158,9 @@ EditConfig(file = tialmasspath, config = param , value = cfgval*2)
 param = 'GOOSE_BN_SPRING_MIG_NOS'
 cfgval = GetParamValue(config = tialmass, param = param)
 EditConfig(file = tialmasspath, config = param, value = cfgval*2)
+df = data.table('foo' = 'Barnacle x 2')
+write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
+			row.names = FALSE, col.names = FALSE)
 # Double greylag geese:
 wdpath = file.path(pathtodirs, 'WD22')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
@@ -164,10 +171,16 @@ EditConfig(file = tialmasspath, config = param , value = cfgval*2)
 param = 'GOOSE_GL_SPRING_MIG_NOS'
 cfgval = GetParamValue(config = tialmass, param = param)
 EditConfig(file = tialmasspath, config = param, value = cfgval*2)
+df = data.table('foo' = 'Greylag x 2')
+write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
+			row.names = FALSE, col.names = FALSE)
 # January hunting
 wdpath = file.path(pathtodirs, 'WD23')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'GOOSE_OPENSEASON_END', value = 31)
+df = data.table('foo' = 'January hunting')
+write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
+			row.names = FALSE, col.names = FALSE)
 # Increase in efficiency
 wdpath = file.path(pathtodirs, 'WD24')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
