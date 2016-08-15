@@ -145,9 +145,7 @@ wdpath = file.path(pathtodirs, 'WD20')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'GOOSE_BN_STARTNOS', value = 0)
 EditConfig(file = tialmasspath, config = 'GOOSE_BN_SPRING_MIG_NOS', value = 0)
-df = data.table('foo' = 'Barnacle x 0')
-write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
-			row.names = FALSE, col.names = FALSE)
+write('Barnacle x 0', file = file.path(wdpath, 'ParameterValues.txt'))
 # Double barnacle geese:
 wdpath = file.path(pathtodirs, 'WD21')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
@@ -158,9 +156,7 @@ EditConfig(file = tialmasspath, config = param , value = cfgval*2)
 param = 'GOOSE_BN_SPRING_MIG_NOS'
 cfgval = GetParamValue(config = tialmass, param = param)
 EditConfig(file = tialmasspath, config = param, value = cfgval*2)
-df = data.table('foo' = 'Barnacle x 2')
-write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
-			row.names = FALSE, col.names = FALSE)
+write('Barnacle x 2', file = file.path(wdpath, 'ParameterValues.txt'))
 # Double greylag geese:
 wdpath = file.path(pathtodirs, 'WD22')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
@@ -171,16 +167,12 @@ EditConfig(file = tialmasspath, config = param , value = cfgval*2)
 param = 'GOOSE_GL_SPRING_MIG_NOS'
 cfgval = GetParamValue(config = tialmass, param = param)
 EditConfig(file = tialmasspath, config = param, value = cfgval*2)
-df = data.table('foo' = 'Greylag x 2')
-write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
-			row.names = FALSE, col.names = FALSE)
+write('Greylag x 2', file = file.path(wdpath, 'ParameterValues.txt'))
 # January hunting
 wdpath = file.path(pathtodirs, 'WD23')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'GOOSE_OPENSEASON_END', value = 31)
-df = data.table('foo' = 'January hunting')
-write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
-			row.names = FALSE, col.names = FALSE)
+write('January hunting', file = file.path(wdpath, 'ParameterValues.txt'))
 # Increase in efficiency
 wdpath = file.path(pathtodirs, 'WD24')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
@@ -204,10 +196,7 @@ hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
 EditHunterInput(hhlpath, column = 'GooseLookChance', change = 1.0)
 # Baseline
 wdpath = file.path(pathtodirs, 'WD28')
-df = data.table('foo' = 'Baseline')
-write.table(df, file = file.path(wdpath, 'ParameterValues.txt'), sep = '\t', quote = FALSE,
-			row.names = FALSE, col.names = FALSE)
-
+write('Baseline', file = file.path(wdpath, 'ParameterValues.txt'))
 
 
 # ------ Multiparam Scenarios ----- #

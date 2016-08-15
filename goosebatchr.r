@@ -32,7 +32,12 @@ library(stringr)
 # To get the line number in the parameter list we make a vector of line numbers for the
 # first of the parameters in each run:
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
-numberofparams = length(unique(paramvals[, V1])) # The number of paramters being modified per run 
+if(nrow(paramvals) == 0) {
+	numberofparams = 1
+}
+if(nrow(paramvals) > 0) {
+	numberofparams = length(unique(paramvals[, V1])) # The number of paramters being modified per run 
+}
 runs = nrow(paramvals)/numberofparams
 lineno = seq(1, runs*numberofparams, numberofparams)
 
