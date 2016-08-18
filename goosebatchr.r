@@ -34,12 +34,16 @@ library(stringr)
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
 if(nrow(paramvals) == 0) {
 	numberofparams = 1
+	runs = 1
+	lineno = 1
+	singlerun = TRUE 
 }
 if(nrow(paramvals) > 0) {
 	numberofparams = length(unique(paramvals[, V1])) # The number of paramters being modified per run 
+	runs = nrow(paramvals)/numberofparams
+	lineno = seq(1, runs*numberofparams, numberofparams)
+	singlerun = FALSE
 }
-runs = nrow(paramvals)/numberofparams
-lineno = seq(1, runs*numberofparams, numberofparams)
 
 # Path to the results:
 resultpath = './Results/'
@@ -290,12 +294,12 @@ if(file.exists("GooseFieldForageData.txt"))
 	# run might still be sitting in the run directory and we would simply analyze these as if they were the new 
 	# run and get results identical to the previous run
 
-	if(file.exists("GooseEnergeticsData.txt"))
+	if(file.exists("GooseEnergeticsData.txt") && !singlerun)
 	{
 		file.remove("GooseEnergeticsData.txt")
 	}
 
-	if(file.exists("GooseFieldForageData.txt"))
+	if(file.exists("GooseFieldForageData.txt") && !singlerun)
 	{
 		file.remove("GooseFieldForageData.txt")
 	}
@@ -325,6 +329,9 @@ cat(report)
 # }
 
 # Very last thing is to update the counter:
-counter = counter+1  
-write(counter, file = 'counter.txt', append = FALSE)
+if(!singlerun) 
+{
+	counter = counter+1  
+	write(counter, file = 'counter.txt', append = FALSE)
+}
 
