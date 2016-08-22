@@ -28,9 +28,9 @@ for (i in 1:numberofparams)
 	stri = GetParamString(TheParam)
 	specialhunt = c('HuntingDays', 'WeekdayHunterChance', 'GooseLookChance', 'Efficiency')
 	if(stri %in% specialhunt) {
-		theval = GetParamValue(TheParam)
-		hhl = fread('Hunter_Hunting_Locations.txt')
-		EditHunterInput(hhl, column = stri, change = theval)
+		theval = GetParamValue(param = TheParam)
+		hhlpath = 'Hunter_Hunting_Locations.txt'
+		EditHunterInput(hhlpath, parameter = stri, change = theval)
 	}
 	if(!stri %in% specialhunt) 
 	{
