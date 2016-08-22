@@ -1,3 +1,2 @@
 REM Run ALMaSS command line
-ALMaSS_CmdLine.exe
-
+START ALMaSS_CmdLine.exe /WAIT

@@ -3,13 +3,13 @@ library(R.utils)
 library(ralmass)
 
 # Setup the directories
-npar = 27 
+npar = 49
 basedir = 'e:/almass/WorkDirectories/Goose/WD01/'
 basename = 'WD'
 # resultpath = 'e:/almass/Results/GooseManagement/Goose/Results08032016/' 
 setwd('e:/almass/WorkDirectories/Goose/')
 # Copy the files
-for (i in 23:npar) 
+for (i in 40:npar) 
 {
 	# file.copy(basedir, to = paste0(basename,i))  # Copy the almass work directory
 	copyDirectory(basedir, to = paste0(basename,i))  # Copy the almass work directory

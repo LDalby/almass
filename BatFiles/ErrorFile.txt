@@ -1,0 +1,102 @@
+Thu Aug 18 09:34:35 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:50:03 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:50:03 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:50:03 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:50:03 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:52:34 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:52:34 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:52:34 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:52:34 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:54:59 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:54:59 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:54:59 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:55:20 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:55:20 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:55:20 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:55:20 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:56:30 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:56:30 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:56:31 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:56:31 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:56:46 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:56:46 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:56:46 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:56:46 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:58:11 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:58:11 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:58:11 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 09:58:11 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 14:43:37 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 14:53:04 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 15:03:22 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 15:03:22 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 15:03:22 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
+Thu Aug 18 15:03:22 2016
+ Level 3 *****
+Configurator::ReadSymbols() Unable to open file for reading:  TIALMaSSConfig.cfg
