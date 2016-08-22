@@ -23,9 +23,8 @@
 # Load the packages we're going to need:
 library(data.table)
 library(ralmass)
-library(stringr)
 
-# library(slackr)  # Only needed if you want Slack to give you updates on progress
+library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work directory (done automatically when distributing the files, therefore blank):
 
@@ -153,7 +152,7 @@ if(file.exists("GooseFieldForageData.txt"))
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3
 	fieldobs = fread('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt')
 	roost = fread('GooseRoosts.txt', skip = 1)
-	poly = fread('Vejlerne2015_polyrefs_RenumFBHBOp.txt', skip = 1, verbose = FALSE)
+	poly = fread('VejlerneOpenMay2016PolyRef.txt', skip = 1, verbose = FALSE)
 	sp = c('Pinkfoot', 'Barnacle', 'Greylag')
 	
 	DistToNearestRoostField = CalcDistToRoosts(roost = roost, fields = fieldobs, polyref = poly, species = sp, fieldobs = TRUE)
@@ -310,23 +309,9 @@ report = paste0(basename(getwd()), ' - run number ', counter, '\n')
 cat(report)
 
 # If you want updates:
-# token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
-# slackrSetup(channel="@lars", api_token = token)
-# slackr(paste(Sys.time(), report, sep = ' '))
-
-# If you plots for each run:
-# if(counter > 1 & counter < runs) 
-# {
-	# token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')
-	# slackrSetup(channel="@slackbot", api_token = token)
-	# library(ggplot2)
-	# res = fread(paste0(resultpath, 'ParameterFittingResults.txt'))
-	# res[, Type:='Individual']
-	# res[FitType %in% c('PinkfootFit', 'BarnacleFit', 'GreylagFit') , Type:='Overall']
-	# p = ggplot(res, aes(Value ,Fit)) + geom_line(aes(color = FitType), size = 1) +
-	# 	scale_color_brewer(palette = "Set3") + facet_wrap(~Type, scales = 'free_y')
-	# ggslackr(p)
-# }
+token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
+slackrSetup(channel="@lars", api_token = token)
+slackr(paste(Sys.time(), report, sep = ' '))
 
 # Very last thing is to update the counter:
 if(!singlerun) 
@@ -334,4 +319,3 @@ if(!singlerun)
 	counter = counter+1  
 	write(counter, file = 'counter.txt', append = FALSE)
 }
-
