@@ -7,7 +7,9 @@ library(ralmass)
 pathtodirs = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
-dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
+# dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
+# dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
+dirs = dirs[grep('WD4', dirs)]  # Goose scenarios
 # dirs = c("WD23", "WD24", "WD25", "WD26", "WD27")
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
@@ -33,7 +35,8 @@ file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				file11, file12)
 # HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
-HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_Eff33_05-07-2016.txt'
+# HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_Eff33_05-07-2016.txt'
+HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
 weather = 'Vejlerne2013-2014.pre'
 pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
 # rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
@@ -48,6 +51,8 @@ for (i in seq_along(dirs)) {
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = weather)
 	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
+	# cmdpath = file.path(wd, 'ALMaSS_CmdLine.exe')
+	# write(cmdpath, file.path(wd, 'RunCmd.bat'))
 }
 # Store the results from previous round of fitting:
 # StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
@@ -58,9 +63,12 @@ for (i in seq_along(dirs)) {
 	unlink(wd, recursive = TRUE)
 }
 
-
 #------ Below here we ditribute the different parameters ------#
+
+# ----
 # Goose parameter fitting
+# ----
+
 # Distribute the paramter values to run:
 # Openness
 openval = round(seq(0, 100, length.out = 11))
@@ -130,9 +138,43 @@ for (i in seq_along(dirs)) {
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')
 }
+
+# ----
+# Full model hunter fitting
+# ----
+
+# hunting length
+huntlengthval = round(seq(0, 360, length.out = 11))
+wdpath = file.path(pathtodirs, 'WD40')
+GenerateParams('GOOSE_HUNTER_HUNT_LENGTH' = huntlengthval, write = TRUE, path = wdpath)
+# Probability of going out:
+huntdayprobval = seq(0, 1, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD41')
+GenerateParams('HUNTER_HUNTDAYPROBSCALER' = huntdayprobval, write = TRUE, path = wdpath)
+# Shooting chance on large fields
+largefieldval = seq(0, 1, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD42')
+GenerateParams('HUNTER_LARGEFIELDGOOSEPROXIMITYCHANCE' = largefieldval, write = TRUE, path = wdpath)
+
+# Hunter efficiency
+efficiencyval = seq(0, 1, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD43')
+GenerateParams('HUNTER_EFFICIENCY' = efficiencyval, write = TRUE, path = wdpath)
+# Set the edit the bat, ini and cfg files to match the parameters set above:
+for (i in seq_along(dirs)) {
+	wd = file.path(pathtodirs, dirs[i])
+	EditBat(wd)
+	years = 5
+	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_RUNTIMEREPORTING', value = 'true')
+}
+
 # ----
 # Goose project scenarios
 # ----
+
 years = 10
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
@@ -168,10 +210,10 @@ param = 'GOOSE_GL_SPRING_MIG_NOS'
 cfgval = GetParamValue(config = tialmass, param = param)
 EditConfig(file = tialmasspath, config = param, value = cfgval*2)
 write('Greylag x 2', file = file.path(wdpath, 'ParameterValues.txt'))
-# January hunting
+# January pinkfoot hunting
 wdpath = file.path(pathtodirs, 'WD23')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
-EditConfig(file = tialmasspath, config = 'GOOSE_OPENSEASON_END', value = 31)
+EditConfig(file = tialmasspath, config = 'GOOSE_PF_OPENSEASONEND', value = 31)
 write('January hunting', file = file.path(wdpath, 'ParameterValues.txt'))
 # Increase in efficiency
 wdpath = file.path(pathtodirs, 'WD24')
