@@ -9,8 +9,8 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-dirs = dirs[grep('WD4', dirs)]  # Goose scenarios
-# dirs = c("WD23", "WD24", "WD25", "WD26", "WD27")
+# dirs = dirs[grep('WD4', dirs)]  # Goose scenarios
+dirs = c("WD44", "WD45")
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -165,11 +165,8 @@ wdpath = file.path(pathtodirs, 'WD44')
 GenerateParams('HuntingDays' = huntdayval, write = TRUE, path = wdpath)
 # Proportion chekcers
 checkerval = seq(0.5, 1.5, length.out = 11)
-wdpath = file.path(pathtodirs, 'WD44')
+wdpath = file.path(pathtodirs, 'WD45')
 GenerateParams('GooseLookChance' = checkerval, write = TRUE, path = wdpath)
-
-
-
 
 # Set the edit the bat, ini and cfg files to match the parameters set above:
 for (i in seq_along(dirs)) {
@@ -185,7 +182,7 @@ for (i in seq_along(dirs)) {
 # ----
 # Goose project scenarios
 # ----
-
+file = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
 years = 10
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
@@ -229,30 +226,35 @@ write('January hunting', file = file.path(wdpath, 'ParameterValues.txt'))
 # Increase in efficiency
 wdpath = file.path(pathtodirs, 'WD24')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(hhlpath, parameter = 'Efficiency', change = 0.66)
+EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'Efficiency', change = 0.66)
 write('Double efficiency', file = file.path(wdpath, 'ParameterValues.txt'))
 # Only hunt once per week
 wdpath = file.path(pathtodirs, 'WD25')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'HUNTER_REFRACTIONPERIOD', value = 7)
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(hhlpath, parameter = 'WeekdayHunterChance', change = 0.0, weekbehav = 2)  # This sets all hunters to be refraction period hunters
+EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'WeekdayHunterChance', change = 0.0, weekbehav = 2)  # This sets all hunters to be refraction period hunters
 write('Hunt once a week', file = file.path(wdpath, 'ParameterValues.txt'))
 # Teaming up of hunters
 wdpath = file.path(pathtodirs, 'WD26')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'HUNTER_MAGAZINECAPACITY', value = 4)
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 0.5, weekbehav = 0)
+EditHunterInput(file = file, hhlpath = hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 0.5, weekbehav = 0)
 write('Hunters teaming up', file = file.path(wdpath, 'ParameterValues.txt'))
 # All hunters checkers:
 wdpath = file.path(pathtodirs, 'WD27')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(hhlpath, parameter = 'GooseLookChance', change = 1.0)
+EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 1.0)
 write('All hunters checkers', file = file.path(wdpath, 'ParameterValues.txt'))
 # Baseline
 wdpath = file.path(pathtodirs, 'WD28')
 write('Baseline', file = file.path(wdpath, 'ParameterValues.txt'))
+# Doubling of hunters
+wdpath = file.path(pathtodirs, 'WD29')
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 2, weekbehav = 0)
+write('Doubling of hunters', file = file.path(wdpath, 'ParameterValues.txt'))
 
 
 # ------ Multiparam Scenarios ----- #
