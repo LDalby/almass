@@ -245,7 +245,7 @@ if(file.exists("GooseFieldForageData.txt"))
 		propwithbag = unique(ho[!is.na(PropWithBag),.(PropWithBag, Year)])
 	}
 	# huntdays 
-	hhl = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt')
+	hhl = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt', skip = 1)
 	for (i in seq_along(seasons)) {
 		huntdaycorr[i] = summary(lm(hhl[,HuntingDays] ~ ho[Year == i,HuntingDays]))$r.squared
 	}
