@@ -30,9 +30,9 @@ arcpy.ASCIIToRaster_conversion(AsciiDst, RasterDst, "INTEGER")
 arcpy.AddColormap_management(RasterDst, "#", colors)
 
 # Process: Reclass by ASCII File
-# ReclDst = os.path.join(DstGDB, ReclRast)
-# if arcpy.Exists(ReclDst):
-#         arcpy.Delete_management(ReclDst)
-# outraster = ReclassByASCIIFile(RasterDst, MappingNumbers, "NODATA")
-# outraster.save(ReclDst)
+ReclDst = os.path.join(DstGDB, ReclRast)
+if arcpy.Exists(ReclDst):
+        arcpy.Delete_management(ReclDst)
+outraster = ReclassByASCIIFile(RasterDst, MappingNumbers, "NODATA")
+outraster.save(ReclDst)
 

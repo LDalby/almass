@@ -9,8 +9,9 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-# dirs = dirs[grep('WD4', dirs)]  # Goose scenarios
-dirs = c("WD44", "WD45")
+dirs = dirs[grep('WD4', dirs)]  # Goose scenarios
+# dirs = c("WD44", "WD45")
+# dirs = "WD41"
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -37,6 +38,7 @@ filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, f
 # HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
 # HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_Eff33_05-07-2016.txt'
 HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
+EditHunterInput(file = HHL, hhlpath = HHL, parameter = 'Efficiency', change = 0.5)
 weather = 'Vejlerne2013-2014.pre'
 pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
 # rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
@@ -148,7 +150,7 @@ huntlengthval = round(seq(10, 360, length.out = 11))
 wdpath = file.path(pathtodirs, 'WD40')
 GenerateParams('GOOSE_HUNTER_HUNT_LENGTH' = huntlengthval, write = TRUE, path = wdpath)
 # Probability of going out:
-huntdayprobval = seq(0.1, 1, length.out = 11)
+huntdayprobval = seq(1, 10, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD41')
 GenerateParams('HUNTER_HUNTDAYPROBSCALER' = huntdayprobval, write = TRUE, path = wdpath)
 # Shooting chance on large fields
@@ -164,7 +166,7 @@ huntdayval = seq(0.5, 1.5, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD44')
 GenerateParams('HuntingDays' = huntdayval, write = TRUE, path = wdpath)
 # Proportion chekcers
-checkerval = seq(0.5, 1.5, length.out = 11)
+checkerval = seq(0.1, 1.0, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD45')
 GenerateParams('GooseLookChance' = checkerval, write = TRUE, path = wdpath)
 
