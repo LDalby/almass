@@ -216,6 +216,7 @@ if(file.exists("GooseFieldForageData.txt"))
 	totalbaggl = rep(NA, length(seasons))
 	avgbaggl = rep(NA, length(seasons))
 	avgbagpf = rep(NA, length(seasons))
+	huntdaycorr = rep(NA, length(seasons))
 	simbag = fread('HuntingBagRecord.txt')
 	if(nrow(simbag) != 0){
 		simbag[, Species:=sapply(GameType, ConvertGameType)]
@@ -236,14 +237,18 @@ if(file.exists("GooseFieldForageData.txt"))
 			avgbaggl[m] = full[Species == 'Greylag' & Type == 'Simulated', unique(AvgBag)]
 		}
 	}
-
+	# hunters with bag
 	ho = fread('HuntingOpportunities.txt') 
 	if(nrow(ho) != 0){
 		ho[TotalBag != 0, N:=.N, by = Year]
 		ho[, PropWithBag:=N/.N, by = Year]
 		propwithbag = unique(ho[!is.na(PropWithBag),.(PropWithBag, Year)])
 	}
-
+	# huntdays 
+	hhl = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt')
+	for (i in seq_along(seasons)) {
+		huntdaycorr[i] = summary(lm(hhl[,HuntingDays] ~ ho[Year == i,HuntingDays]))$r.squared
+	}
 
 # --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
