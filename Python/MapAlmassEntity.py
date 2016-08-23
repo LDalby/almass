@@ -1,6 +1,6 @@
 # Name: Animal number mapper
 # Purpose: Convert ASCII file of ALMaSS landscape to raster 
-#		   and map animal numbers to it.
+#		   and map some ALMaSS entity to it.
 # Author: Lars Dalby
 # Date: 31/5/2016
 
