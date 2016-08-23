@@ -144,22 +144,33 @@ for (i in seq_along(dirs)) {
 # ----
 
 # hunting length
-huntlengthval = round(seq(0, 360, length.out = 11))
+huntlengthval = round(seq(10, 360, length.out = 11))
 wdpath = file.path(pathtodirs, 'WD40')
 GenerateParams('GOOSE_HUNTER_HUNT_LENGTH' = huntlengthval, write = TRUE, path = wdpath)
 # Probability of going out:
-huntdayprobval = seq(0, 1, length.out = 11)
+huntdayprobval = seq(0.1, 1, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD41')
 GenerateParams('HUNTER_HUNTDAYPROBSCALER' = huntdayprobval, write = TRUE, path = wdpath)
 # Shooting chance on large fields
-largefieldval = seq(0, 1, length.out = 11)
+largefieldval = seq(0.1, 1, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD42')
 GenerateParams('HUNTER_LARGEFIELDGOOSEPROXIMITYCHANCE' = largefieldval, write = TRUE, path = wdpath)
-
 # Hunter efficiency
-efficiencyval = seq(0, 1, length.out = 11)
+efficiencyval = seq(0.1, 1, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD43')
-GenerateParams('HUNTER_EFFICIENCY' = efficiencyval, write = TRUE, path = wdpath)
+GenerateParams('Efficiency' = efficiencyval, write = TRUE, path = wdpath)
+# Hunting days
+huntdayval = seq(0.5, 1.5, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD44')
+GenerateParams('HuntingDays' = huntdayval, write = TRUE, path = wdpath)
+# Proportion chekcers
+checkerval = seq(0.5, 1.5, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD44')
+GenerateParams('GooseLookChance' = checkerval, write = TRUE, path = wdpath)
+
+
+
+
 # Set the edit the bat, ini and cfg files to match the parameters set above:
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])

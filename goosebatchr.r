@@ -210,31 +210,26 @@ if(file.exists("GooseFieldForageData.txt"))
 	bag = melt(bag, id.vars = 'ABMhunter', measure.vars = c('Greylag', 'Pinkfoot'), variable.name = 'Species', value.name = 'NoShot')
 	bag[, Type:='Fieldobs']
 	
+	GLBagOverlap = rep(NA, length(seasons))
+	PFBagOverlap = rep(NA, length(seasons))
+	totalbagpf = rep(NA, length(seasons))
+	totalbaggl = rep(NA, length(seasons))
 	simbag = fread('HuntingBagRecord.txt')
-
-	simbag[, Species:=sapply(GameType, ConvertGameType)]
-	simbag[, NoShot:=.N, by = list(Species, HunterRef, SeasonNumber)]
-	sim = unique(simbag[, .(HunterRef, Species, NoShot, SeasonNumber)])
-	sim[, Type:='Simulated']
-	GLBagOverlap = NA 
-	PFBagOverlap = NA 
-	for (i in seq_along(seasons)) {
-		full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], sim[SeasonNumber == seasons[i], .(Species, NoShot, Type)])
-		GLBagOverlap[i] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
-		PFBagOverlap[i] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
-	}
-	GLBagOverlap = NA
-	PFBagOverlap = NA
-	totalbagpf = NA
-	totalbaggl = NA
-	for (m in seq_along(seasons)) {
-		tmp = sim[SeasonNumber == m,]
-		full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], tmp[, .(Species, NoShot, Type)])
-		full[, TotalBag:=sum(NoShot), by = c('Species', 'Type')]
-		GLBagOverlap[m] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
-		PFBagOverlap[m] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
-		totalbagpf[m] = full[Species == 'Pinkfoot' & Type == 'Simulated', unique(TotalBag)]
-		totalbaggl[m] = full[Species == 'Greylag' & Type == 'Simulated', unique(TotalBag)]
+	if(nrow(simbag) != 0){
+		simbag[, Species:=sapply(GameType, ConvertGameType)]
+		simbag[, NoShot:=.N, by = list(Species, HunterRef, SeasonNumber)]
+		sim = unique(simbag[, .(HunterRef, Species, NoShot, SeasonNumber)])
+		sim[, Type:='Simulated']
+		
+		for (m in seq_along(seasons)) {
+			tmp = sim[SeasonNumber == m,]
+			full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], tmp[, .(Species, NoShot, Type)])
+			full[, TotalBag:=sum(NoShot), by = c('Species', 'Type')]
+			GLBagOverlap[m] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
+			PFBagOverlap[m] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
+			totalbagpf[m] = full[Species == 'Pinkfoot' & Type == 'Simulated', unique(TotalBag)]
+			totalbaggl[m] = full[Species == 'Greylag' & Type == 'Simulated', unique(TotalBag)]
+		}
 	}
 
 # --------------------------------------------------------------------------------------------#
