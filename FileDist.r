@@ -9,9 +9,9 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-dirs = dirs[grep('WD4', dirs)]  # Goose scenarios
+# dirs = dirs[grep('WD4', dirs)]  # Goose scenarios
 # dirs = c("WD44", "WD45")
-# dirs = "WD41"
+dirs = "WD40"
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -168,7 +168,11 @@ GenerateParams('HuntingDays' = huntdayval, write = TRUE, path = wdpath)
 # Proportion chekcers
 checkerval = seq(0.1, 1.0, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD45')
-GenerateParams('GooseLookChance' = checkerval, write = TRUE, path = wdpath)
+GenerateParams('GooseLookChance' = checkerval, write = TRUE, path = wdpath, allhunters = FALSE)
+# Proportion weekday hunters
+weekdayval = seq(0.1, 1.0, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD46')
+GenerateParams('WeekdayHunterChance' = weekdayval, write = TRUE, path = wdpath, allhunters = FALSE)
 
 # Set the edit the bat, ini and cfg files to match the parameters set above:
 for (i in seq_along(dirs)) {
@@ -247,7 +251,7 @@ write('Hunters teaming up', file = file.path(wdpath, 'ParameterValues.txt'))
 # All hunters checkers:
 wdpath = file.path(pathtodirs, 'WD27')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 1.0)
+EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 1.0, allhunters = TRUE)
 write('All hunters checkers', file = file.path(wdpath, 'ParameterValues.txt'))
 # Baseline
 wdpath = file.path(pathtodirs, 'WD28')

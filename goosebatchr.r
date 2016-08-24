@@ -244,6 +244,7 @@ if(file.exists("GooseFieldForageData.txt"))
 			ho[TotalBag != 0, N:=.N, by = Year]
 			ho[, PropWithBag:=N/.N, by = Year]
 			propwithbag = unique(ho[!is.na(PropWithBag),.(PropWithBag, Year)])
+			propwithbag = propwithbag[,PropWithBag]
 		}
 		if(nrow(ho[TotalBag != 0,]) == 0) {
 			propwithbag = rep(NA, length(seasons))
