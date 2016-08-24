@@ -31,7 +31,12 @@ for (i in 1:numberofparams)
 		theval = GetParamValue(param = TheParam)
 		hhlpath = 'Hunter_Hunting_Locations.txt'
 		file = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
-		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval)
+		if(stri %in% c('HuntingDays', 'Efficiency')) {
+		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, allhunters = TRUE)
+		}
+		if(!stri %in% c('HuntingDays', 'Efficiency')) {
+		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, allhunters = FALSE)
+	}
 	}
 	if(!stri %in% specialhunt) 
 	{
