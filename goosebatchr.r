@@ -240,9 +240,14 @@ if(file.exists("GooseFieldForageData.txt"))
 	# hunters with bag
 	ho = fread('HuntingOpportunities.txt') 
 	if(nrow(ho) != 0){
-		ho[TotalBag != 0, N:=.N, by = Year]
-		ho[, PropWithBag:=N/.N, by = Year]
-		propwithbag = unique(ho[!is.na(PropWithBag),.(PropWithBag, Year)])
+		if(nrow(ho[TotalBag != 0,]) > 0) {
+			ho[TotalBag != 0, N:=.N, by = Year]
+			ho[, PropWithBag:=N/.N, by = Year]
+			propwithbag = unique(ho[!is.na(PropWithBag),.(PropWithBag, Year)])
+		}
+		if(nrow(ho[TotalBag != 0,]) == 0) {
+			propwithbag = rep(NA, length(seasons))
+		}
 	}
 	# huntdays 
 	hhl = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt', skip = 1)
@@ -268,12 +273,12 @@ if(file.exists("GooseFieldForageData.txt"))
 			HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
 			RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
 			PropDayInSimGL[k], PropDayInSimBN[k], PFBagOverlap[k], GLBagOverlap[k], totalbagpf[k],
-			totalbaggl[k], avgbagpf[k], avgbaggl[k], propwithbag[k])
+			totalbaggl[k], avgbagpf[k], avgbaggl[k], propwithbag[k], huntdaycorr[k])
 		FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 			'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 			'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
 			'PropDayInSimGL', 'PropDayInSimBN', 'BagOverlapPF', 'BagOverlapGL', 'TotalBagPF',
-			'TotalBagGL', 'AvgBagPF', 'AvgBagGL', 'PropWithBag')
+			'TotalBagGL', 'AvgBagPF', 'AvgBagGL', 'PropWithBag', 'HuntDayCorr')
 	# Goose-only runs:
 	# 	PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2
 	# 	PinkfootFit = PinkfootFit/5
