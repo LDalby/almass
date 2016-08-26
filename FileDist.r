@@ -9,9 +9,8 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-# dirs = dirs[grep('WD4', dirs)]  # Goose scenarios
-# dirs = c("WD44", "WD45")
-dirs = "WD40"
+dirs = dirs[grep('WD4', dirs)]  # Hunter param fittin
+# dirs = c("WD41", "WD42", "WD43", "WD44", "WD45", "WD46", "WD47", "48")
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -168,11 +167,28 @@ GenerateParams('HuntingDays' = huntdayval, write = TRUE, path = wdpath)
 # Proportion chekcers
 checkerval = seq(0.1, 1.0, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD45')
-GenerateParams('GooseLookChance' = checkerval, write = TRUE, path = wdpath, allhunters = FALSE)
+GenerateParams('GooseLookChance' = checkerval, write = TRUE, path = wdpath)
 # Proportion weekday hunters
 weekdayval = seq(0.1, 1.0, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD46')
-GenerateParams('WeekdayHunterChance' = weekdayval, write = TRUE, path = wdpath, allhunters = FALSE)
+GenerateParams('WeekdayHunterChance' = weekdayval, write = TRUE, path = wdpath)
+# Following likelyhood
+followingval = round(seq(5000, 10000, length.out = 11))
+followingval1 = round(seq(5000, 10000, length.out = 11))
+followingval2 = round(seq(5000, 10000, length.out = 11))
+wdpath = file.path(pathtodirs, 'WD47')
+GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
+			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
+			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
+			    write = TRUE, path = wdpath, expand = FALSE)
+# Memory duration
+memoryval = seq(0, 10, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD48')
+GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, path = wdpath)
+# Large field size
+largefieldcutoffval = seq(0, 10000, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD49')
+GenerateParams('HUNTER_LARGEFIELDGOOSEPROXIMITYCHANCESIZECUTOFF' = largefieldcutoffval, write = TRUE, path = wdpath)
 
 # Set the edit the bat, ini and cfg files to match the parameters set above:
 for (i in seq_along(dirs)) {
@@ -184,6 +200,7 @@ for (i in seq_along(dirs)) {
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_RUNTIMEREPORTING', value = 'true')
 }
+
 
 # ----
 # Goose project scenarios
