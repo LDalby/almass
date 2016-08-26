@@ -26,8 +26,6 @@ RasterDst = os.path.join(DstGDB, RasterName)
 if arcpy.Exists(RasterDst):
         arcpy.Delete_management(RasterDst)
 arcpy.ASCIIToRaster_conversion(AsciiDst, RasterDst, "INTEGER")
-# Apply the standard ALMaSS colors
-arcpy.AddColormap_management(RasterDst, "#", colors)
 
 # Process: Reclass by ASCII File
 ReclDst = os.path.join(DstGDB, ReclRast)
@@ -35,4 +33,6 @@ if arcpy.Exists(ReclDst):
         arcpy.Delete_management(ReclDst)
 outraster = ReclassByASCIIFile(RasterDst, MappingNumbers, "NODATA")
 outraster.save(ReclDst)
+# Apply the standard ALMaSS colors
+arcpy.AddColormap_management(RasterDst, "#", colors)
 
