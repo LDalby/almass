@@ -14,19 +14,20 @@ arcpy.env.parallelProcessingFactor = "100%"  # You can always hope that one day 
 # Local variables:
 PathToAscii = "c:\\MSV\\WorkDirectory"
 AsciiFile = "AsciiLandscape.txt"
-# DstGDB = "O:\\ST_GooseProject\\ALMaSS\\GIS\\MapDump.gdb"
-DstGDB = "O:\\ST_GooseProject\\ALMaSS\\GIS\\MapSimOutput.gdb"
+DstGDB = "O:\\ST_GooseProject\\ALMaSS\\GIS\\MapDump.gdb"
 RasterName = "VejlElemType"
-ReclRast = "PfBagHS1"
-MappingNumbers = "o:\\ST_LandskabsGenerering\\temp\\ReclassTestData\\HS1Pinkfoot.txt"  # The reclassification table
-# colors = "C:\\Users\\lada\\Git\\almass\\StandardAlmassColors.clr"
+ReclRast = "BNNumbers"
+MappingNumbers = "c:\\Users\\lada\\Desktop\\bnoct.txt"  # The reclassification table
+colors = "C:\\Users\\lada\\Git\\almass\\StandardAlmassColors.clr"
 
 # Process: ASCII to Raster
 AsciiDst = os.path.join(PathToAscii, AsciiFile)
 RasterDst = os.path.join(DstGDB, RasterName)
 if arcpy.Exists(RasterDst):
-       arcpy.Delete_management(RasterDst)
+        arcpy.Delete_management(RasterDst)
 arcpy.ASCIIToRaster_conversion(AsciiDst, RasterDst, "INTEGER")
+# Apply the standard ALMaSS colors
+arcpy.AddColormap_management(RasterDst, "#", colors)
 
 # Process: Reclass by ASCII File
 ReclDst = os.path.join(DstGDB, ReclRast)
@@ -34,6 +35,4 @@ if arcpy.Exists(ReclDst):
         arcpy.Delete_management(ReclDst)
 outraster = ReclassByASCIIFile(RasterDst, MappingNumbers, "NODATA")
 outraster.save(ReclDst)
-# Apply the standard ALMaSS colors
-# arcpy.AddColormap_management(RasterDst, "#", colors)
 
