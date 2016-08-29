@@ -32,10 +32,10 @@ for (i in 1:numberofparams)
 		hhlpath = 'Hunter_Hunting_Locations.txt'
 		file = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
 		if(stri %in% c('HuntingDays', 'Efficiency')) {
-		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, allhunters = TRUE)
+		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, huntersubset = 'all')
 		}
 		if(!stri %in% c('HuntingDays', 'Efficiency')) {
-		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, allhunters = FALSE)
+		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, huntersubset = 'experts')
 	}
 	}
 	if(!stri %in% specialhunt) 
