@@ -16,7 +16,7 @@ PathToAscii = "c:\\MSV\\WorkDirectory"
 AsciiFile = "AsciiLandscape.txt"
 DstGDB = "O:\\ST_GooseProject\\ALMaSS\\GIS\\MapDump.gdb"
 RasterName = "VejlElemType"
-ReclRast = "BNNumbers"
+ReclRast = "BNNumbersTest"
 MappingNumbers = "c:\\Users\\lada\\Desktop\\bnoct.txt"  # The reclassification table
 colors = "C:\\Users\\lada\\Git\\almass\\StandardAlmassColors.clr"
 
