@@ -324,14 +324,15 @@ if(file.exists("GooseFieldForageData.txt"))
 }
 
 # Report progress to console:
-report = paste0(basename(getwd()), ' - run number ', counter, '\n')
+workstation = Sys.info()['nodename']
+report = paste(workstation, basename(getwd()), '- run number', counter, '\n', sep = ' ')
 cat(report)
 
 # If you want updates:
-if(Sys.info()['nodename'] == 'DMU-WS-8297'){
+if(workstation == 'DMU-WS-8297'){
 	token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
 }
-if(Sys.info()['nodename'] == 'BIOS-REGN01'){
+if(workstation == 'BIOS-REGN01'){
 	token = readLines('C:/Users/au206907/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
 }
 
