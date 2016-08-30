@@ -189,14 +189,6 @@ GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, path = wdpath)
 largefieldcutoffval = seq(0, 100000, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD49')
 GenerateParams('HUNTER_LARGEFIELDGOOSEPROXIMITYCHANCESIZECUTOFF' = largefieldcutoffval, write = TRUE, path = wdpath)
-# Hunter check frequency
-checkfreqval = seq(0.1, 1.0, length.out = 11)
-wdpath = file.path(pathtodirs, 'WD50')
-GenerateParams('HUNTER_CHECK_FREQUENCY' = checkfreqval, write = TRUE, path = wdpath)
-# Proportion occasional hunter checkers
-occashuntcheckval = seq(0.1, 1.0, length.out = 11)
-wdpath = file.path(pathtodirs, 'WD51')
-GenerateParams('GooseLookChance' = occashuntcheckval, write = TRUE, path = wdpath)
 
 # Set the edit the bat, ini and cfg files to match the parameters set above:
 for (i in seq_along(dirs)) {
