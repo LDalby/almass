@@ -14,7 +14,8 @@ dirs = dirs[c(grep('WD4', dirs), grep('WD5', dirs))]  # Hunter param fittin
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
-gitalmass = 'C:/Users/lada/Git/almass/'  # LDWorkstation
+# gitalmass = 'C:/Users/lada/Git/almass/'  # LDWorkstation
+gitalmass = 'c:/Users/au206907/Documents/GitHub/almass/'  # biosregn01
 file1 = 'c:/MSV/ALMaSS_CmdLine/x64/Release/ALMaSS_CmdLine.exe' 
 file2 = file.path(gitalmass, 'counter.txt' )
 file3 = file.path(gitalmass, 'goosebatchr.r')
