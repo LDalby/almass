@@ -16,7 +16,9 @@ dirs = dirs[c(grep('WD4', dirs), grep('WD5', dirs))]  # Hunter param fittin
 # the batchr and prerunsetup file.
 # gitalmass = 'C:/Users/lada/Git/almass/'  # LDWorkstation
 gitalmass = 'c:/Users/au206907/Documents/GitHub/almass/'  # biosregn01
-file1 = 'c:/MSV/ALMaSS_CmdLine/x64/Release/ALMaSS_CmdLine.exe' 
+exepath = 'o:/ST_GooseProject/ALMaSS/Executables/Lars/'  # biosregn01
+# exepath = 'c:/MSV/ALMaSS_CmdLine/x64/Release/'  # LDWorkstation
+file1 = file.path(exepath, 'ALMaSS_CmdLine.exe')
 file2 = file.path(gitalmass, 'counter.txt' )
 file3 = file.path(gitalmass, 'goosebatchr.r')
 file4 = file.path(gitalmass, 'ErrorFile.txt')
