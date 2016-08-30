@@ -34,7 +34,7 @@ for (i in 1:numberofparams)
 		if(stri %in% c('HuntingDays', 'Efficiency')) {
 		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, huntersubset = 'all')
 		}
-		if(!stri %in% c('HuntingDays', 'Efficiency')) {
+		if(stri %in% c('WeekdayHunterChance', 'GooseLookChance')) {
 		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, huntersubset = 'experts')
 	}
 	}
