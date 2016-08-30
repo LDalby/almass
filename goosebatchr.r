@@ -328,7 +328,13 @@ report = paste0(basename(getwd()), ' - run number ', counter, '\n')
 cat(report)
 
 # If you want updates:
-token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
+if(Sys.info()['nodename'] == 'DMU-WS-8297'){
+	token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
+}
+if(Sys.info()['nodename'] == 'BIOS-REGN01'){
+	token = readLines('C:/Users/au206907/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
+}
+
 slackrSetup(channel="@lars", api_token = token)
 slackr(paste(Sys.time(), report, sep = ' '))
 
