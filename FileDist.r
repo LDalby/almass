@@ -4,7 +4,7 @@ library(data.table)
 library(ralmass)
 
 # List the parent directory of all the work directories
-pathtodirs = 'e:/almass/WorkDirectories/Goose/'
+pathtodirs = 'e:/almass/WorkDirectories/Goose/'  # Both machines
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
@@ -14,22 +14,24 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
 # gitalmass = 'C:/Users/lada/Git/almass/'  # LDWorkstation
+# exepath = 'c:/MSV/ALMaSS_CmdLine/x64/Release/'  # LDWorkstation
 gitalmass = 'c:/Users/au206907/Documents/GitHub/almass/'  # biosregn01
 exepath = 'o:/ST_GooseProject/ALMaSS/Executables/Lars/'  # biosregn01
-# exepath = 'c:/MSV/ALMaSS_CmdLine/x64/Release/'  # LDWorkstation
+almassinputs = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/'  # Both machines
 file1 = file.path(exepath, 'ALMaSS_CmdLine.exe')
 file2 = file.path(gitalmass, 'counter.txt' )
 file3 = file.path(gitalmass, 'goosebatchr.r')
 file4 = file.path(gitalmass, 'ErrorFile.txt')
 file5 = file.path(gitalmass, 'PreRunSetup.r')
 # Species specific things:
-file6 = 'o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt'
-file7 = 'o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv'
-file8 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/APIdata.txt'
-file9 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/GooseRoosts.txt'
-file10 = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Goose/PfYoungDist.txt'
-file11 = 'C:/MSV/ALMaSS_inputs/GooseManagement/TIALMaSSConfig.cfg'
-file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
+fielddata = 'o:/ST_GooseProject/Field data/'
+file6 = file.path(fielddata, 'FieldobsDistancesFromRoost2016-04-25.txt')
+file7 = file.path(fielddata, 'Fugledata/HabitatUseAll2014.csv')
+file8 = file.path(almassinputs, 'APIdata.txt')
+file9 = file.path(almassinputs, 'Goose/GooseRoosts.txt')
+file10 = file.path(almassinputs, 'Goose/PfYoungDist.txt')
+file11 = file.path(almassinputs, 'TIALMaSSConfig.cfg')
+file12 = file.path(fielddata, 'FieldobsFlockSizes2016-05-03.txt')
 # Landscape:
 # file13 = 'C:/MSV/WorkDirectory/VejlerneOpenMay2016PolyRef.txt'
 # file14 = 'C:/MSV/WorkDirectory/VejlerneOpenMay2016.lsb'
@@ -37,13 +39,7 @@ file12 = 'o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt'
 
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				file11, file12)
-# HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
-# HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_Eff33_05-07-2016.txt'
-HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
-HHLpath = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016_backup.txt'
-# EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'Efficiency', change = 0.33)
-EditHunterInput(file = HHLpath, hhlpath = HHL, parameter = 'Efficiency', change = 0.5)
-EditHunterInput(file = HHL, hhlpath = HHL, parameter = 'GooseLookChance', change = 0.55, huntersubset = 'occasional')  # was zero before
+HHL = file.path(almassinputs, 'Hunter/746_VejlerneHuntersDiffGLC.txt')
 weather = 'Vejlerne2013-2014.pre'
 pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
 # rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
@@ -58,8 +54,6 @@ for (i in seq_along(dirs)) {
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = weather)
 	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
 	AppendWorkDir(WorkDir = wd, InScript = file5, OutScript = 'PreRunSetup.r') 
-	# cmdpath = file.path(wd, 'ALMaSS_CmdLine.exe')
-	# write(cmdpath, file.path(wd, 'RunCmd.bat'))
 }
 # Store the results from previous round of fitting:
 # StoreResults(pathtodirs, 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/')
