@@ -3,13 +3,14 @@ library(R.utils)
 library(ralmass)
 
 # Setup the directories
-npar = 49
-basedir = 'e:/almass/WorkDirectories/Goose/WD01/'
+npar = 110
+# basedir = 'e:/almass/WorkDirectories/Goose/WD01/'  # LDWorkstation
+basedir = 'c:/ALMaSS/Goose/WD001/'  # biosregn01
 basename = 'WD'
 # resultpath = 'e:/almass/Results/GooseManagement/Goose/Results08032016/' 
 setwd('e:/almass/WorkDirectories/Goose/')
 # Copy the files
-for (i in 40:npar) 
+for (i in 100:npar) 
 {
 	# file.copy(basedir, to = paste0(basename,i))  # Copy the almass work directory
 	copyDirectory(basedir, to = paste0(basename,i))  # Copy the almass work directory
