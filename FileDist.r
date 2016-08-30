@@ -9,16 +9,17 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-dirs = dirs[grep('WD4', dirs)]  # Hunter param fittin
-# dirs = c("WD41", "WD42", "WD43", "WD44", "WD45", "WD46", "WD47", "48")
+dirs = dirs[c(grep('WD4', dirs), grep('WD5', dirs))]  # Hunter param fittin
+# dirs = c("WD49")
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
+gitalmass = 'C:/Users/lada/Git/almass/'  # LDWorkstation
 file1 = 'c:/MSV/ALMaSS_CmdLine/x64/Release/ALMaSS_CmdLine.exe' 
-file2 = 'C:/Users/lada/Git/almass/counter.txt' 
-file3 = 'C:/Users/lada/Git/almass/goosebatchr.r'	
-file4 = 'C:/Users/lada/Git/almass/ErrorFile.txt'
-file5 = 'C:/Users/lada/Git/almass/PreRunSetup.r'
+file2 = file.path(gitalmass, 'counter.txt' )
+file3 = file.path(gitalmass, 'goosebatchr.r')
+file4 = file.path(gitalmass, 'ErrorFile.txt')
+file5 = file.path(gitalmass, 'PreRunSetup.r')
 # Species specific things:
 file6 = 'o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt'
 file7 = 'o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv'
@@ -37,7 +38,10 @@ filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, f
 # HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_NoHunters.txt'
 # HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/Hunter_Hunting_Locations_Eff33_05-07-2016.txt'
 HHL = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
-EditHunterInput(file = HHL, hhlpath = HHL, parameter = 'Efficiency', change = 0.5)
+HHLpath = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016_backup.txt'
+# EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'Efficiency', change = 0.33)
+EditHunterInput(file = HHLpath, hhlpath = HHL, parameter = 'Efficiency', change = 0.5)
+EditHunterInput(file = HHL, hhlpath = HHL, parameter = 'GooseLookChance', change = 0.55, huntersubset = 'occasional')  # was zero before
 weather = 'Vejlerne2013-2014.pre'
 pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
 # rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
@@ -186,9 +190,17 @@ memoryval = seq(0, 10, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD48')
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, path = wdpath)
 # Large field size
-largefieldcutoffval = seq(0, 10000, length.out = 11)
+largefieldcutoffval = seq(0, 100000, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD49')
 GenerateParams('HUNTER_LARGEFIELDGOOSEPROXIMITYCHANCESIZECUTOFF' = largefieldcutoffval, write = TRUE, path = wdpath)
+# Hunter check frequency
+checkfreqval = seq(0.1, 1.0, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD50')
+GenerateParams('HUNTER_CHECK_FREQUENCY' = checkfreqval, write = TRUE, path = wdpath)
+# Proportion occasional hunter checkers
+occashuntcheckval = seq(0.1, 1.0, length.out = 11)
+wdpath = file.path(pathtodirs, 'WD51')
+GenerateParams('GooseLookChance' = occashuntcheckval, write = TRUE, path = wdpath)
 
 # Set the edit the bat, ini and cfg files to match the parameters set above:
 for (i in seq_along(dirs)) {
