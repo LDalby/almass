@@ -9,8 +9,7 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-dirs = dirs[c(grep('WD4', dirs), grep('WD5', dirs))]  # Hunter param fittin
-# dirs = c("WD49")
+# dirs = dirs[c(grep('WD4', dirs), grep('WD5', dirs))]  # Hunter param fitting
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
