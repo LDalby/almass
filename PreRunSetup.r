@@ -30,7 +30,7 @@ for (i in 1:numberofparams)
 	if(stri %in% specialhunt) {
 		theval = GetParamValue(param = TheParam)
 		hhlpath = 'Hunter_Hunting_Locations.txt'
-		file = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
+		file = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_VejlerneHuntersDiffGLC.txt'
 		if(stri %in% c('HuntingDays', 'Efficiency')) {
 		EditHunterInput(file = file, hhlpath = hhlpath, parameter = stri, change = theval, huntersubset = 'all')
 		}
