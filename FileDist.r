@@ -281,7 +281,51 @@ wdpath = file.path(pathtodirs, 'WD29')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
 EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 2, weekbehav = 0)
 write('Doubling of hunters', file = file.path(wdpath, 'ParameterValues.txt'))
-
+# Double pinkfoot geese:
+wdpath = file.path(pathtodirs, 'WD31')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+param = 'GOOSE_PF_STARTNOS'
+tialmass = readLines(tialmasspath)
+cfgval = GetParamValue(config = tialmass, param = param) 
+EditConfig(file = tialmasspath, config = param, value = cfgval*2)
+param = 'GOOSE_PF_SPRING_MIG_NOS'
+cfgval = GetParamValue(config = tialmass, param = param)
+EditConfig(file = tialmasspath, config = param, value = cfgval*2)
+write('Pinkfoot x 2', file = file.path(wdpath, 'ParameterValues.txt'))
+# Half greylag geese:
+wdpath = file.path(pathtodirs, 'WD32')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+param = 'GOOSE_GL_STARTNOS'
+tialmass = readLines(tialmasspath)
+cfgval = GetParamValue(config = tialmass, param = param) 
+EditConfig(file = tialmasspath, config = param, value = round(cfgval*0.5))
+param = 'GOOSE_GL_SPRING_MIG_NOS'
+cfgval = GetParamValue(config = tialmass, param = param)
+EditConfig(file = tialmasspath, config = param, value = round(cfgval*0.5))
+write('Greylag x 0.5', file = file.path(wdpath, 'ParameterValues.txt'))
+# No hunters checkers:
+wdpath = file.path(pathtodirs, 'WD33')
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 0.0, huntersubset = 'all')
+write('No checkers', file = file.path(wdpath, 'ParameterValues.txt'))
+# Hunt twice per week
+wdpath = file.path(pathtodirs, 'WD34')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+EditConfig(file = tialmasspath, config = 'HUNTER_REFRACTIONPERIOD', value = 3)
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'WeekdayHunterChance', change = 0.0, weekbehav = 2)  # This sets all hunters to be refraction period hunters
+write('Hunt twice a week', file = file.path(wdpath, 'ParameterValues.txt'))
+# 4 x barnacle geese:
+wdpath = file.path(pathtodirs, 'WD35')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+param = 'GOOSE_BN_STARTNOS'
+tialmass = readLines(tialmasspath)
+cfgval = GetParamValue(config = tialmass, param = param) 
+EditConfig(file = tialmasspath, config = param, value = cfgval*4)
+param = 'GOOSE_BN_SPRING_MIG_NOS'
+cfgval = GetParamValue(config = tialmass, param = param)
+EditConfig(file = tialmasspath, config = param, value = cfgval*4)
+write('Barnacle x 4', file = file.path(wdpath, 'ParameterValues.txt'))
 
 # ------ Multiparam Scenarios ----- #
 # Following likelyhood and SD of roost leave times
