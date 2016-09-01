@@ -26,10 +26,14 @@ thelist[, mean:=round(mean(Bag)), by = c('Scenario', 'TotalBag')]
 thelist[, min:=min(Bag), by = c('Scenario', 'TotalBag')]
 thelist[, max:=max(Bag), by = c('Scenario', 'TotalBag')]
 plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Greylag x 2", "January hunting", "Double efficiency",
- "Hunt once a week", "All hunters checkers", "Hunters teaming up")
+ "Hunt once a week", "All hunters checkers", "Hunters teaming up", "Doubling of hunters")
 thelist[, Scenario:=factor(Scenario, levels = plotorder)]
 p = ggplot(thelist, aes(Scenario, mean)) + 
 	 geom_pointrange(aes(ymin = min, ymax = max, color = TotalBag), position=position_dodge(width=0.2)) + 
 	 scale_color_viridis(discrete=TRUE, guide = guide_legend(title = "Total bag")) + 
 	 ylab('Mean total bag size') + ylim(0, thelist[, max(Bag)]) +  theme_dark()
+
+
+token = readLines('C:/Users/au206907/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
+slackrSetup(channel="#goosemodel", api_token = token)
 ggslackr(p)	
