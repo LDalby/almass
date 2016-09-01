@@ -9,7 +9,7 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-# dirs = dirs[c(grep('WD4', dirs), grep('WD5', dirs))]  # Hunter param fitting
+dirs = c('WD45', 'WD46')
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -164,12 +164,12 @@ GenerateParams('Efficiency' = efficiencyval, write = TRUE, path = wdpath)
 huntdayval = seq(0.5, 1.5, length.out = 11)
 wdpath = file.path(pathtodirs, 'WD44')
 GenerateParams('HuntingDays' = huntdayval, write = TRUE, path = wdpath)
-# Proportion chekcers
-checkerval = seq(0.1, 1.0, length.out = 11)
+# Greylag foraging distance
+fordistval = seq(1800, 10000, length.out = 5)
 wdpath = file.path(pathtodirs, 'WD45')
-GenerateParams('GooseLookChance' = checkerval, write = TRUE, path = wdpath)
+GenerateParams('GOOSE_FORAGEDIST_GL' = fordistval, write = TRUE, path = wdpath)
 # Proportion weekday hunters
-weekdayval = seq(0.1, 1.0, length.out = 11)
+weekdayval = seq(0.2, 0.8, length.out = 5)
 wdpath = file.path(pathtodirs, 'WD46')
 GenerateParams('WeekdayHunterChance' = weekdayval, write = TRUE, path = wdpath)
 # Following likelyhood
