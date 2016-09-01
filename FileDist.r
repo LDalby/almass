@@ -7,16 +7,20 @@ library(ralmass)
 pathtodirs = 'e:/almass/WorkDirectories/Goose/'  # Both machines
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
-# dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
+dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-dirs = c('WD45', 'WD46')
+# dirs = c('WD45', 'WD46')
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
-# gitalmass = 'C:/Users/lada/Git/almass/'  # LDWorkstation
-# exepath = 'c:/MSV/ALMaSS_CmdLine/x64/Release/'  # LDWorkstation
-gitalmass = 'c:/Users/au206907/Documents/GitHub/almass/'  # biosregn01
-exepath = 'o:/ST_GooseProject/ALMaSS/Executables/Lars/'  # biosregn01
+if(Sys.info()['nodename'] == 'BIOS-REGN01') {
+  gitalmass = 'c:/Users/au206907/Documents/GitHub/almass/' 
+  exepath = 'o:/ST_GooseProject/ALMaSS/Executables/Lars/' 
+}
+if(Sys.info()['nodename'] == 'DMU-WS-8297') {
+  gitalmass = 'C:/Users/lada/Git/almass/'  
+  exepath = 'c:/MSV/ALMaSS_CmdLine/x64/Release/'  
+}
 almassinputs = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/'  # Both machines
 file1 = file.path(exepath, 'ALMaSS_CmdLine.exe')
 file2 = file.path(gitalmass, 'counter.txt' )
@@ -205,7 +209,6 @@ for (i in seq_along(dirs)) {
 # ----
 # Goose project scenarios
 # ----
-file = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt'
 years = 10
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
@@ -249,26 +252,26 @@ write('January hunting', file = file.path(wdpath, 'ParameterValues.txt'))
 # Increase in efficiency
 wdpath = file.path(pathtodirs, 'WD24')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'Efficiency', change = 0.66)
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'Efficiency', change = 0.66)
 write('Double efficiency', file = file.path(wdpath, 'ParameterValues.txt'))
 # Only hunt once per week
 wdpath = file.path(pathtodirs, 'WD25')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'HUNTER_REFRACTIONPERIOD', value = 7)
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'WeekdayHunterChance', change = 0.0, weekbehav = 2)  # This sets all hunters to be refraction period hunters
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'WeekdayHunterChance', change = 0.0, weekbehav = 2)  # This sets all hunters to be refraction period hunters
 write('Hunt once a week', file = file.path(wdpath, 'ParameterValues.txt'))
 # Teaming up of hunters
 wdpath = file.path(pathtodirs, 'WD26')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 EditConfig(file = tialmasspath, config = 'HUNTER_MAGAZINECAPACITY', value = 4)
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(file = file, hhlpath = hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 0.5, weekbehav = 0)
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 0.5, weekbehav = 0)
 write('Hunters teaming up', file = file.path(wdpath, 'ParameterValues.txt'))
 # All hunters checkers:
 wdpath = file.path(pathtodirs, 'WD27')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 1.0, allhunters = TRUE)
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 1.0, huntersubset = 'all')
 write('All hunters checkers', file = file.path(wdpath, 'ParameterValues.txt'))
 # Baseline
 wdpath = file.path(pathtodirs, 'WD28')
@@ -276,7 +279,7 @@ write('Baseline', file = file.path(wdpath, 'ParameterValues.txt'))
 # Doubling of hunters
 wdpath = file.path(pathtodirs, 'WD29')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(file = file, hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 2, weekbehav = 0)
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 2, weekbehav = 0)
 write('Doubling of hunters', file = file.path(wdpath, 'ParameterValues.txt'))
 
 
