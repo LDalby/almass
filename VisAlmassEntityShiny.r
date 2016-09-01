@@ -19,10 +19,14 @@ vejlerne@data = joined
 
 vejlmap = SpatialPolygons2map(vejlerne, namefield = 'PolyRefNum')
 
-
+polyrefs = map(vejlmap, plot = FALSE)$names
+match(polyrefs, )
 
 map(vejlmap, plot = FALSE)
 spplot(vejlerne, 'Numbers')
+
+
+
 
 #---- 
  data(unemp)
