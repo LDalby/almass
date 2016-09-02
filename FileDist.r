@@ -9,6 +9,7 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 dirs = dirs[grep('WD3', dirs)]  # For the full model extra scenarios
+dirs = 'WD24'
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
 # dirs = c('WD45', 'WD46')
 # A common use for this would be to copy a fresh exe along with
@@ -253,8 +254,8 @@ write('January hunting', file = file.path(wdpath, 'ParameterValues.txt'))
 # Increase in efficiency
 wdpath = file.path(pathtodirs, 'WD24')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
-EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'Efficiency', change = 0.66)
-write('Double efficiency', file = file.path(wdpath, 'ParameterValues.txt'))
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'Efficiency', change = 0.75)
+write('1.5 x efficiency', file = file.path(wdpath, 'ParameterValues.txt'))
 # Only hunt once per week
 wdpath = file.path(pathtodirs, 'WD25')
 tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')

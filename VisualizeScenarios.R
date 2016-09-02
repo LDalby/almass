@@ -10,6 +10,7 @@ library(viridis)
 pth = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pth)
 scenariodirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
+scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35'))
 # scenariodirs = scenariodirs[c(1:6, 9)]
 resultlist = vector('list', length(scenariodirs))
 for (i in 1:length(resultlist)) {
@@ -25,14 +26,18 @@ setnames(thelist, c('Scenario', 'TotalBag', 'Bag'))
 thelist[, mean:=round(mean(Bag)), by = c('Scenario', 'TotalBag')]
 thelist[, min:=min(Bag), by = c('Scenario', 'TotalBag')]
 thelist[, max:=max(Bag), by = c('Scenario', 'TotalBag')]
-plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Greylag x 2", "January hunting", "Double efficiency",
- "Hunt once a week", "All hunters checkers", "Hunters teaming up", "Doubling of hunters")
+plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Barnacle x 4", "Greylag x 2", "Greylag x 0.5", "Pinkfoot x 2",
+              "January hunting", "1.5 x efficiency", "Hunt once a week", "Hunt twice a week", "All hunters checkers",
+              "No checkers", "Hunters teaming up", "Doubling of hunters")
 thelist[, Scenario:=factor(Scenario, levels = plotorder)]
+# thelistfile = file.path('o:/ST_GooseProject/ALMaSS/Scenarios/', paste0("Scenarios ", Sys.Date(), ".txt"))
+# write.table(thelist, file = thelistfile, row.names = FALSE, quote = FALSE)
 p = ggplot(thelist, aes(Scenario, mean)) + 
 	 geom_pointrange(aes(ymin = min, ymax = max, color = TotalBag), position=position_dodge(width=0.2)) + 
 	 scale_color_viridis(discrete=TRUE, guide = guide_legend(title = "Total bag")) + 
 	 ylab('Mean total bag size') + ylim(0, thelist[, max(Bag)]) +  theme_dark()
-
+p = p + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust =1))
+p
 
 token = readLines('C:/Users/au206907/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
 slackrSetup(channel="#goosemodel", api_token = token)
