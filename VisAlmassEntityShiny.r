@@ -5,25 +5,30 @@ library(data.table)
 # Prepare the map of fields
 vejlerne <- readOGR(dsn="e:/Gis/VejlerneMapping", layer="VejlerneFields")
 vejlerne = spTransform(vejlerne, CRS("+init=epsg:4326"))
+vejlerne = vejlerne[!duplicated(vejlerne@data$majority),]  # Some duplicated polygons needed removing
 
-entity = fread('o:/ST_LandskabsGenerering/temp/ReclassTestData/HS1Pinkfoot.txt')
-entity[,V2:=NULL]
-setnames(entity, c('PolyRefNum', 'Numbers'))
-setkey(entity, 'PolyRefNum')
+# Find the order of the polygons:
+str(vejlerne, max.level = 2)
+orignialorder = row.names(vejlerne)
+head(orignialorder)
+entity = fread('o:/ST_LandskabsGenerering/temp/ReclassTestData/HS1Pinkfoot2.csv')
+# setkey(entity, 'PolyRefNum')
 
 DTvejlerne = as.data.table(vejlerne@data)[,.(majority)]
 setnames(DTvejlerne, 'PolyRefNum')
-setkey(DTvejlerne, 'PolyRefNum')
-joined = merge(DTvejlerne, entity, all.x = TRUE)
-vejlerne@data = joined
+DTvejlerne[, roworder:=orignialorder,]  # needed to restore order after merge.
+# setkey(DTvejlerne, 'PolyRefNum')
+joined = merge(DTvejlerne, entity, all.x = TRUE, by = 'PolyRefNum')
+vejlerne@data = joined[match(orignialorder, roworder),]
 
 vejlmap = SpatialPolygons2map(vejlerne, namefield = 'PolyRefNum')
 
 polyrefs = map(vejlmap, plot = FALSE)$names
-match(polyrefs, )
-
-map(vejlmap, plot = FALSE)
-spplot(vejlerne, 'Numbers')
+cols = rep('white', length(polyrefs))
+cols[!is.na(joined[,Numbers])] = 'blue'
+map(vejlmap, fill= TRUE, col = cols)
+x11()
+spplot(vejlerne, 'Numbers', col = 'lightgrey')
 
 
 
