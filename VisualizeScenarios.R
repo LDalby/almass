@@ -13,6 +13,7 @@ scenariodirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35'))
 # scenariodirs = scenariodirs[c(1:6, 9)]
 resultlist = vector('list', length(scenariodirs))
+# ---- Visualize scenarios
 for (i in 1:length(resultlist)) {
 	respath = file.path(pth, scenariodirs[i], 'Results', 'ParameterFittingResults.txt')
 	resultlist[[i]] = fread(respath)
@@ -42,3 +43,16 @@ p
 token = readLines('C:/Users/au206907/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
 slackrSetup(channel="#goosemodel", api_token = token)
 ggslackr(p)	
+
+#---- Chunk to collect huntingbagrecords
+for (i in 1:length(resultlist)) {
+  respath = file.path(pth, scenariodirs[i], 'HuntingBagRecord.txt')
+  tmp = fread(respath)
+  paramvalpath = file.path(pth, scenariodirs[i], 'ParameterValues.txt')
+  scenario = readLines(paramvalpath)
+  tmp[,scenario:=scenario]
+  resultlist[[i]] = tmp
+}
+thelist = rbindlist(resultlist)
+thelist
+write.table(thelist, file = 'o:/ST_GooseProject/ALMaSS/Scenarios/ScenarioHuntingBags.txt', row.names = FALSE, quote = FALSE)
