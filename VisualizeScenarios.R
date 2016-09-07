@@ -55,4 +55,4 @@ for (i in 1:length(resultlist)) {
 }
 thelist = rbindlist(resultlist)
 thelist
-write.table(thelist, file = 'o:/ST_GooseProject/ALMaSS/Scenarios/ScenarioHuntingBags.txt', row.names = FALSE, quote = FALSE)
+write.table(thelist, file = 'o:/ST_GooseProject/ALMaSS/Scenarios/ScenarioHuntingBags.txt', row.names = FALSE)

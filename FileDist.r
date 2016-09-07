@@ -9,7 +9,7 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 # dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 dirs = dirs[grep('WD3', dirs)]  # For the full model extra scenarios
-dirs = 'WD24'
+dirs = c('WD37', 'WD38')
 # dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
 # dirs = c('WD45', 'WD46')
 # A common use for this would be to copy a fresh exe along with
@@ -329,6 +329,38 @@ param = 'GOOSE_BN_SPRING_MIG_NOS'
 cfgval = GetParamValue(config = tialmass, param = param)
 EditConfig(file = tialmasspath, config = param, value = cfgval*4)
 write('Barnacle x 4', file = file.path(wdpath, 'ParameterValues.txt'))
+# 10 x barnacle geese:
+wdpath = file.path(pathtodirs, 'WD36')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+param = 'GOOSE_BN_STARTNOS'
+tialmass = readLines(tialmasspath)
+cfgval = GetParamValue(config = tialmass, param = param) 
+EditConfig(file = tialmasspath, config = param, value = cfgval*10)
+param = 'GOOSE_BN_SPRING_MIG_NOS'
+cfgval = GetParamValue(config = tialmass, param = param)
+EditConfig(file = tialmasspath, config = param, value = cfgval*10)
+write('Barnacle x 10', file = file.path(wdpath, 'ParameterValues.txt'))
+# Hunt twice a week, but check:
+wdpath = file.path(pathtodirs, 'WD37')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+EditConfig(file = tialmasspath, config = 'HUNTER_REFRACTIONPERIOD', value = 3)
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'WeekdayHunterChance', change = 0.0, weekbehav = 2)  # This sets all hunters to be refraction period hunters
+EditHunterInput(file = hhlpath, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 1.0, huntersubset = 'all')
+write('Hunt twice a week, but check', file = file.path(wdpath, 'ParameterValues.txt'))
+# Team up and check:
+wdpath = file.path(pathtodirs, 'WD38')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+EditConfig(file = tialmasspath, config = 'HUNTER_MAGAZINECAPACITY', value = 4)
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 0.5, weekbehav = 0)
+EditHunterInput(file = hhlpath, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 1.0, huntersubset = 'all')
+write('Team up and check', file = file.path(wdpath, 'ParameterValues.txt'))
+
+
+
+
+
 
 # ------ Multiparam Scenarios ----- #
 # Following likelyhood and SD of roost leave times
