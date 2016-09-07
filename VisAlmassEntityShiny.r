@@ -5,8 +5,10 @@ library(data.table)
 # Prepare the map of fields
 vejlerne <- readOGR(dsn="e:/Gis/VejlerneMapping", layer="VejlerneFields")
 vejlerne = spTransform(vejlerne, CRS("+init=epsg:4326"))
-vejlerne = vejlerne[!duplicated(vejlerne@data$majority),]  # Some duplicated polygons needed removing
-
+# vejlerne = vejlerne[!duplicated(vejlerne@data$majority),]  # Some duplicated polygons needed removing
+writeOGR(vejlerne[, "majority"], dsn = "e:/Gis/VejlerneMapping", layer = "Fields", driver = "ESRI Shapefile", overwrite_layer = TRUE)
+setwd('C:/Users/lada/Git/shiny/Vejlerne')
+tmp = readOGR(dsn="Data", layer="Fields")
 # Find the order of the polygons:
 str(vejlerne, max.level = 2)
 orignialorder = row.names(vejlerne)
@@ -30,11 +32,30 @@ mapnames = map(vejlmap, namesonly = TRUE)  # the roworder and now contains "dupl
 getfirst = function(x) {stringr::str_split(x, ":")[[1]][1]}
 stripmapnames = sapply(mapnames, FUN = getfirst)
 cols = rep('white', length(mapnames))
-cols[match(polyswithbirds, mapnames)] = 'blue' 
-cols[which(mapnames %in% polyswithbirds)] = 'red' 
 cols[match(polyswithbirds, stripmapnames)] = 'green' 
-x11()
 map(vejlmap, fill= TRUE, col = cols)
 
 
 
+ dataSet<-entity
+    # Copy our GIS data
+    joinedDataset<-vejlerne
+names(joinedDataset) = "PolyRefNum"    
+    # Join the two datasets together
+    joinedDataset@data <- left_join(joinedDataset@data, dataSet, by="PolyRefNum")
+
+
+
+
+    bag = fread("c:/Users/lada/Git/shiny/test2/Data/snouter.csv")
+
+    dataSet<-bag[bag$Year == 1,]
+    # Copy our GIS data
+    joinedDataset<-tmp
+    names(joinedDataset) = "PolyRefNum"    
+    # Join the two datasets together
+    joinedDataset@data <- suppressWarnings(left_join(joinedDataset@data, dataSet, by="PolyRefNum"))
+    as.numeric(quantile(joinedDataset$Numbers, na.rm = T))
+
+    pal = colorQuantile("Greens", joinedDataset$Numbers, n = 10) 
+    pal(joinedDataset$Numbers)
