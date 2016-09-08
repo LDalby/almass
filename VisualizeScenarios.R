@@ -10,7 +10,7 @@ library(viridis)
 pth = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pth)
 scenariodirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
-scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35'))
+scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
 # scenariodirs = scenariodirs[c(1:6, 9)]
 resultlist = vector('list', length(scenariodirs))
 # ---- Visualize scenarios
@@ -27,9 +27,10 @@ setnames(thelist, c('Scenario', 'TotalBag', 'Bag'))
 thelist[, mean:=round(mean(Bag)), by = c('Scenario', 'TotalBag')]
 thelist[, min:=min(Bag), by = c('Scenario', 'TotalBag')]
 thelist[, max:=max(Bag), by = c('Scenario', 'TotalBag')]
-plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Barnacle x 4", "Greylag x 2", "Greylag x 0.5", "Pinkfoot x 2",
-              "January hunting", "1.5 x efficiency", "Hunt once a week", "Hunt twice a week", "All hunters checkers",
-              "No checkers", "Hunters teaming up", "Doubling of hunters")
+plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Barnacle x 4", "Barnacle x 10", "Greylag x 2", "Greylag x 0.5",
+              "Pinkfoot x 2", "January hunting", "1.5 x efficiency", "Hunt once a week", "Hunt twice a week", 
+              "No checkers", "Hunters teaming up", "Doubling of hunters", "Team up and check", "Hunt twice a week, but check",
+              "All hunters checkers")
 thelist[, Scenario:=factor(Scenario, levels = plotorder)]
 # thelistfile = file.path('o:/ST_GooseProject/ALMaSS/Scenarios/', paste0("Scenarios ", Sys.Date(), ".txt"))
 # write.table(thelist, file = thelistfile, row.names = FALSE, quote = FALSE)
@@ -55,4 +56,4 @@ for (i in 1:length(resultlist)) {
 }
 thelist = rbindlist(resultlist)
 thelist
-write.table(thelist, file = 'o:/ST_GooseProject/ALMaSS/Scenarios/ScenarioHuntingBags.txt', row.names = FALSE)
+write.table(thelist, file = 'o:/ST_GooseProject/ALMaSS/Scenarios/ScenarioHuntingBags2.txt', row.names = FALSE)
