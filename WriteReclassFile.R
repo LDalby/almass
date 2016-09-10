@@ -54,13 +54,36 @@ forage[, Numbers:=NULL]
 forage = forage[AvgNum > 0,]
 forage = unique(forage)
 
-#----
+#---- Visualise hunting bag
+hb = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheHuntingbagFiles.txt',
+			 drop = c('Day', 'HunterRef', 'GameType'))
+nseason = length(hb[,unique(SeasonNumber)])
+hb[,SeasonNumber:=NULL]
+hb[, AvgNoShot:=ceiling(mean(NoShot)/nseason), by = list(Scenario, PolygonRef, Species)]
+hb[,NoShot:=NULL]
+hb = unique(hb)
+setnames(hb, new = c('Polyref', 'Udbytte'), old = c('PolygonRef', 'AvgNoShot'))
+setkeyv(hb, c('Polyref', 'Scenario', 'Species'))
+file = 'C:/Users/lada/Git/shiny/test3/Data'
+# write.table(hb, file.path(file, 'snouter4.txt'),  row.names = FALSE, sep = '\t')
 
+# ---- Visualise number of birds
+nb = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheForageFiles.txt')
+nseason = length(nb[,unique(SeasonNumber)])
+nb[,SeasonNumber:=NULL]
+# AvgNum is mean of the season.
+nb[, SeasonAvg:=ceiling(sum(AvgNum)/nseason), by = list(Scenario, Polyref, Species)]
+nb[,AvgNum:=NULL]
+nb = unique(nb)
+setnames(nb, old = 'SeasonAvg', new = c('Antal'))
+setkeyv(nb, c('Polyref', 'Scenario', 'Species'))
 
-
-
-
-
+# Merge the two data sets?
+comb = merge(nb, hb, all = TRUE)
+comb[Polyref == 1,]
+comb = melt(comb, id.vars = c('Polyref', 'Scenario', 'Species'), value.name = 'Numbers', variable.name = 'Entity')
+comb = comb[complete.cases(comb),]
+write.table(comb, file.path(file, 'snouter4.txt'),  row.names = FALSE, sep = '\t')
 
 
 
@@ -75,3 +98,5 @@ ConvertGooseSpeciesType = function(ConvertGooseSpeciesType) {
 		'foobar'
 		)
 }
+
+
