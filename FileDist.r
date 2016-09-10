@@ -7,11 +7,8 @@ library(ralmass)
 pathtodirs = 'e:/almass/WorkDirectories/Goose/'  # Both machines
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
-# dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
-dirs = dirs[grep('WD3', dirs)]  # For the full model extra scenarios
-dirs = c('WD37', 'WD38')
-# dirs = dirs[c(grep('WD0', dirs), grep('WD1', dirs))]  # Goose scenarios
-# dirs = c('WD45', 'WD46')
+dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
+dirs = c(dirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -216,6 +213,7 @@ for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_RUNTIMEREPORTING', value = 'true')
 	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
 }
 # No barnacle geese:
