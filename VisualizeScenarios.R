@@ -10,24 +10,40 @@ library(viridis)
 pth = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pth)
 scenariodirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
-scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
+scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38', 'WD39'))
 # scenariodirs = scenariodirs[c(1:6, 9)]
 resultlist = vector('list', length(scenariodirs))
 # ---- Visualize scenarios
+# for (i in 1:length(resultlist)) {
+# 	respath = file.path(pth, scenariodirs[i], 'Results', 'ParameterFittingResults.txt')
+# 	resultlist[[i]] = fread(respath)
+# }
+# thelist = rbindlist(resultlist)
+# thelist = thelist[grep('TotalBag', FitType),]
+# thelist[,Value:=NULL]
+# thelist[FitType == 'TotalBagPF', FitType:='Pinkfoot']
+# thelist[FitType == 'TotalBagGL', FitType:='Greylag']
+# setnames(thelist, c('Scenario', 'TotalBag', 'Bag'))
+# thelist[, mean:=round(mean(Bag)), by = c('Scenario', 'TotalBag')]
+# thelist[, min:=min(Bag), by = c('Scenario', 'TotalBag')]
+# thelist[, max:=max(Bag), by = c('Scenario', 'TotalBag')]
 for (i in 1:length(resultlist)) {
-	respath = file.path(pth, scenariodirs[i], 'Results', 'ParameterFittingResults.txt')
-	resultlist[[i]] = fread(respath)
+  respath = file.path(pth, scenariodirs[i], 'HuntingBagRecord.txt')
+  thescenario = readLines(file.path(pth, scenariodirs[i], 'ParameterValues.txt'))
+  sim = fread(respath)
+  sim[, Species:=sapply(GameType, ConvertGameType)]
+  sim[, NoShot:=.N, by = list(Species, HunterRef, SeasonNumber)]
+  sim = unique(sim[, .(HunterRef, Species, NoShot, SeasonNumber)])
+  sim[, TotalBag:=sum(NoShot), by = list(Species, SeasonNumber)]
+  sim = unique(sim[,.(TotalBag, Species, SeasonNumber)])
+  sim[, Scenario:=thescenario]
+  resultlist[[i]] = sim
 }
 thelist = rbindlist(resultlist)
-thelist = thelist[grep('TotalBag', FitType),]
-thelist[,Value:=NULL]
-thelist[FitType == 'TotalBagPF', FitType:='Pinkfoot']
-thelist[FitType == 'TotalBagGL', FitType:='Greylag']
-setnames(thelist, c('Scenario', 'TotalBag', 'Bag'))
-thelist[, mean:=round(mean(Bag)), by = c('Scenario', 'TotalBag')]
-thelist[, min:=min(Bag), by = c('Scenario', 'TotalBag')]
-thelist[, max:=max(Bag), by = c('Scenario', 'TotalBag')]
-plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Barnacle x 4", "Barnacle x 10", "Greylag x 2", "Greylag x 0.5",
+thelist[, mean:=round(mean(TotalBag)), by = c('Scenario', 'Species')]
+thelist[, min:=min(TotalBag), by = c('Scenario', 'Species')]
+thelist[, max:=max(TotalBag), by = c('Scenario', 'Species')]
+plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Barnacle x 4", "Barnacle x 10", "Barnacle early arrival", "Greylag x 2", "Greylag x 0.5",
               "Pinkfoot x 2", "January hunting", "1.5 x efficiency", "Hunt once a week", "Hunt twice a week", 
               "No checkers", "Hunters teaming up", "Doubling of hunters", "Team up and check", "Hunt twice a week, but check",
               "All hunters checkers")
@@ -35,9 +51,9 @@ thelist[, Scenario:=factor(Scenario, levels = plotorder)]
 # thelistfile = file.path('o:/ST_GooseProject/ALMaSS/Scenarios/', paste0("Scenarios ", Sys.Date(), ".txt"))
 # write.table(thelist, file = thelistfile, row.names = FALSE, quote = FALSE)
 p = ggplot(thelist, aes(Scenario, mean)) + 
-	 geom_pointrange(aes(ymin = min, ymax = max, color = TotalBag), position=position_dodge(width=0.2)) + 
-	 scale_color_viridis(discrete=TRUE, guide = guide_legend(title = "Total bag")) + 
-	 ylab('Mean total bag size') + ylim(0, thelist[, max(Bag)]) +  theme_dark()
+	 geom_pointrange(aes(ymin = min, ymax = max, color = Species), position=position_dodge(width=0.2)) + 
+	 scale_color_viridis(discrete=TRUE, guide = guide_legend(title = "Art")) + 
+	 ylab('Totalt udbytte') + ylim(0, thelist[, max(TotalBag)]) +  theme_dark()
 p = p + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust =1))
 p
 
@@ -45,7 +61,7 @@ token = readLines('C:/Users/au206907/Dropbox/slackrToken.txt')  # Your token and
 slackrSetup(channel="#goosemodel", api_token = token)
 ggslackr(p)	
 
-#---- Chunk to collect huntingbagrecords
+#---- Chunk to collect huntingbagrecords  
 for (i in 1:length(resultlist)) {
   respath = file.path(pth, scenariodirs[i], 'HuntingBagRecord.txt')
   tmp = fread(respath)
