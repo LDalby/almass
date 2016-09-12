@@ -9,6 +9,7 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 dirs = c(dirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
+dirs = "WD39"
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -354,9 +355,17 @@ hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
 EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'NumberOfHunters', change = 0.5, weekbehav = 0)
 EditHunterInput(file = hhlpath, hhlpath = hhlpath, parameter = 'GooseLookChance', change = 1.0, huntersubset = 'all')
 write('Team up and check', file = file.path(wdpath, 'ParameterValues.txt'))
-
-
-
+# Earlier barnacle arrival
+wdpath = file.path(pathtodirs, 'WD39')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+param = 'GOOSE_BN_ARRIVEDATESTART'
+tialmass = readLines(tialmasspath)
+cfgval = GetParamValue(config = tialmass, param = param) 
+EditConfig(file = tialmasspath, config = param, value = cfgval-31)
+param = 'GOOSE_BN_ARRIVEDATEEND'
+cfgval = GetParamValue(config = tialmass, param = param)
+EditConfig(file = tialmasspath, config = param, value = cfgval-31)
+write('Barnacle early arrival', file = file.path(wdpath, 'ParameterValues.txt'))
 
 
 
