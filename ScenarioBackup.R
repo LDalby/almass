@@ -60,8 +60,10 @@ for (i in seq_along(scenariodirs)) {
     value.name = 'Numbers',
     variable.name = 'Species'
   )
-  forage[, AvgNum := round(mean(Numbers)), by = c('SeasonNumber', 'Month', 'Polyref', 'Species')]
-  forage[, Numbers := NULL]
+  # forage[, AvgNum := round(mean(Numbers)), by = c('SeasonNumber', 'Month', 'Polyref', 'Species')]
+  # forage[, Numbers := NULL]
+  forage[, AvgNum := round(mean(Numbers)), by = c('SeasonNumber','Polyref', 'Species')]
+  forage[, c('Numbers', 'Month') := NULL]
   forage = forage[AvgNum > 0, ]
   forage = unique(forage)
   thescenario = readLines(file.path(pth, scenariodirs[i], 'ParameterValues.txt'))
@@ -77,9 +79,9 @@ simbag[, Scenario:=thescenario]
 huntingbaglist[[i]] = simbag
 }
 theforagelist = rbindlist(foragelist)
-write.table(theforagelist, 'o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheForageFiles.txt', row.names = FALSE, quote = FALSE)
+write.table(theforagelist, 'o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheForageFiles.txt', row.names = FALSE)
 huntingbaglist = rbindlist(huntingbaglist)
-write.table(huntingbaglist, 'o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheHuntingbagFiles.txt', row.names = FALSE, quote = FALSE)
+write.table(huntingbaglist, 'o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheHuntingbagFiles.txt', row.names = FALSE)
 
 
 
