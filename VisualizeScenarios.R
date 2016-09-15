@@ -74,7 +74,7 @@ p = p + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust =1, size =
 return(p)
 }
 
-thelist = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenarios 2016-09-12.txt')
+thelist = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenarios 2016-09-15.txt')
 thelist[, Species:=as.factor(Species)]
 levels(thelist$Species) = c('Grågås', 'Kortnæbbet gås')
 # Gåseplots.
@@ -125,10 +125,10 @@ png(filename = 'o:/ST_GooseProject/Presentations/JagtAdfærd.png', width = 14, he
 print(p)
 dev.off()
 # Jagtadfærd II
-subset = c('Baseline', 'Hunt once a week', 'Hunt twice a week')
+subset = c('Baseline', 'Hunt once a week', 'Hunt twice a week', 'Pinkfoot baglimit 10', 'Pinkfoot baglimit 15')
 plotdata = thelist[Scenario %in% subset,]
 plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "1 ugentlig jagtdag", "2 ugentlige jagtdage")
+levels(plotdata$Scenario) = c("Baseline", "1 ugentlig jagtdag", "2 ugentlige jagtdage", "Kvote på 10 KG", "Kvote på 15 KG")
 p = presentationplot(plotdata)
 p
 png(filename = 'o:/ST_GooseProject/Presentations/JagtAdfærd2.png', width = 14, height = 15, unit = 'cm', res = 300 )
