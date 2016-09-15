@@ -12,6 +12,10 @@ vejlerne = spTransform(vejlerne, CRS("+init=epsg:4326"))
 vejlerne = vejlerne[, "majority"]
 names(vejlerne) =  "Polyref"
 # vejlerne = vejlerne[!vejlerne$Polyref %in% c(134266, 136277,156216,163713,139680,141133),]
+poly = fread('c:/MSV/WorkDirectory/VejlerneOpenMay2016PolyRef.txt', skip = 1)
+poly = poly[Openness >= 70,]
+vejlerne = vejlerne[vejlerne$Polyref %in% poly[,PolyRefNum],]
+rm(poly) 
 bb = bbox(vejlerne)
 # writeOGR(vejlerne[, "majority"], dsn = "e:/Gis/VejlerneMapping", layer = "Fields", driver = "ESRI Shapefile", overwrite_layer = TRUE)
 
@@ -33,7 +37,7 @@ roosts = spTransform(roosts, CRS("+init=epsg:4326"))
 save(list = ls(), file = file.path('C:/Users/lada/Git/shiny/test3/Data', 'maps.RData'))
 
 #---- Visualise hunting bag
-hb = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheHuntingbagFiles.txt',
+hb = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheHuntingbagFiles2016-09-15.txt',
 			 drop = c('Day', 'HunterRef', 'GameType'))
 # nseason = length(hb[,unique(SeasonNumber)])
 # hb[,SeasonNumber:=NULL]
@@ -48,7 +52,7 @@ file = 'C:/Users/lada/Git/shiny/test3/Data'
 # write.table(hb, file.path(file, 'snouter4.txt'),  row.names = FALSE, sep = '\t')
 
 # ---- Visualise number of birds
-nb = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheForageFiles.txt')
+nb = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheForageFiles2016-09-15.txt')
 # nseason = length(nb[,unique(SeasonNumber)])
 # nb[,SeasonNumber:=NULL]
 # AvgNum is mean of the season.
@@ -59,23 +63,40 @@ nb = unique(nb)
 setnames(nb, old = 'AvgNum', new = c('Antal'))
 # setkeyv(nb, c('Polyref', 'Scenario', 'Species'))
 setkeyv(nb, c('Polyref', 'Scenario', 'Species', 'SeasonNumber'))
-
-# Merge the two data sets?
+# Merge the two data sets
 bag = merge(nb, hb, all = TRUE)
 bag[Polyref == 1,]
-bag = melt(bag, id.vars = c('Polyref', 'Scenario', 'Species'), value.name = 'Numbers', variable.name = 'Entity')
+bag = melt(bag, id.vars = c('Polyref', 'Scenario', 'Species', 'SeasonNumber'), value.name = 'Numbers', variable.name = 'Entity')
 bag = bag[complete.cases(bag),]
 # write.table(bag, file.path(file, 'snouter4.txt'),  row.names = FALSE, sep = '\t')
 bag[, Entity:=as.character(Entity)]
 
-totalbag = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenarios 2016-09-12.txt')
+totalbag = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenarios 2016-09-15.txt')
+
+# ---- Plot number of hunters per field
+hhl = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_VejlerneHuntersDiffGLC.txt', skip = 1)
+molten = melt(hhl[,.(HunterID, FarmRef1, FarmRef2, FarmRef3, FarmRef4, FarmRef5)], id.vars = 'HunterID')
+molten = molten[complete.cases(molten),]
+molten[, N:=.N, by = value]
+molten[,c('HunterID', 'variable'):=NULL]
+setnames(molten, c('FarmRef', 'Numbers'))
+setkey(molten, FarmRef)
+molten = unique(molten)
+poly = fread('c:/MSV/WorkDirectory/VejlerneOpenMay2016PolyRef.txt', skip = 1)
+setnames(poly, old = 'PolyRefNum', new = 'Polyref')
+poly = unique(poly[,.(Polyref, FarmRef)])
+setkey(poly, FarmRef)
+hunters = merge(molten, poly, all.x = TRUE)
+rm(list = c('poly', 'hhl', 'molten'))
+hunters[, FarmRef:=NULL]
+hunters = unique(hunters)
+hunters[, Scenario:='Hunters per field']
+hunters[, SeasonNumber:=1]
+hunters[, Species:='Hunters']
+hunters[, Entity:='Antal']
+setcolorder(hunters, names(bag))
+bag = rbind(bag, hunters)
+fix = hunters[1,]
+fix[,Species:='Pinkfoot']
+bag = rbind(bag, fix)
 save(list = c("bag", "totalbag"), file = file.path(file, 'bag.RData'))
-
-
-library(viridis)
-getvir = function(x) {
-	vir = viridis(255)
-	if(x == 0) {return(vir[1])}
-	if(x != 0) {return(vir[ceiling(length(vir)*x)])}
-}
-colorNumeric(getvir, 1:10)
