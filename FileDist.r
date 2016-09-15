@@ -9,7 +9,7 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 dirs = c(dirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
-dirs = "WD40"
+dirs = c('WD41', 'WD42', 'WD43')
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -372,8 +372,21 @@ tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
 hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
 EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'WeekdayHunterChance', change = 0.0, weekbehav = 0)
 write('Only weekend hunting', file = file.path(wdpath, 'ParameterValues.txt'))
-
-
+# Hunting bag limit 5
+wdpath = file.path(pathtodirs, 'WD41')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+EditConfig(file = tialmasspath, config = 'HUNTER_PINKFOOTBAGLIMIT', value = 5)
+write('Pinkfoot baglimit 5', file = file.path(wdpath, 'ParameterValues.txt'))
+# Hunting bag limit 10
+wdpath = file.path(pathtodirs, 'WD42')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+EditConfig(file = tialmasspath, config = 'HUNTER_PINKFOOTBAGLIMIT', value = 10)
+write('Pinkfoot baglimit 10', file = file.path(wdpath, 'ParameterValues.txt'))
+# Hunting bag limit 15
+wdpath = file.path(pathtodirs, 'WD43')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+EditConfig(file = tialmasspath, config = 'HUNTER_PINKFOOTBAGLIMIT', value = 15)
+write('Pinkfoot baglimit 15', file = file.path(wdpath, 'ParameterValues.txt'))
 
 
 
