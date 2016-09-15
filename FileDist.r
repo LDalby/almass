@@ -9,7 +9,7 @@ dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sittin
 						# in pathtodirs. Only the subdirectories
 dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
 dirs = c(dirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
-dirs = "WD39"
+dirs = "WD40"
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -42,7 +42,7 @@ file12 = file.path(fielddata, 'FieldobsFlockSizes2016-05-03.txt')
 # file15 = 'C:/MSV/WorkDirectory/VejlerneOpenMay2016FarmRef.txt'
 
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
-				file11, file12)
+				        file11, file12)
 HHL = file.path(almassinputs, 'Hunter/746_VejlerneHuntersDiffGLC.txt')
 weather = 'Vejlerne2013-2014.pre'
 pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
@@ -366,6 +366,16 @@ param = 'GOOSE_BN_ARRIVEDATEEND'
 cfgval = GetParamValue(config = tialmass, param = param)
 EditConfig(file = tialmasspath, config = param, value = cfgval-31)
 write('Barnacle early arrival', file = file.path(wdpath, 'ParameterValues.txt'))
+# Only weekend hunting
+wdpath = file.path(pathtodirs, 'WD40')
+tialmasspath = file.path(wdpath, 'TIALMaSSConfig.cfg')
+hhlpath = file.path(wdpath, 'Hunter_Hunting_Locations.txt')
+EditHunterInput(file = HHL, hhlpath = hhlpath, parameter = 'WeekdayHunterChance', change = 0.0, weekbehav = 0)
+write('Only weekend hunting', file = file.path(wdpath, 'ParameterValues.txt'))
+
+
+
+
 
 
 

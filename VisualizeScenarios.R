@@ -10,7 +10,7 @@ library(viridis)
 pth = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pth)
 scenariodirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
-scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38', 'WD39'))
+scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38', 'WD39', 'WD40'))
 # scenariodirs = scenariodirs[c(1:6, 9)]
 resultlist = vector('list', length(scenariodirs))
 # ---- Visualize scenarios
@@ -31,7 +31,7 @@ thelist[, mean:=round(mean(TotalBag)), by = c('Scenario', 'Species')]
 thelist[, min:=min(TotalBag), by = c('Scenario', 'Species')]
 thelist[, max:=max(TotalBag), by = c('Scenario', 'Species')]
 plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Barnacle x 4", "Barnacle x 10", "Barnacle early arrival", "Greylag x 2", "Greylag x 0.5",
-              "Pinkfoot x 2", "January hunting", "1.5 x efficiency", "Hunt once a week", "Hunt twice a week", 
+              "Pinkfoot x 2", "January hunting", "1.5 x efficiency", "Hunt once a week", "Hunt twice a week", "Only weekend hunting",
               "No checkers", "Hunters teaming up", "Doubling of hunters", "Team up and check", "Hunt twice a week, but check",
               "All hunters checkers")
 thelist[, Scenario:=factor(Scenario, levels = plotorder)]

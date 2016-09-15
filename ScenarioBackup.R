@@ -36,7 +36,7 @@ for (i in seq_along(scenariodirs)) {
 pth = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pth)
 scenariodirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
-scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
+scenariodirs = c(scenariodirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38', 'WD39', 'WD40'))
 # scenariodirs = c('WD20', 'WD21', 'WD22')
 foragelist = vector('list', length(scenariodirs))
 huntingoplist = foragelist
@@ -79,9 +79,11 @@ simbag[, Scenario:=thescenario]
 huntingbaglist[[i]] = simbag
 }
 theforagelist = rbindlist(foragelist)
-write.table(theforagelist, 'o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheForageFiles.txt', row.names = FALSE)
+foragedest = file.path('o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016', paste0('TheForageFiles', Sys.Date(), '.txt'))
+write.table(theforagelist, foragedest, row.names = FALSE)
 huntingbaglist = rbindlist(huntingbaglist)
-write.table(huntingbaglist, 'o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016/TheHuntingbagFiles.txt', row.names = FALSE)
+huntingdest = file.path('o:/ST_GooseProject/ALMaSS/Scenarios/Scenario09092016', paste0('TheHuntingBagFiles', Sys.Date(), '.txt'))
+write.table(huntingbaglist, huntingdest, row.names = FALSE)
 
 
 
