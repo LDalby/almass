@@ -88,10 +88,10 @@ png(filename = 'o:/ST_GooseProject/Presentations/Graa.png', width = 14, height =
 print(p)
 dev.off()
 # Bramgås
-subset = c('Baseline', 'Barnacle x 0', 'Barnacle x 4', 'Barnacle early arrival')
+subset = c('Baseline', 'Barnacle x 0', 'Barnacle x 4')
 plotdata = thelist[Scenario %in% subset,]
 plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "Bramgås x 0", "Bramgås x 4", "Tidlig ankomst")
+levels(plotdata$Scenario) = c("Baseline", "Bramgås x 0", "Bramgås x 4")
 p = presentationplot(plotdata)
 png(filename = 'o:/ST_GooseProject/Presentations/Bram.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
@@ -115,10 +115,10 @@ png(filename = 'o:/ST_GooseProject/Presentations/Janjagt.png', width = 14, heigh
 print(p)
 dev.off()
 # Jagtadfærd
-subset = c('Baseline', 'Hunters teaming up', 'Doubling of hunters', '1.5 x efficiency')
+subset = c('Baseline', '1.5 x efficiency', 'Hunters teaming up', 'Doubling of hunters')
 plotdata = thelist[Scenario %in% subset,]
 plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "Jæger gruppering", "Fordobling af jægere", "Øget effektivitet")
+levels(plotdata$Scenario) = c("Baseline", "Øget effektivitet", "Jæger gruppering", "Fordobling af jægere")
 p = presentationplot(plotdata)
 p
 png(filename = 'o:/ST_GooseProject/Presentations/JagtAdfærd.png', width = 14, height = 15, unit = 'cm', res = 300 )

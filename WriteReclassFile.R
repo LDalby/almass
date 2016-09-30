@@ -13,7 +13,7 @@ vejlerne = vejlerne[, "majority"]
 names(vejlerne) =  "Polyref"
 # vejlerne = vejlerne[!vejlerne$Polyref %in% c(134266, 136277,156216,163713,139680,141133),]
 poly = fread('c:/MSV/WorkDirectory/VejlerneOpenMay2016PolyRef.txt', skip = 1)
-poly = poly[Openness >= 70,]
+poly = poly[Openness >= 70,]  # Subset to the allowed openness
 vejlerne = vejlerne[vejlerne$Polyref %in% poly[,PolyRefNum],]
 rm(poly) 
 bb = bbox(vejlerne)
