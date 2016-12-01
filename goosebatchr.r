@@ -87,37 +87,30 @@ if(file.exists("GooseFieldForageData.txt"))
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3. See o:\ST_GooseProject\R\ConvertObsToALMaSS.r
 	# for details on the data handling
 	flocks = fread('o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt')
-	seasons = unique(forage[, SeasonNumber])
+	seasons = unique(forage[, Season])
 	DegreeOverlapBT = NA
 	DegreeOverlapPT = NA
 	DegreeOverlapGT = NA
+	simflocks = forage[Geese > 0,]
 	for (i in seq_along(seasons)) {
 	# Simulation results - timed counts:
-		simflocks = forage[Geese > 0 & SeasonNumber == seasons[i], .(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
+		simflocks = simflocks[Season == seasons[i], .(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
 		melted = data.table::melt(simflocks, id.vars = 'Day', variable.name = 'Species', value.name = 'Numbers')
 		melted = melted[Numbers != 0,]
 		melted[ ,Day:=NULL]
-		melted[, Type:='Simulated']
-		distsTimed = rbind(melted, flocks)
 
-		DegreeOverlapBT[i] = round(CalcOverlap(distsTimed, species = 'Barnacle', metric = 'Numbers'), digits = 4)
-		DegreeOverlapPT[i] = round(CalcOverlap(distsTimed, species = 'Pinkfoot', metric = 'Numbers'), digits = 4)
-		DegreeOverlapGT[i] = round(CalcOverlap(distsTimed, species = 'Greylag', metric = 'Numbers'), digits = 4)
+		DegreeOverlapBT[i] = CalcFlockSizeFit(melted, flocks, 'Barnacle')
+		DegreeOverlapPT[i] = CalcFlockSizeFit(melted, flocks, 'Pinkfoot')
+		DegreeOverlapGT[i] = CalcFlockSizeFit(melted, flocks, 'Greylag')
 	}
 
 # --------------------------------------------------------------------------------------------#
 #                                    Weights                                                  #
 # --------------------------------------------------------------------------------------------#
-	mass = fread('GooseEnergeticsData.txt', showProgress = FALSE)
-	mass = mass[GooseType %in% c('PF', 'PFNB'),]
-	mass[,Day:=Day-365]
-	mass = mass[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
-	mass = mass[data.table::month(Date) %in% c(9:12,1:3)]
-	api = fread('APIdata.txt')
-	Weightfit = NA
-	for (i in seq_along(seasons)) {
-		Weightfit[i] = CalcWeightFit(mass[SeasonNumber == seasons[i],], api)
-	}
+		mass = fread('GooseWeightStats.txt', showProgress = FALSE, drop = c('StdError', 'N'))
+		mass = mass[Species == 'Pinkfoot' & MeanWeight != -1,]
+		api = fread('e:/almass/WorkDirectories/Goose/WD01/APIdata.txt')
+		Weightfit = CalcWeightFit(Sim = mass, Field = api, measuer = 'SSSE')
 
 # --------------------------------------------------------------------------------------------#
 #                                      Habitat use                                            #
