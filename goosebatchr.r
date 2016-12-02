@@ -145,22 +145,25 @@ if(file.exists("GooseFieldForageData.txt"))
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3
 	fieldobs = fread('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt')
 	roost = fread('GooseRoosts.txt', skip = 1)
-	poly = fread('VejlerneOpenMay2016PolyRef.txt', skip = 1, verbose = FALSE)
+	selectCols = c('PolyRefNum', 'CentroidX', 'CentroidY')
+	poly = fread('VejlerneOpenMay2016PolyRef.txt', skip = 1, verbose = FALSE, select = selectCols)
 	sp = c('Pinkfoot', 'Barnacle', 'Greylag')
 	
-	DistToNearestRoostField = CalcDistToRoosts(roost = roost, fields = fieldobs, polyref = poly, species = sp, fieldobs = TRUE)
-	DistToNearestRoostField[, Type:='Fieldobs']
+	DistToNearestRoostField = CalcDistToRoosts(roost = roost, fields = fieldobs, polyref = poly,
+												 species = sp, fieldobs = TRUE)
 	RoostDistFitGL = NA
 	RoostDistFitPF = NA
 	RoostDistFitBN = NA
 	for (i in seq_along(seasons)) {
-		DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage[SeasonNumber == seasons[i],], polyref = poly, species = sp, fieldobs = FALSE)
-		DistToNearestRoostSim[, Type:='Simulated']
-		Distances = rbind(DistToNearestRoostSim[,.(Shortest, Species, Type)], DistToNearestRoostField[,.(Shortest, Species, Type)])
+		DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage[Season == seasons[i],],
+												 polyref = poly, species = sp, fieldobs = FALSE)
 
-		RoostDistFitGL[i] = CalcOverlap(Distances, species = 'Greylag', metric = 'Shortest')
-		RoostDistFitPF[i] = CalcOverlap(Distances, species = 'Pinkfoot', metric = 'Shortest')
-		RoostDistFitBN[i] = CalcOverlap(Distances, species = 'Barnacle', metric = 'Shortest')
+		RoostDistFitGL[i] = CalcForageDistFit(Sim = DistToNearestRoostSim,
+											  Obs = DistToNearestRoostField, species = 'Greylag')
+		RoostDistFitPF[i] = CalcForageDistFit(Sim = DistToNearestRoostSim,
+											  Obs = DistToNearestRoostField, species = 'Pinkfoot')
+		RoostDistFitBN[i] = CalcForageDistFit(Sim = DistToNearestRoostSim,
+											  Obs = DistToNearestRoostField, species = 'Barnacle')
 	}
 
 # --------------------------------------------------------------------------------------------#
@@ -172,9 +175,9 @@ if(file.exists("GooseFieldForageData.txt"))
 	gllos = GetLengthOfStay(config = cfg, species = 'Greylag')
 	bnlos = GetLengthOfStay(config = cfg, species = 'Barnacle')
 	pflos = GetLengthOfStay(config = cfg, species = 'Pinkfoot')
-	PropDayInSimGL = popn[,list(GLNonBreeders=sum(GLNonBreeders != 0)/gllos), by = SeasonNumber][,GLNonBreeders]
-	PropDayInSimBN = popn[,list(BNNonBreeders=sum(BNNonBreeders != 0)/bnlos), by = SeasonNumber][,BNNonBreeders]
-	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0)/pflos), by = SeasonNumber][,PFNonBreeders]
+	PropDayInSimGL = popn[,list(GLNonBreeders=sum(GLNonBreeders != 0)/gllos), by = Season][,GLNonBreeders]
+	PropDayInSimBN = popn[,list(BNNonBreeders=sum(BNNonBreeders != 0)/bnlos), by = Season][,BNNonBreeders]
+	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0)/pflos), by = Season][,PFNonBreeders]
 
 # --------------------------------------------------------------------------------------------#
 #                                 Openness distribution                                       #
