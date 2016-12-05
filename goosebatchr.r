@@ -27,7 +27,7 @@ library(ralmass)
 library(slackr)  # Only needed if you want Slack to give you updates on progress
 
 # Setup work directory (done automatically when distributing the files, therefore blank):
-setwd('c:/MSV/WorkDirectory/')
+
 # To get the line number in the parameter list we make a vector of line numbers for the
 # first of the parameters in each run:
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
