@@ -1,0 +1,29 @@
+#!/bin/csh
+#SBATCH --job-name=ALMaSSjob
+#SBATCH --partition=q28
+#SBATCH --ntasks=1
+#SBATCH --mem=128G
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=20
+#SBATCH --time=24:00:00
+
+echo "========= Job started at `date` =========="
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest75C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest60C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest50C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest40C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest30C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest20C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest10C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest05C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest00C Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest75E Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest60E Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest50E Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest40E Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest30E Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest20E Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest10E Goose10
+sh /home/cjt/workspace/ALMaSSScenarioDirectories/ALMaSS_job_goose_SCRATCH-s.sh Ve Sk_EggShellTest05E Goose10
+echo "========= Job finished at `date` =========="
+#

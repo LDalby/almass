@@ -7,9 +7,9 @@ library(ralmass)
 pathtodirs = 'e:/almass/WorkDirectories/Goose/'  # Both machines
 dirs = dir(pathtodirs)  # For this to work you can't have a bunch of crap sitting in
 						# in pathtodirs. Only the subdirectories
-dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
-dirs = c(dirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
-dirs = c('WD41', 'WD42', 'WD43')
+# dirs = dirs[grep('WD2', dirs)]  # For the full model scenarios
+# dirs = c(dirs, c('WD31', 'WD32', 'WD32', 'WD33', 'WD34', 'WD35', 'WD36', 'WD37', 'WD38'))
+dirs = 'WD01'
 # A common use for this would be to copy a fresh exe along with
 # resetting the counter, clearing the error file and copying
 # the batchr and prerunsetup file.
@@ -43,7 +43,7 @@ file12 = file.path(fielddata, 'FieldobsFlockSizes2016-05-03.txt')
 
 filestodist = c(file1, file2, file3, file4, file5, file6, file7, file8, file9, file10,
 				        file11, file12)
-HHL = file.path(almassinputs, 'Hunter/746_VejlerneHuntersDiffGLC.txt')
+# HHL = file.path(almassinputs, 'Hunter/746_VejlerneHuntersDiffGLC.txt')
 weather = 'Vejlerne2013-2014.pre'
 pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
 # rot = 'C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Farms'
@@ -53,7 +53,7 @@ pre = file.path('c:/MSV/ALMaSS_inputs/Weather/', weather)
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	file.copy(filestodist, to = wd, overwrite = TRUE)
-	file.copy(HHL, to = file.path(wd, 'Hunter_Hunting_Locations.txt'), overwrite = TRUE)
+	# file.copy(HHL, to = file.path(wd, 'Hunter_Hunting_Locations.txt'), overwrite = TRUE)
 	file.copy(pre, to = file.path(wd, weather), overwrite = TRUE)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = weather)
 	AppendWorkDir(WorkDir = wd, InScript = file3, OutScript = 'batchr.r') 
@@ -76,7 +76,7 @@ for (i in seq_along(dirs)) {
 
 # Distribute the paramter values to run:
 # Openness
-openval = round(seq(0, 100, length.out = 11))
+openval = round(seq(0, 100, length.out = 3))
 wdpath = file.path(pathtodirs, 'WD01')
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE, path = wdpath)
 # Max appetite scaler
@@ -138,7 +138,7 @@ GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpat
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditBat(wd)
-	years = 5
+	years = 2
 	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')

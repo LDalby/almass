@@ -1,0 +1,17 @@
+# Notes on setting up R on grendel
+
+# cd to root and do this to start R
+/com/R/3.1.2/bin/R
+
+# Path to RStudio 0-Cloud (the https doesnt work):
+repo = "http://cloud.r-project.org/"
+lib = "/home/ldalby/R/packages/"
+pckgs = c("devtools", "RCurl")
+install.packages(pckgs, lib = lib , repos = repo, dependencies = TRUE)
+# Add the local lib path to be able to call packages from there
+.libPaths(lib)
+library(devtools)
+# This is needed to make the install_github() method work:
+options(download.file.method = "wget")
+install_github('ldalby/ralmass', ref = 'grendel', lib = lib)  # The grendel branch without any need for rgdal
+

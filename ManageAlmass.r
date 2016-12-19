@@ -1,7 +1,7 @@
 # Functions to manage almass runs
 library(ralmass)
 wd = 'c:/MSV/WorkDirectory/'
-seasons = 5
+seasons = 1
 EditIni(WorkDir = wd, Model = 'goose', NYear = seasons+1)
 EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+seasons*365)
 EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'HUNTERS_RECORDBAG', value = 'true')
