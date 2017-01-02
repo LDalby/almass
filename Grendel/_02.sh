@@ -1,9 +1,8 @@
 # Get the parameter
-Rscript.exe PreRunSetup.r
-
+chmod +x PreRunSetup.r
+./PreRunSetup.r
 # Run ALMaSS
-almass_cmdline
-
+./almass_cmdline
 # Call R to analyze results
-Rscript.exe batchr.r
-
+chmod +x batchr.r
+batchr.r

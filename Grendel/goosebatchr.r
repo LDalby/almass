@@ -7,7 +7,7 @@
 # This will become the main version going forward. 
 # -------------------------------------------------------------------------------------------- # 
 
-# Load the packages we're going to need:
+# Load the packages we are going to need
 library(data.table)
 library(ralmass)
 
