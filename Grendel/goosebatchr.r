@@ -1,3 +1,4 @@
+#!/usr/local/bin/r
 # Title: goosebatchr
 # Updated: December 2016
 # Author: Lars Dalby
@@ -10,10 +11,8 @@
 library(data.table)
 library(ralmass)
 
-library(slackr)  # Only needed if you want Slack to give you updates on progress
-
 # Setup work directory (done automatically when distributing the files, therefore blank):
-
+setwd('/home/lars/ALMaSS/WorkDirectory')
 # To get the line number in the parameter list we make a vector of line numbers for the
 # first of the parameters in each run:
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
@@ -76,7 +75,7 @@ if(file.exists("GooseFieldForageData.txt"))
 	# Field data:
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3. See o:\ST_GooseProject\R\ConvertObsToALMaSS.r
 	# for details on the data handling
-	flocks = fread('o:/ST_GooseProject/Field data/FieldobsFlockSizes2016-05-03.txt')
+	flocks = fread('FieldobsFlockSizes2016-05-03.txt')
 	seasons = unique(forage[, Season])
 	DegreeOverlapBT = NA
 	DegreeOverlapPT = NA
@@ -99,7 +98,7 @@ if(file.exists("GooseFieldForageData.txt"))
 # --------------------------------------------------------------------------------------------#
 		mass = fread('GooseWeightStats.txt', showProgress = FALSE, drop = c('StdError', 'N'))
 		mass = mass[Species == 'Pinkfoot' & MeanWeight != -1,]
-		api = fread('e:/almass/WorkDirectories/Goose/WD01/APIdata.txt')
+		api = fread('APIdata.txt')
 		Weightfit = CalcWeightFit(Sim = mass, Field = api, measure = fitmeasure)
 
 # --------------------------------------------------------------------------------------------#
@@ -133,7 +132,7 @@ if(file.exists("GooseFieldForageData.txt"))
 # --------------------------------------------------------------------------------------------#
 	# Field observations were subset and selected here:
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3
-	fieldobs = fread('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt')
+	fieldobs = fread('FieldobsDistancesFromRoost2016-04-25.txt')
 	roost = fread('GooseRoosts.txt', skip = 1)
 	selectCols = c('PolyRefNum', 'CentroidX', 'CentroidY')
 	poly = fread('VejlerneOpenMay2016PolyRef.txt', skip = 1, verbose = FALSE, select = selectCols)
@@ -167,102 +166,10 @@ if(file.exists("GooseFieldForageData.txt"))
 	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0)/pflos), by = Season][,PFNonBreeders]
 
 # --------------------------------------------------------------------------------------------#
-#                                 Openness distribution                                       #
-# --------------------------------------------------------------------------------------------#
-	# observedopen = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/ObservedOpenness.txt')
-	# sim = forage[, .(Day, Polyref, Openness, BarnacleTimed, PinkfootTimed, GreylagTimed)]
-	# setnames(sim, old = c('BarnacleTimed', 'PinkfootTimed', 'GreylagTimed'),
-	# 			 new = c('Barnacle', 'Pinkfoot', 'Greylag'))
-	# melted = melt(sim, id.vars = c('Day', 'Polyref', 'Openness'),
-	# 	variable.name = 'Species', value.name = 'Numbers')
-	# melted = melted[Numbers != 0,]
-	# melted[,Type:='Simulated']
-	# full = rbind(observedopen, melted[,.(Openness, Species, Type)])
-	
-	# OpenOverlapGL = CalcOverlap(full[Species == 'Greylag',], species = 'greylag', metric = 'Openness')	
-	# OpenOverlapPF = CalcOverlap(full[Species == 'Pinkfoot',], species = 'Pinkfoot', metric = 'Openness')	
-	# OpenOverlapBN = CalcOverlap(full[Species == 'Barnacle',], species = 'Barnacle', metric = 'Openness')	
-
-# --------------------------------------------------------------------------------------------#
-#                          Huntingbag - ONLY USED IN FULL MODEL                               #
-# --------------------------------------------------------------------------------------------#
-	# Remember to handle these fits when writing out and summarizing 
-	# bag = fread('o:/ST_GooseProject/ALMaSS/HunterModelTesting/SurveyResults/THS_JAM_Goosehunters_2013.csv')
-	# bag = bag[!is.na(ABMhunter),.(ABMhunter, Greylag, Pinkfeet)]
-	# setnames(bag, old = 'Pinkfeet', new = 'Pinkfoot')
-	# bag = melt(bag, id.vars = 'ABMhunter', measure.vars = c('Greylag', 'Pinkfoot'), variable.name = 'Species', value.name = 'NoShot')
-	# bag[, Type:='Fieldobs']
-	
-	# GLBagOverlap = rep(NA, length(seasons))
-	# PFBagOverlap = rep(NA, length(seasons))
-	# totalbagpf = rep(NA, length(seasons))
-	# totalbaggl = rep(NA, length(seasons))
-	# avgbaggl = rep(NA, length(seasons))
-	# avgbagpf = rep(NA, length(seasons))
-	# huntdaycorr = rep(NA, length(seasons))
-	# simbag = fread('HuntingBagRecord.txt')
-	# if(nrow(simbag) != 0){
-	# 	simbag[, Species:=sapply(GameType, ConvertGameType)]
-	# 	simbag[, NoShot:=.N, by = list(Species, HunterRef, SeasonNumber)]
-	# 	sim = unique(simbag[, .(HunterRef, Species, NoShot, SeasonNumber)])
-	# 	sim[, Type:='Simulated']
-		
-	# 	for (m in seq_along(seasons)) {
-	# 		tmp = sim[SeasonNumber == m,]
-	# 		full = rbind(bag[NoShot != 0, .(Species, NoShot, Type)], tmp[, .(Species, NoShot, Type)])
-	# 		full[, TotalBag:=sum(NoShot), by = c('Species', 'Type')]
-	# 		full[, AvgBag:=mean(NoShot), by = c('Species', 'Type')]
-	# 		GLBagOverlap[m] = CalcOverlap(data = full, species = 'Greylag', metric = 'NoShot')
-	# 		PFBagOverlap[m] = CalcOverlap(data = full, species = 'Pinkfoot', metric = 'NoShot')
-	# 		totalbagpf[m] = full[Species == 'Pinkfoot' & Type == 'Simulated', unique(TotalBag)]
-	# 		totalbaggl[m] = full[Species == 'Greylag' & Type == 'Simulated', unique(TotalBag)]
-	# 		avgbagpf[m] = full[Species == 'Pinkfoot' & Type == 'Simulated', unique(AvgBag)]
-	# 		avgbaggl[m] = full[Species == 'Greylag' & Type == 'Simulated', unique(AvgBag)]
-	# 	}
-	# }
-	# # hunters with bag
-	# ho = fread('HuntingOpportunities.txt') 
-	# if(nrow(ho) != 0){
-	# 	if(nrow(ho[TotalBag != 0,]) > 0) {
-	# 		ho[TotalBag != 0, N:=.N, by = Year]
-	# 		ho[, PropWithBag:=N/.N, by = Year]
-	# 		propwithbag = unique(ho[!is.na(PropWithBag),.(PropWithBag, Year)])
-	# 		propwithbag = propwithbag[,PropWithBag]
-	# 	}
-	# 	if(nrow(ho[TotalBag != 0,]) == 0) {
-	# 		propwithbag = rep(NA, length(seasons))
-	# 	}
-	# }
-	# # huntdays 
-	# hhl = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/Hunter/746_vejhunter_behaviour_18-08-2016.txt', skip = 1)
-	# for (i in seq_along(seasons)) {
-	# 	huntdaycorr[i] = summary(lm(hhl[,HuntingDays] ~ ho[Year == i,HuntingDays]))$r.squared
-	# }
-
-# --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
 	# Calculate the overall model fit
 	for (k in seq_along(seasons)) {
-		# Full model runs:
-	# 	PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2 + PFBagOverlap[k]^2
-	# 	PinkfootFit = PinkfootFit/6
-	# 	GreylagFit = HabUseGL[k]^2 + DegreeOverlapGT[k]^2 + RoostDistFitGL[k]^2 + PropDayInSimGL[k]^2 + GLBagOverlap[k]^2
-	# 	GreylagFit = GreylagFit/5
-	# 	BarnacleFit = HabUseBN[k]^2 + DegreeOverlapBT[k]^2 + RoostDistFitBN[k]^2 + PropDayInSimBN[k]^2
-	# 	BarnacleFit = BarnacleFit/4
-
-	# # Write out the results of the parameter fitting and prepare for next run:
-	# 	FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
-	# 		HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
-	# 		RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
-	# 		PropDayInSimGL[k], PropDayInSimBN[k], PFBagOverlap[k], GLBagOverlap[k], totalbagpf[k],
-	# 		totalbaggl[k], avgbagpf[k], avgbaggl[k], propwithbag[k], huntdaycorr[k])
-	# 	FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
-	# 		'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
-	# 		'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
-	# 		'PropDayInSimGL', 'PropDayInSimBN', 'BagOverlapPF', 'BagOverlapGL', 'TotalBagPF',
-	# 		'TotalBagGL', 'AvgBagPF', 'AvgBagGL', 'PropWithBag', 'HuntDayCorr')
 	# Goose-only runs:
 		PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2
 		PinkfootFit = PinkfootFit/5
@@ -310,17 +217,6 @@ if(file.exists("GooseFieldForageData.txt"))
 workstation = Sys.info()['nodename']
 report = paste(workstation, basename(getwd()), '- run number', counter, '\n', sep = ' ')
 cat(report)
-
-# If you want updates:
-if(workstation == 'DMU-WS-8297'){
-	token = readLines('c:/Users/lada/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
-}
-if(workstation == 'BIOS-REGN01'){
-	token = readLines('C:/Users/au206907/Dropbox/slackrToken.txt')  # Your token and nothing else in a file. 
-}
-
-slackrSetup(channel="@lars", api_token = token)
-slackr(paste(Sys.time(), report, sep = ' '))
 
 # Very last thing is to update the counter:
 if(!singlerun) 
