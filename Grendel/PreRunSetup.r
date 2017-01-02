@@ -1,3 +1,4 @@
+#!/usr/local/bin/r
 # PreRunSetup
 # Script to copy lines to TIALMaSSConfig pre run
 # Author: Lars Dalby
