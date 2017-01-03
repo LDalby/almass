@@ -1,3 +1,4 @@
+#!/bin/bash
 # Get the parameter
 chmod +x PreRunSetup.r
 ./PreRunSetup.r
