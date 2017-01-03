@@ -1,3 +1,4 @@
+#!/usr/local/bin/r
 # Copy run directories and setup parameters
 # Author: Lars Dalby
 # Date: January 2017
