@@ -178,7 +178,7 @@ if(file.exists("GooseFieldForageData.txt"))
 		BarnacleFit = HabUseBN[k]^2 + DegreeOverlapBT[k]^2 + RoostDistFitBN[k]^2 + PropDayInSimBN[k]^2
 		BarnacleFit = BarnacleFit/4
 
-	# # Write out the results of the parameter fitting and prepare for next run:
+	# Write out the results of the parameter fitting and prepare for next run:
 		FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
 			HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
 			RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
@@ -199,8 +199,8 @@ if(file.exists("GooseFieldForageData.txt"))
 	}	
 	# As the last thing we delete the goose output files
 	# We do this in case almass exits due to an error. If that happens files from a previous
-	# run might still be sitting in the run directory and we would simply analyze these as if they were the new 
-	# run and get results identical to the previous run
+	# run might still be sitting in the run directory and we would simply analyze these 
+	# as if they were a new run 
 
 	if(file.exists("GooseEnergeticsData.txt") && !singlerun)
 	{
@@ -212,7 +212,12 @@ if(file.exists("GooseFieldForageData.txt"))
 		file.remove("GooseFieldForageData.txt")
 	}
 }
-
+# Grab the result file and copy it to a safe place
+if(counter+1 == runs){
+  resfilename = paste(basename(getwd()), 'ParameterFittingResults.txt', sep = '_')
+  file.copy(from = file.path(resultpath, 'ParameterFittingResults.txt'),
+            to = file.path('/home/lars/ALMaSS/tempdirectory', resfilename))
+}
 # Report progress to console:
 workstation = Sys.info()['nodename']
 report = paste(workstation, basename(getwd()), '- run number', counter, '\n', sep = ' ')
