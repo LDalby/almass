@@ -6,4 +6,4 @@ chmod +x PreRunSetup.r
 ./almass_cmdline
 # Call R to analyze results
 chmod +x batchr.r
-batchr.r
+./batchr.r
