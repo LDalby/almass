@@ -7,7 +7,7 @@
 library(data.table)
 library(ralmass)
 # Setup work directory (done automatically when distributing the files, therefore blank):
-setwd('/home/lars/ALMaSS/WorkDirectory')
+
 # To get the line number in the parameter list in multi parameter scenarios we make a vector of line numbers for the
 # first of the parameters in each run (this approach is also used for single parameter scenarios):
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
