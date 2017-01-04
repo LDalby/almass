@@ -30,7 +30,7 @@ if(nrow(paramvals) > 0) {
 }
 
 # Path to the results:
-resultpath = './Results/'
+resultpath = file.path(getwd(),'Results')
 
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
