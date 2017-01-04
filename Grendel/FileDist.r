@@ -6,8 +6,7 @@
 library(data.table)
 library(ralmass)
 
-# The base directory with all input files except ParameterValues.txt
-# The ParameterValues.txt file is written further down.
+# The base directory with all input files except ParameterValues.txt (ParameterValues.txt file is written further down):
 basedir = '/home/lars/ALMaSS/WorkDirectory'
 # The parent directory of all the work directories
 pathtodirs = '/home/lars/ALMaSS/tempdirectory'
