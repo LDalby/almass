@@ -30,8 +30,8 @@ if(nrow(paramvals) > 0) {
 }
 
 # Path to the results:
-resultpath = file.path(getwd(),'Results')
-
+resultpath = file.path(getwd(),'Results')  # intermediate results
+finalreslocation =  '/home/lars/ALMaSS/tempdirectory'  # the final result file stored
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
 
@@ -216,7 +216,7 @@ if(file.exists("GooseFieldForageData.txt"))
 if(counter+1 == runs){
   resfilename = paste(basename(getwd()), 'ParameterFittingResults.txt', sep = '_')
   file.copy(from = file.path(resultpath, 'ParameterFittingResults.txt'),
-            to = file.path('/home/lars/ALMaSS/tempdirectory', resfilename))
+            to = file.path(finalreslocation, resfilename))
 }
 # Report progress to console:
 workstation = Sys.info()['nodename']
