@@ -1,11 +1,12 @@
 #!/usr/local/bin/r
 # Title: goosebatchr
-# Updated: December 2016
+# Updated: December 2016 (to run on linux)
 # Author: Lars Dalby
 
-# This is a linux version of the windows version of the goosebatchr.r script
-# This will become the main version going forward. 
-# -------------------------------------------------------------------------------------------- # 
+# Set the local R package library (if not done already)
+if(!'/home/ldalby/R/packages' %in% .libPaths()) {
+	.libPaths('/home/ldalby/R/packages')
+}
 
 # Load the packages we are going to need
 library(data.table)

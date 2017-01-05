@@ -3,6 +3,11 @@
 # Author: Lars Dalby
 # Date: January 2017
 
+# Set the local R package library (if not done already)
+if(!'/home/ldalby/R/packages' %in% .libPaths()) {
+	.libPaths('/home/ldalby/R/packages')
+}
+
 library(data.table)
 library(ralmass)
 

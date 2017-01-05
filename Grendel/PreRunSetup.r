@@ -4,6 +4,11 @@
 # Author: Lars Dalby
 # Date: 25 Sep 2015
 
+# Set the local R package library (if not done already)
+if(!'/home/ldalby/R/packages' %in% .libPaths()) {
+	.libPaths('/home/ldalby/R/packages')
+}
+
 library(data.table)
 library(ralmass)
 # Setup work directory (done automatically when distributing the files, therefore blank):
