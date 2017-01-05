@@ -11,7 +11,7 @@ basedir = '/home/lars/ALMaSS/WorkDirectory'
 # The parent directory of all the work directories
 pathtodirs = '/home/lars/ALMaSS/tempdirectory'
 # Setup the directories
-npar = 2  # Specifies the number of run directories
+npar = 13  # Specifies the number of run directories
 basename = 'WD'  # The prefix to the directories
 # Make the directories and copy the files:
 for (i in 1:npar) 
@@ -45,6 +45,55 @@ GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE, path = wdpath)
 appetiteval = seq(1, 7, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[2])
 GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE, path = wdpath)
+# Max energy reserve proportion
+energyval = seq(0.15, 0.25, length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[3])
+GenerateParams('GOOSE_MAXENERGYRESERVEPROPORTION' = energyval, write = TRUE, path = wdpath)
+# The leaving threshold
+leavingval = seq(1.0, 1.1, length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[4])
+GenerateParams('GOOSE_LEAVINGTHRESHOLD' = leavingval, write = TRUE, path = wdpath)
+# After dark time
+afterdarkval = round(seq(0, 90, length.out = nsteps))
+wdpath = file.path(pathtodirs, dirs[5])
+GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE, path = wdpath)
+# Min forage decay rate
+foragedecayval = seq(0.0, 1, length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[6])
+GenerateParams('GOOSE_MINFORAGEDECAYRATE' = foragedecayval, write = TRUE, path = wdpath)
+# Goose feeding time
+feedingval = seq(0.7, 0.85, length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[7])
+GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE, path = wdpath)
+# Roost leaving likelyhood
+leavedistsdval = round(seq(0, 30, length.out = nsteps))
+wdpath = file.path(pathtodirs, dirs[8])
+GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE, path = wdpath)
+# Expected foraging time
+expectedval = round(seq(60, 350, length.out = nsteps))
+wdpath = file.path(pathtodirs, dirs[9])
+GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE, path = wdpath)
+# Grain decay rate
+grainval = seq(0.985, 1, length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[10])
+GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE, path = wdpath)
+# Memory duration
+memoryval = seq(0, 30, length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[11])
+GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, path = wdpath)
+# Following likelyhood
+followingval = round(seq(5000, 10000, length.out = nsteps))
+followingval1 = round(seq(5000, 10000, length.out = nsteps))
+followingval2 = round(seq(5000, 10000, length.out = nsteps))
+wdpath = file.path(pathtodirs, dirs[12])
+GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
+			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
+			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
+			    write = TRUE, path = wdpath, expand = FALSE)
+# Forage distance
+foragedistval = round(seq(1000, 3000, length.out = nsteps))
+wdpath = file.path(pathtodirs, dirs[13])
+GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
 
 # Edit the bat, ini and cfg files to match the parameters set above:
 years = 2  # the number of seasons to run (goose sims run over the year boundary)
