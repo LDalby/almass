@@ -32,7 +32,7 @@ if(nrow(paramvals) > 0) {
 
 # Path to the results:
 resultpath = file.path(getwd(),'Results')  # intermediate results
-finalreslocation =  '/home/lars/ALMaSS/tempdirectory'  # the final result file stored
+finalreslocation =  '/home/ldalby/workspace/Goose/ParamFitting/Results'  # the final result file stored
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
 
