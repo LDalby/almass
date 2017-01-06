@@ -10,11 +10,13 @@ if(!'/home/ldalby/R/packages' %in% .libPaths()) {
 
 library(data.table)
 library(ralmass)
+# Get the slurm job-id (is being passed in from the shell script calling this R script)
+args = commandArgs(trailingOnly=TRUE)
 
 # The base directory with all input files except ParameterValues.txt (ParameterValues.txt file is written further down):
-basedir = '/home/lars/ALMaSS/WorkDirectory'
+basedir = '/home/ldalby/workspace/Goose/RunDirectory'
 # The parent directory of all the work directories
-pathtodirs = '/home/lars/ALMaSS/tempdirectory'
+pathtodirs = file.path('/scratch', args)
 # Setup the directories
 npar = 13  # Specifies the number of run directories
 basename = 'WD'  # The prefix to the directories
