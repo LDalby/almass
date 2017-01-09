@@ -33,6 +33,7 @@ if(nrow(paramvals) > 0) {
 # Path to the results:
 resultpath = file.path(getwd(),'Results')  # intermediate results
 finalreslocation =  '/home/ldalby/workspace/Goose/ParamFitting/Results'  # the final result file stored
+errorfilelocation =  '/home/ldalby/workspace/Goose/ParamFitting/Errors'  # the error files
 # Figure out how far we have come
 counter = as.numeric(readLines('counter.txt'))
 
@@ -219,6 +220,11 @@ if(counter+1 == runs){
   file.copy(from = file.path(resultpath, 'ParameterFittingResults.txt'),
             to = file.path(finalreslocation, resfilename))
 }
+# Grab the error file 
+  errorfilename = paste(basename(getwd()), counter, 'ErrorFile.txt', sep = '_')
+  file.copy(from = 'ErrorFile.txt',
+            to = file.path(errorfilelocation, errorfilename))
+
 # Report progress to console:
 workstation = Sys.info()['nodename']
 report = paste(workstation, basename(getwd()), '- run number', counter, '\n', sep = ' ')
