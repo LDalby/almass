@@ -109,4 +109,5 @@ for (i in seq_along(dirs)) {
 	EditBat(wd)
 	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = 'Vejlerne2009-2014.pre')
 }
