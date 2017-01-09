@@ -3,67 +3,67 @@ cd /home/ldalby/workspace/Goose/ParamFitting
 chmod +x FileDist.r
 /home/com/R/3.1.2/bin/Rscript FileDist.r $SLURM_JOBID
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD1
+cd /scratch/$SLURM_JOBID/WD1
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD2
+cd /scratch/$SLURM_JOBID/WD2
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD3
+cd /scratch/$SLURM_JOBID/WD3
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD4
+cd /scratch/$SLURM_JOBID/WD4
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD5
+cd /scratch/$SLURM_JOBID/WD5
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD6
+cd /scratch/$SLURM_JOBID/WD6
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD7
+cd /scratch/$SLURM_JOBID/WD7
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD8
+cd /scratch/$SLURM_JOBID/WD8
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD9
+cd /scratch/$SLURM_JOBID/WD9
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD10
+cd /scratch/$SLURM_JOBID/WD10
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD11
+cd /scratch/$SLURM_JOBID/WD11
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD12
+cd /scratch/$SLURM_JOBID/WD12
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
-cd /scratch/$SLURM_JOBID/GooseParamFit/WD13
+cd /scratch/$SLURM_JOBID/WD13
 chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
