@@ -9,6 +9,7 @@ if(!'/home/ldalby/R/packages' %in% .libPaths()) {
 }
 
 # Load the packages we are going to need
+library(methods)  # to avoid warning when calling lubridate
 library(data.table)
 library(ralmass)
 
@@ -215,7 +216,7 @@ if(file.exists("GooseFieldForageData.txt"))
 	}
 }
 # Grab the result file and copy it to a safe place
-if(counter+1 == runs){
+if(counter == runs){
   resfilename = paste(basename(getwd()), 'ParameterFittingResults.txt', sep = '_')
   file.copy(from = file.path(resultpath, 'ParameterFittingResults.txt'),
             to = file.path(finalreslocation, resfilename))
