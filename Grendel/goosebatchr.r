@@ -217,12 +217,12 @@ if(file.exists("GooseFieldForageData.txt"))
 }
 # Grab the result file and copy it to a safe place
 if(counter == runs){
-  resfilename = paste(basename(getwd()), 'ParameterFittingResults.txt', sep = '_')
+  resfilename = paste(basename(getwd()), Sys.Date(), 'ParameterFittingResults.txt', sep = '_')
   file.copy(from = file.path(resultpath, 'ParameterFittingResults.txt'),
             to = file.path(finalreslocation, resfilename))
 }
 # Grab the error file 
-  errorfilename = paste(basename(getwd()), counter, 'ErrorFile.txt', sep = '_')
+  errorfilename = paste(basename(getwd()), counter, Sys.Date(), 'ErrorFile.txt', sep = '_')
   file.copy(from = 'ErrorFile.txt',
             to = file.path(errorfilelocation, errorfilename))
 
