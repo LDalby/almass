@@ -1,0 +1,314 @@
+---
+title: "Goose parameter fitting"
+author: "Lars Dalby"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8)
+```
+
+```{r load, echo=FALSE,message=FALSE, warning=FALSE, include=FALSE}
+# 'rgl',
+packs = c('data.table', 'ralmass', 'ggplot2', 'RColorBrewer', 'knitr',  'stringr', 'viridis')
+sapply(packs, FUN = require, character.only = TRUE)
+pathtodirs = 'e:/almass/WorkDirectories/Goose'
+knitr::opts_chunk$set(echo = FALSE)
+knit_hooks$set(webgl = hook_webgl)
+destdir = 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/'
+doc = paste0(destdir, 'ParameterFittingGoose.html')
+newname = paste0(destdir, 'ParameterFittingGoose', Sys.Date(), '.html')
+if(file.exists(doc)) {
+  file.copy(from = doc, to = newname, overwrite = TRUE)
+}
+```
+
+```{r almassexe, echo=FALSE}
+wds = dir(pathtodirs)
+wds = wds[-grep('WD2', wds)]
+# wds = c("WD01", "WD02", "WD03", "WD04", "WD05", "WD06", "WD07", "WD09")
+exes = vector('list', length(wds))
+for (i in seq_along(wds)) {
+  exes[[i]] = file.info(paste(pathtodirs, wds[i], 'ALMaSS_CmdLine.exe', sep = '/'))$mtime
+}
+exe = unique(exes)
+
+```
+
+The date stamp on the ALMaSS exe: `r exe`
+
+Showing mean of 5 replicates whiskers showing min and max. Five years in a row. Only 2013-2014 weather. Spilled grain distributions now randomly chosen between years and within a year randomly from that distribution. Snow is the new implementation.
+
+Here hunters (700+) were switched on using a 33% percent efficiency.
+
+
+
+## Plots
+The **Individual** panel is showing the individual fits (raw values) and the **Overall** panel is showing the sum of the squared species specific fits. Note that for pinkfeet we have more tests hence the higher value.
+
+```{r colors, include=FALSE}
+cols = c(brewer.pal(10, 'Set3'), brewer.pal(9, 'Set1'), brewer.pal(12, 'Set3')[11:12])
+cols = c("Weightfit" = cols[1], "FlockSizeFitPT" = cols[2], "FlockSizeFitGT" = cols[3], "FlockSizeFitBT" = cols[4], "HabUsePF" = cols[5], "HabUseGL" = cols[6], "HabUseBN" = cols[7], "RoostDistFitPF" = cols[8], "RoostDistFitGL" = cols[9], "RoostDistFitBN" = cols[10], "PinkFootFit" = cols[11],"GreylagFit" = cols[12],"BarnacleFit" = cols[13], 'PropAtEndGL' = cols[14], 'PropAtEndPF' = cols[15], 'PropAtEndBN' = cols[16], 'PropDayInSimGL' = cols[17], 'PropDayInSimPF' = cols[18], 'PropDayInSimBN' = cols[19], 
+         'OpennessFitGL' = cols[20], 'OpennessFitPF' = cols[21], 'OpennessFitBN' = brewer.pal(8, 'Dark2')[8])
+```
+
+```{r Remodel, echo=FALSE}
+se = function(x) sd(x, na.rm = TRUE)/sqrt(length(na.omit(x)))
+remodel = function(res) {
+	res[c(grep('PF', FitType), grep('PT', FitType), grep('Pinkfoot', FitType)), Species:='Pinkfoot']
+  # res[c(grep('PF', FitType), grep('PT', FitType), grep('Pinkfoot', FitType)), unique(FitType) ]
+	res[FitType == 'Weightfit', Species:='Pinkfoot']	
+	res[c(grep('BN', FitType), grep('BT', FitType), grep('Barnacle', FitType)), Species:='Barnacle']
+	# res[c(grep('BN', FitType), grep('BT', FitType)), unique(FitType) ]	
+	res[c(grep('GL', FitType), grep('GT', FitType), grep('Greylag', FitType)), Species:='Greylag']
+	# res[c(grep('GL', FitType), grep('GT', FitType)), unique(FitType) ]	
+	# res[FitType %in% c('BarnacleFit', 'GreylagFit', 'PinkfootFit'), Species:=str_sub(FitType, end = -4)]
+	res[FitType %in% c('BarnacleFit', 'GreylagFit', 'PinkfootFit'), FitType:='OverallFit']
+	res[!FitType %in% c('Weightfit', 'OverallFit'), FitType:=str_sub(FitType, end = -3)]
+	res[, mean:=mean(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
+	#res[, min:=mean - sd(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
+	#res[, max:=mean + sd(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
+	res[, min:=min(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
+	res[, max:=max(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
+	fitres = unique(res[,.(Species, Parameter, Value, FitType, mean, min, max)])
+	fitres[, Type:='Individual']
+	fitres[FitType == 'OverallFit' , Type:='Overall']
+	fitres[grep('Prop', FitType), Type:='Timings']
+	return(fitres)
+}
+
+```
+
+
+```{r ThePlots, echo=FALSE, fig.width=12}
+# wds = dir(pathtodirs)
+# pdf(file = 'c:/Users/lada/Desktop/GPtoPrint2.pdf', width = 12, height = 8)
+for (i in seq_along(wds)) {
+  param = fread(file.path(pathtodirs, wds[i], 'Results', 'Parametervalues.txt'), showProgress = FALSE)
+	param = unique(param[, V1])
+	if(length(param) == 1) {
+	cfg = readLines('C:/MSV/ALMaSS_inputs/GooseManagement/TIALMaSSConfig.cfg')
+	paramvalue = GetParamValue(config = cfg, param)
+	}
+	res = fread(file.path(pathtodirs, wds[i], 'Results', 'ParameterFittingResults.txt'))
+	res[FitType == 'PFBagOverlap', FitType:='BagOverlapPF']
+	res[FitType == 'GLBagOverlap', FitType:='BagOverlapGL']
+	res[FitType == 'PFTotalBag', FitType:='TotalBagPF']
+	res[FitType == 'GLTotalBag', FitType:='TotalBagGL']
+	res = remodel(res)
+	# res = res[!FitType %in% c('TotalBag', 'BagOverlap'),]
+	res = res[FitType != 'TotalBag',]
+	
+	p = ggplot(res, aes(Value, mean)) +
+	 geom_line(aes(color = FitType)) + 
+	 geom_pointrange(aes(ymin = min, ymax = max, color = FitType)) + 
+	 facet_grid(Species~Type, scales = 'free_y') + 
+	 scale_color_viridis(discrete=TRUE) +
+	 theme(legend.text=element_text(size=10)) +
+	 theme_bw() +
+	 ylab('Fit')
+	if(length(param) == 1) {
+		p = p + xlab(paste0(param, ', default: ', paramvalue)) + ggtitle(ConvertParam(param))
+	}
+	if(length(param) > 1) {
+		p = p + xlab(sapply(param, FUN = ConvertParam)) + ggtitle(sapply(param, FUN = ConvertParam))
+	}
+	print(p)
+}
+# dev.off()
+```
+
+
+```{r configs, echo=FALSE}
+#configs = fread('C:/MSV/ALMaSS_inputs/GooseManagement/TIALMaSSConfig.cfg')
+#kable(configs, caption = 'Config settings used in this run')
+```
+
+## Multiparam plots
+### Following likelyhood and Roost leave SD
+
+```{r FollowRoostSDPinkFoot, eval=FALSE, fig.height=8, fig.width=8, include=FALSE, webgl=TRUE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD14/Results/ParameterFittingResults.txt')
+
+pf = fit[FitType == 'PinkFootFit' & Parameter %in% c('PFGOOSE_FOLLOWINGLIKELYHOOD', 'GOOSE_ROOSTLEAVEDISTSD'),]
+xrows = grep('PFGOOSE_FOLLOWINGLIKELYHOOD', pf[,Parameter])
+x = pf[xrows,Value]
+yrows = grep('GOOSE_ROOSTLEAVEDISTSD', pf[,Parameter])
+y = pf[yrows, Value]
+z = pf[xrows, Fit]  # We can recycle the index (xrows) as the overall fit is 
+# duplicated for each parameter setting.
+
+plot3d(x, y, z, col = rainbow(length(z)), size = 1, type = 's',
+       xlab = 'Following likelyhood', ylab = 'Roost leave SD', zlab = 'PinkFootFit')
+themax = max(pf[, Fit])
+thefollowing = pf[Fit == themax, Value][1]
+theroostsd = pf[Fit == themax, Value][2]
+The maximum overall fit was `r round(themax, 2)` with FollowingLikelyhood = `r thefollowing` and RoostLeaveSD = `r theroostsd`. Scenario was run with an followinglikelyhood range from `r range(x)[1]` to `r range(x)[2]` in `r length(unique(x))` steps and a roostsd range from `r range(y)[1]` to `r range(y)[2]` in `r length(unique(y))` steps.
+
+```
+
+
+
+
+
+```{r FollowRoostSDBarnacle, eval=FALSE, fig.height=8, fig.width=8, include=FALSE, webgl=TRUE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD14/Results/ParameterFittingResults.txt')
+
+bn = fit[FitType == 'BarnacleFit' & Parameter %in% c('BGOOSE_FOLLOWINGLIKELYHOOD', 'GOOSE_ROOSTLEAVEDISTSD'),]
+xrows = grep('BGOOSE_FOLLOWINGLIKELYHOOD', bn[,Parameter])
+x = bn[xrows,Value]
+yrows = grep('GOOSE_ROOSTLEAVEDISTSD', bn[,Parameter])
+y = bn[yrows, Value]
+z = bn[xrows, Fit]  # We can recycle the index (xrows) as the overall fit is 
+# duplicated for each parameter setting.
+
+plot3d(x, y, z, col = rainbow(length(z)), size = 1, type = 's',
+       xlab = 'Following likelyhood', ylab = 'Roost leave SD', zlab = 'BarnacleFit')
+themax = max(bn[, Fit])
+thefollowing = bn[Fit == themax, Value][1]
+theroostsd = bn[Fit == themax, Value][2]
+The maximum overall fit was `r round(themax, 2)` with FollowingLikelyhood = `r thefollowing` and RoostLeaveSD = `r theroostsd`. Scenario was run with an followinglikelyhood range from `r range(x)[1]` to `r range(x)[2]` in `r length(unique(x))` steps and a roostsd range from `r range(y)[1]` to `r range(y)[2]` in `r length(unique(y))` steps.
+
+```
+
+
+
+```{r FollowRoostSDGreylag, eval=FALSE, fig.height=8, fig.width=8, include=FALSE, webgl=TRUE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD14/Results/ParameterFittingResults.txt')
+
+gl = fit[FitType == 'GreylagFit' & Parameter %in% c('GLGOOSE_FOLLOWINGLIKELYHOOD', 'GOOSE_ROOSTLEAVEDISTSD'),]
+xrows = grep('GLGOOSE_FOLLOWINGLIKELYHOOD', gl[,Parameter])
+x = gl[xrows,Value]
+yrows = grep('GOOSE_ROOSTLEAVEDISTSD', gl[,Parameter])
+y = gl[yrows, Value]
+z = gl[xrows, Fit]  # We can recycle the index (xrows) as the overall fit is 
+# duplicated for each parameter setting.
+
+plot3d(x, y, z, col = rainbow(length(z)), size = 1, type = 's',
+       xlab = 'Following likelyhood', ylab = 'Roost leave SD', zlab = 'GreylagFit')
+themax = max(gl[, Fit])
+thefollowing = gl[Fit == themax, Value][1]
+theroostsd = gl[Fit == themax, Value][2]
+
+The maximum overall fit was `r round(themax, 2)` with FollowingLikelyhood = `r thefollowing` and RoostLeaveSD = `r theroostsd`. Scenario was run with an followinglikelyhood range from `r range(x)[1]` to `r range(x)[2]` in `r length(unique(x))` steps and a roostsd range from `r range(y)[1]` to `r range(y)[2]` in `r length(unique(y))` steps.
+
+```
+
+
+
+```{r FollowRoostSDGreylagCheck1, eval=FALSE, fig.height=8, fig.width=8, include=FALSE, webgl=TRUE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD14/Results/ParameterFittingResults.txt')
+
+gl = fit[FitType == 'FlockSizeFitGT' & Parameter %in% c('GLGOOSE_FOLLOWINGLIKELYHOOD', 'GOOSE_ROOSTLEAVEDISTSD'),]
+xrows = grep('GLGOOSE_FOLLOWINGLIKELYHOOD', gl[,Parameter])
+x = gl[xrows,Value]
+yrows = grep('GOOSE_ROOSTLEAVEDISTSD', gl[,Parameter])
+y = gl[yrows, Value]
+z = gl[xrows, Fit]  # We can recycle the index (xrows) as the overall fit is 
+# duplicated for each parameter setting.
+
+plot3d(x, y, z, col = rainbow(length(z)), size = 1, type = 's',
+       xlab = 'Following likelyhood', ylab = 'Roost leave SD', zlab = 'FlockSizeFitGT')
+
+```
+
+```{r FollowRoostSDGreylagCheck2, eval=FALSE, fig.height=8, fig.width=8, include=FALSE, webgl=TRUE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD14/Results/ParameterFittingResults.txt')
+
+gl = fit[FitType == 'PropAtEndGL' & Parameter %in% c('GLGOOSE_FOLLOWINGLIKELYHOOD', 'GOOSE_ROOSTLEAVEDISTSD'),]
+xrows = grep('GLGOOSE_FOLLOWINGLIKELYHOOD', gl[,Parameter])
+x = gl[xrows,Value]
+yrows = grep('GOOSE_ROOSTLEAVEDISTSD', gl[,Parameter])
+y = gl[yrows, Value]
+z = gl[xrows, Fit]  # We can recycle the index (xrows) as the overall fit is 
+# duplicated for each parameter setting.
+
+plot3d(x, y, z, col = rainbow(length(z)), size = 1, type = 's',
+       xlab = 'Following likelyhood', ylab = 'Roost leave SD', zlab = 'PropAtEndGL')
+
+```
+
+
+```{r , eval=FALSE, fig.height=8, fig.width=8, include=FALSE, webgl=TRUE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD14/Results/ParameterFittingResults.txt')
+
+gl = fit[FitType == 'PropAtEndGL' & Parameter %in% c('GLGOOSE_FOLLOWINGLIKELYHOOD', 'GOOSE_ROOSTLEAVEDISTSD'),]
+xrows = grep('GLGOOSE_FOLLOWINGLIKELYHOOD', gl[,Parameter])
+x = gl[xrows,Value]
+yrows = grep('GOOSE_ROOSTLEAVEDISTSD', gl[,Parameter])
+y = gl[yrows, Value]
+z = gl[xrows, Fit]  # We can recycle the index (xrows) as the overall fit is 
+# duplicated for each parameter setting.
+
+plot3d(x, y, z, col = rainbow(length(z)), size = 1, type = 's',
+       xlab = 'Following likelyhood', ylab = 'Roost leave SD', zlab = 'PropAtEndGL')
+
+```
+
+
+### Max energy, feeding time and appetite scaler
+
+
+```{r MAS_ERP_FT_PF, eval=FALSE, fig.height=8, fig.width=8, include=FALSE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD15/Results/ParameterFittingResults.txt')
+pffit = fit[FitType == 'PinkFootFit',]
+pffit[, Value:=round(Value,2)]
+# This plot was used to narrow down the plot
+# tmp = dcast(pffit, Fit ~ Parameter, value.var = 'Value')
+# ggplot(tmp, aes(GOOSE_FEEDINGTIME,  Fit)) + geom_point() + facet_grid(GOOSE_MAXAPPETITESCALER ~ GOOSE_MAXENERGYRESERVEPROPORTION)
+pffit = pffit[Parameter == 'GOOSE_MAXENERGYRESERVEPROPORTION' & Value > 0.15 & Value < 0.24 |
+ Parameter == 'GOOSE_MAXAPPETITESCALER' & Value > 1.5 | Parameter == 'GOOSE_FEEDINGTIME', ]
+tmp = dcast(pffit, Fit ~ Parameter, value.var = 'Value')
+tmp = tmp[complete.cases(tmp),]
+ggplot(tmp, aes(GOOSE_FEEDINGTIME,  Fit)) + geom_point() + facet_grid(GOOSE_MAXAPPETITESCALER ~ GOOSE_MAXENERGYRESERVEPROPORTION) + 
+ggtitle('Pinkfoot')
+```
+
+
+
+
+```{r MAS_ERP_FT_BN, eval=FALSE, fig.height=8, fig.width=8, include=FALSE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD15/Results/ParameterFittingResults.txt')
+bnfit = fit[FitType == 'BarnacleFit',]
+bnfit[, Value:=round(Value,2)]
+# This plot was used to narrow down the plot
+# tmp = dcast(bnfit, Fit ~ Parameter, value.var = 'Value')
+# ggplot(tmp, aes(GOOSE_FEEDINGTIME,  Fit)) + geom_point() + facet_grid(GOOSE_MAXAPPETITESCALER ~ GOOSE_MAXENERGYRESERVEPROPORTION)
+bnfit = bnfit[Parameter == 'GOOSE_MAXENERGYRESERVEPROPORTION' & Value > 0.15|
+ Parameter == 'GOOSE_MAXAPPETITESCALER' & Value > 1.5 | Parameter == 'GOOSE_FEEDINGTIME' & Value > 0.75, ]
+tmp = dcast(bnfit, Fit ~ Parameter, value.var = 'Value')
+tmp = tmp[complete.cases(tmp),]
+ggplot(tmp, aes(GOOSE_FEEDINGTIME,  Fit)) + geom_point() + facet_grid(GOOSE_MAXAPPETITESCALER ~ GOOSE_MAXENERGYRESERVEPROPORTION) + 
+ ggtitle('Barnacle')
+```
+
+
+```{r MAS_ERP_FT_GL, eval=FALSE, fig.height=8, fig.width=8, include=FALSE}
+fit = fread('e:/almass/WorkDirectories/Goose/WD15/Results/ParameterFittingResults.txt')
+glfit = fit[FitType == 'GreylagFit',]
+glfit[, Value:=round(Value,2)]
+# This plot was used to narrow down the plot
+# tmp = dcast(glfit, Fit ~ Parameter, value.var = 'Value')
+# ggplot(tmp, aes(GOOSE_FEEDINGTIME,  Fit)) + geom_point() + facet_grid(GOOSE_MAXAPPETITESCALER ~ GOOSE_MAXENERGYRESERVEPROPORTION)
+glfit = glfit[Parameter == 'GOOSE_MAXENERGYRESERVEPROPORTION'|
+ Parameter == 'GOOSE_MAXAPPETITESCALER' & Value > 1.5 | Parameter == 'GOOSE_FEEDINGTIME' , ]
+tmp = dcast(glfit, Fit ~ Parameter, value.var = 'Value')
+tmp = tmp[complete.cases(tmp),]
+ggplot(tmp, aes(GOOSE_FEEDINGTIME,  Fit)) + geom_point() + facet_grid(GOOSE_MAXAPPETITESCALER ~ GOOSE_MAXENERGYRESERVEPROPORTION) + ggtitle('Greylag')
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
