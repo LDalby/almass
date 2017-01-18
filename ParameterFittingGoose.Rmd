@@ -22,6 +22,8 @@ newname = paste0('ParameterFittingGoose', Sys.Date(), '.html')
 if(file.exists(doc)) {
   file.copy(from = doc, to = file.path(destdir, newname), overwrite = TRUE)
 }
+# Read in the config so we can print the default values onto the plots
+cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg')
 ```
 
 ```{r almassexe, echo=FALSE}
@@ -37,13 +39,7 @@ if(file.exists(doc)) {
 ```
 
 ## Plots
-The **Individual** panel is showing the individual fits (raw values) and the **Overall** panel is showing the sum of the squared species specific fits. Note that for pinkfeet we have more tests hence the higher value.
-
-```{r colors, include=FALSE}
-cols = c(brewer.pal(10, 'Set3'), brewer.pal(9, 'Set1'), brewer.pal(12, 'Set3')[11:12])
-cols = c("Weightfit" = cols[1], "FlockSizeFitPT" = cols[2], "FlockSizeFitGT" = cols[3], "FlockSizeFitBT" = cols[4], "HabUsePF" = cols[5], "HabUseGL" = cols[6], "HabUseBN" = cols[7], "RoostDistFitPF" = cols[8], "RoostDistFitGL" = cols[9], "RoostDistFitBN" = cols[10], "PinkFootFit" = cols[11],"GreylagFit" = cols[12],"BarnacleFit" = cols[13], 'PropAtEndGL' = cols[14], 'PropAtEndPF' = cols[15], 'PropAtEndBN' = cols[16], 'PropDayInSimGL' = cols[17], 'PropDayInSimPF' = cols[18], 'PropDayInSimBN' = cols[19], 
-         'OpennessFitGL' = cols[20], 'OpennessFitPF' = cols[21], 'OpennessFitBN' = brewer.pal(8, 'Dark2')[8])
-```
+The **Individual** panel is showing the individual fits (raw values) and the **Overall** panel is showing the average sum of the squared species specific fits.
 
 ```{r Remodel, echo=FALSE}
 se = function(x) sd(x, na.rm = TRUE)/sqrt(length(na.omit(x)))
@@ -75,7 +71,6 @@ remodel = function(res, type = "minmax") {
 
 ```{r ThePlots, echo=FALSE, fig.width=12}
 allres = fread("/home/lars/temp/GooseParameterFitting_2017-01-11.txt")
-# wds = dir(pathtodirs)
 # pdf(file = 'c:/Users/lada/Desktop/GPtoPrint2.pdf', width = 12, height = 8)
 for (i in seq_along(allres[,unique(Parameter)])) {
 	res = allres[Parameter == unique(Parameter)[i],]
@@ -95,7 +90,7 @@ for (i in seq_along(allres[,unique(Parameter)])) {
 	 theme_bw() +
 	 ylab('Fit')
 	if(length(param) == 1) {
-		p = p + ggtitle(ConvertParam(param))
+		p = p + ggtitle(ConvertParam(param), subtitle = paste0('Default value: ', GetParamValue(cfg, param)))
 	}
 	if(length(param) > 1) {
 		p = p + xlab(sapply(param, FUN = ConvertParam)) + ggtitle(sapply(param, FUN = ConvertParam))
@@ -104,6 +99,29 @@ for (i in seq_along(allres[,unique(Parameter)])) {
 }
 # dev.off()
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
