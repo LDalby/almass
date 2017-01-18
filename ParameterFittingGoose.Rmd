@@ -47,22 +47,22 @@ cols = c("Weightfit" = cols[1], "FlockSizeFitPT" = cols[2], "FlockSizeFitGT" = c
 
 ```{r Remodel, echo=FALSE}
 se = function(x) sd(x, na.rm = TRUE)/sqrt(length(na.omit(x)))
-remodel = function(res) {
+remodel = function(res, type = "minmax") {
 	res[c(grep('PF', FitType), grep('PT', FitType), grep('Pinkfoot', FitType)), Species:='Pinkfoot']
-  # res[c(grep('PF', FitType), grep('PT', FitType), grep('Pinkfoot', FitType)), unique(FitType) ]
-	res[FitType == 'Weightfit', Species:='Pinkfoot']	
+  res[FitType == 'Weightfit', Species:='Pinkfoot']	
 	res[c(grep('BN', FitType), grep('BT', FitType), grep('Barnacle', FitType)), Species:='Barnacle']
-	# res[c(grep('BN', FitType), grep('BT', FitType)), unique(FitType) ]	
 	res[c(grep('GL', FitType), grep('GT', FitType), grep('Greylag', FitType)), Species:='Greylag']
-	# res[c(grep('GL', FitType), grep('GT', FitType)), unique(FitType) ]	
-	# res[FitType %in% c('BarnacleFit', 'GreylagFit', 'PinkfootFit'), Species:=str_sub(FitType, end = -4)]
 	res[FitType %in% c('BarnacleFit', 'GreylagFit', 'PinkfootFit'), FitType:='OverallFit']
 	res[!FitType %in% c('Weightfit', 'OverallFit'), FitType:=str_sub(FitType, end = -3)]
-	res[, mean:=mean(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
-	#res[, min:=mean - sd(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
-	#res[, max:=mean + sd(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
-	res[, min:=min(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
-	res[, max:=max(Fit), by = c('Species', 'Parameter', 'Value', 'FitType')]
+	if(type == "minmax"){
+	 res[, c("mean", "min", "max") := .(mean(Fit), min(Fit), max(Fit)), by = .(Parameter, Species, Value, FitType)] 
+	}
+	if(type == "sd"){
+    res[, c("mean", "min", "max") := .(mean(Fit), mean - sd(Fit), mean + sd(Fit)), by = .(Parameter, Species, Value, FitType)]	  
+	}
+	if(type == "se"){
+    res[, c("mean", "min", "max") := .(mean(Fit), mean - se(Fit), mean + se(Fit)), by = .(Parameter, Species, Value, FitType)]	  
+	}
 	fitres = unique(res[,.(Species, Parameter, Value, FitType, mean, min, max)])
 	fitres[, Type:='Individual']
 	fitres[FitType == 'OverallFit' , Type:='Overall']
@@ -84,7 +84,7 @@ for (i in seq_along(allres[,unique(Parameter)])) {
 	res[FitType == 'GLBagOverlap', FitType:='BagOverlapGL']
 	res[FitType == 'PFTotalBag', FitType:='TotalBagPF']
 	res[FitType == 'GLTotalBag', FitType:='TotalBagGL']
-	res = remodel(res)
+	res = remodel(res, type = "minmax")
 
 	p = ggplot(res, aes(Value, mean)) +
 	 geom_line(aes(color = FitType)) + 
