@@ -18,7 +18,7 @@ basedir = '/home/ldalby/workspace/Goose/RunDirectory'
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
 # Setup the directories
-npar = 13  # Specifies the number of run directories
+npar = 15  # Specifies the number of run directories
 basename = 'WD'  # The prefix to the directories
 # Make the directories and copy the files:
 for (i in 1:npar) 
@@ -88,26 +88,33 @@ GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE, path = wdpath)
 memoryval = seq(0, 30, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[11])
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, path = wdpath)
-# Following likelyhood
+# Following likelyhood - Barnacle
 followingval = round(seq(5000, 10000, length.out = nsteps))
-followingval1 = round(seq(5000, 10000, length.out = nsteps))
-followingval2 = round(seq(5000, 10000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[12])
 GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
-			   'PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
-			   'GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
+			   write = TRUE, path = wdpath, expand = FALSE)
+# Following likelyhood - Pinkfoot
+followingval1 = round(seq(5000, 10000, length.out = nsteps))
+wdpath = file.path(pathtodirs, dirs[13])
+GenerateParams('PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
+			    write = TRUE, path = wdpath, expand = FALSE)
+
+# Following likelyhood - Greylag
+followingval2 = round(seq(5000, 10000, length.out = nsteps))
+wdpath = file.path(pathtodirs, dirs[14])
+GenerateParams('GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
 			    write = TRUE, path = wdpath, expand = FALSE)
 # Forage distance
 foragedistval = round(seq(1000, 3000, length.out = nsteps))
-wdpath = file.path(pathtodirs, dirs[13])
+wdpath = file.path(pathtodirs, dirs[15])
 GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
 
 # Edit the bat, ini and cfg files to match the parameters set above:
-years = 2  # the number of seasons to run (goose sims run over the year boundary)
+years = 5  # the number of seasons to run (goose sims run over the year boundary)
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditBat(wd)
 	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
-	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = 'Vejlerne2009-2014.pre')
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = 'Vejlerne2013-2014.pre')
 }
