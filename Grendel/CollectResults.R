@@ -15,7 +15,6 @@ args = commandArgs(trailingOnly=TRUE)
 
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
-pathtofile = file.path(pathtodirs, paste0(basename,i))
 filename = 'ParameterFittingResults.txt'
 npar = 13  # Specifies the number of run directories that was being used
 basename = 'WD'  # The prefix to the directories
@@ -23,7 +22,11 @@ basename = 'WD'  # The prefix to the directories
 reslist = vector('list', npar)
 for (i in 1:npar) 
 {
-	reslist[[i]] = fread(file.path(pathtofile, filename))
+	wd = paste0(basename,i)
+	pathtofile = file.path(pathtodirs, wd)
+	tmp = fread(file.path(pathtofile, filename))
+	tmp[, WD:=wd]
+	reslist[[i]] = tmp
 }
 allres = rbindlist(reslist)
 fwrite(allres, file = '/home/ldalby/workspace/Goose/ParamFitting/Results')
