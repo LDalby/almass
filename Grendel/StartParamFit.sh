@@ -68,6 +68,16 @@ chmod +x _01_BatchLoop.sh
 ./_01_BatchLoop.sh > out &
 sleep 5
 
+cd /scratch/$SLURM_JOB_ID/WD14
+chmod +x _01_BatchLoop.sh
+./_01_BatchLoop.sh > out &
+sleep 5
+
+cd /scratch/$SLURM_JOB_ID/WD15
+chmod +x _01_BatchLoop.sh
+./_01_BatchLoop.sh > out &
+sleep 5
+
 wait
 
 cd /home/ldalby/workspace/Goose/ParamFitting
