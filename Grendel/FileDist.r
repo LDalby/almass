@@ -24,7 +24,7 @@ basename = 'WD'  # The prefix to the directories
 for (i in 1:npar) 
 {
 	dir.create(file.path(pathtodirs, paste0(basename,i)))
-  file.copy(from = file.path(basedir, dir(basedir)),
+  	file.copy(from = file.path(basedir, dir(basedir)),
 	          to = file.path(pathtodirs, paste0(basename,i)),
 	          overwrite = TRUE)
 }
@@ -85,7 +85,7 @@ grainval = seq(0.985, 1, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[10])
 GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE, path = wdpath)
 # Memory duration
-memoryval = seq(0, 30, length.out = nsteps)
+memoryval = seq(0, 10, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[11])
 GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, path = wdpath)
 # Following likelyhood - Barnacle
@@ -105,7 +105,7 @@ wdpath = file.path(pathtodirs, dirs[14])
 GenerateParams('GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
 			    write = TRUE, path = wdpath, expand = FALSE)
 # Forage distance
-foragedistval = round(seq(1000, 3000, length.out = nsteps))
+foragedistval = round(seq(1000, 10000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[15])
 GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
 
