@@ -23,7 +23,7 @@ reslist = vector('list', npar)
 for (i in 1:npar) 
 {
 	wd = paste0(basename,i)
-	pathtofile = file.path(pathtodirs, wd)
+	pathtofile = file.path(pathtodirs, wd, 'Results')
 	tmp = fread(file.path(pathtofile, filename))
 	tmp[, WD:=wd]
 	reslist[[i]] = tmp
