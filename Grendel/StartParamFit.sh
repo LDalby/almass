@@ -14,6 +14,6 @@ wait
 
 cd /home/ldalby/workspace/Goose/ParamFitting
 chmod +x CollectResults.r
-/home/com/R/3.1.2/bin/Rscript CollectResults.r
+/home/com/R/3.1.2/bin/Rscript CollectResults.r $SLURM_JOB_ID
 
 wait
