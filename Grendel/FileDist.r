@@ -77,7 +77,7 @@ leavedistsdval = round(seq(0, 30, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[8])
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE, path = wdpath)
 # Expected foraging time
-expectedval = round(seq(60, 350, length.out = nsteps))
+expectedval = round(seq(0, 300, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[9])
 GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE, path = wdpath)
 # Grain decay rate
