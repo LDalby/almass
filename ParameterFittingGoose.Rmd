@@ -39,7 +39,7 @@ cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg
 ```
 
 ## Plots
-The **Individual** panel is showing the individual fits (raw values) and the **Overall** panel is showing the average sum of the squared species specific fits.
+The **Individual** panel is showing the individual fits (raw values) and the **Overall** panel is showing the average sum of the squared species specific fits. Grey vertical line is showing the default value.
 
 ```{r Remodel, echo=FALSE}
 se = function(x) sd(x, na.rm = TRUE)/sqrt(length(na.omit(x)))
@@ -70,7 +70,7 @@ remodel = function(res, type = "minmax") {
 
 
 ```{r ThePlots, echo=FALSE, fig.width=12}
-allres = fread("/home/lars/temp/GooseParameterFitting_2017-01-18.txt")
+allres = fread("/home/lars/temp/GooseParameterFitting_2017-01-19.txt")
 # pdf(file = 'c:/Users/lada/Desktop/GPtoPrint2.pdf', width = 12, height = 8)
 for (i in seq_along(allres[,unique(Parameter)])) {
 	res = allres[Parameter == unique(Parameter)[i],]
@@ -84,9 +84,9 @@ for (i in seq_along(allres[,unique(Parameter)])) {
 
 	p = ggplot(res, aes(Value, mean)) +
 	 geom_line(aes(color = FitType)) + 
-	 geom_pointrange(aes(ymin = min, ymax = max, color = FitType)) + 
+	 geom_vline(xintercept = paramvalue, color = 'grey') +
+   geom_pointrange(aes(ymin = min, ymax = max, color = FitType)) + 
 	 facet_grid(Species~Type, scales = 'free_y') + 
-	 geom_vline(xintercept = paramvalue, color = 'grey') +  
 	 scale_color_viridis(discrete=TRUE) +
 	 theme(legend.text=element_text(size=10)) +
 	 theme_bw() +
