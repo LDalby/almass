@@ -105,7 +105,7 @@ wdpath = file.path(pathtodirs, dirs[14])
 GenerateParams('GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
 			    write = TRUE, path = wdpath, expand = FALSE)
 # Forage distance
-foragedistval = round(seq(1000, 10000, length.out = nsteps))
+foragedistval = round(seq(1000, 7000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[15])
 GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
 
