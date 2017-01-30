@@ -65,7 +65,7 @@ afterdarkval = round(seq(0, 90, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[5])
 GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE, path = wdpath)
 # Min forage decay rate
-foragedecayval = seq(0.0, 1, length.out = nsteps)
+foragedecayval = seq(0.001, 1, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[6])
 GenerateParams('GOOSE_MINFORAGEDECAYRATE' = foragedecayval, write = TRUE, path = wdpath)
 # Goose feeding time
