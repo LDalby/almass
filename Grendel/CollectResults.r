@@ -15,7 +15,6 @@ args = commandArgs(trailingOnly=TRUE)
 
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
-cat(pathtodirs)
 filename = 'ParameterFittingResults.txt'
 npar = 15  # Specifies the number of run directories that was being used
 basename = 'WD'  # The prefix to the directories
@@ -29,10 +28,7 @@ for (i in 1:npar)
 	tmp[, WD:=wd]
 	reslist[[i]] = tmp
 }
-cat("ready to rbindlist \n")
 allres = rbindlist(reslist)
 destdir = '/home/ldalby/workspace/Goose/ParamFitting/Results/'
 resfilename = paste0('GooseParameterFitting_', Sys.Date(), '.txt')
-cat(paste0("Writing this file: ", file.path(destdir, resfilename), "\n"))
 fwrite(allres, file = file.path(destdir, resfilename))
-cat("wrote file \n")
