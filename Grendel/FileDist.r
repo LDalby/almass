@@ -49,7 +49,7 @@ openval = round(seq(0, 100, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[1])
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE, path = wdpath)
 # Max appetite scaler
-appetiteval = seq(1, 7, length.out = nsteps)
+appetiteval = seq(1, 5, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[2])
 GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE, path = wdpath)
 # Max energy reserve proportion
