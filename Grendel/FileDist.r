@@ -103,7 +103,7 @@ wdpath = file.path(pathtodirs, dirs[8])
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE, path = wdpath)
 # Expected foraging time
 defaultvalue = GetParamValue(cfg, 'GOOSE_MEM_EXPECTEDFORAGINGTIME')
-expectedval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = 11)
+expectedval = round(seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = 11))
 expectedval = expectedval[expectedval >= 20]
 # expectedval = round(seq(20, 300, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[9])
