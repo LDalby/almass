@@ -5,13 +5,15 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
+A round with +-25% of default parameter value (where possible).
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 8)
 ```
 
 ```{r load, echo=FALSE,message=FALSE, warning=FALSE, include=FALSE}
 # 'rgl',
-packs = c('data.table', 'ralmass', 'ggplot2', 'RColorBrewer', 'knitr',  'stringr', 'viridis')
+packs = c('data.table', 'ralmass', 'ggplot2', 'RColorBrewer', 'knitr',  'stringr', 'viridis', 'ggthemes')
 sapply(packs, FUN = require, character.only = TRUE)
 pathtodirs = 'e:/almass/WorkDirectories/Goose'
 knitr::opts_chunk$set(echo = FALSE)
@@ -26,17 +28,6 @@ if(file.exists(doc)) {
 cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg')
 ```
 
-```{r almassexe, echo=FALSE}
-# wds = dir(pathtodirs)
-# wds = wds[-grep('WD2', wds)]
-# # wds = c("WD01", "WD02", "WD03", "WD04", "WD05", "WD06", "WD07", "WD09")
-# exes = vector('list', length(wds))
-# for (i in seq_along(wds)) {
-#   exes[[i]] = file.info(paste(pathtodirs, wds[i], 'ALMaSS_CmdLine.exe', sep = '/'))$mtime
-# }
-# exe = unique(exes)
-
-```
 
 ## Plots
 The **Individual** panel is showing the individual fits (raw values) and the **Overall** panel is showing the average sum of the squared species specific fits. Grey vertical line is showing the default value.
@@ -69,8 +60,59 @@ remodel = function(res, type = "minmax") {
 ```
 
 
+## Standardized plots
+
+```{r FittingPlot, echo=FALSE, fig.width=12}
+allres = fread("/home/lars/temp/GooseParameterFitting_2017-02-02.txt") 	
+invisible({parameters = allres[,unique(Parameter)]
+ 	defaultvalues = rep(NA, length(parameters))
+ 	for(i in seq_along(parameters)){
+ 	  defaultvalues[i] = GetParamValue(cfg, parameters[i])
+ 	}
+ 	dt = data.table('Parameter' = parameters, 'Defaultvalues' = defaultvalues, key = 'Parameter')
+ 	res = remodel(allres, type = "minmax")
+  setkey(res, Parameter)
+ 	DT = merge(res, dt)
+  DT[, Standardized:=(Value/Defaultvalues)-1]
+  DT = DT[!FitType %in% c('PropDayInSim', 'OverallFit'),]
+  minmem = copy(DT)
+  DT = DT[Parameter != 'GOOSE_MEM_MINMEMVALUE',]
+    # DT[, Standardized:=Standardized-1]
+  parameters = DT[,unique(Parameter)]})
+for(i in seq_along(parameters)) {
+  paramvalue = GetParamValue(cfg, parameters[i])
+  p = ggplot(DT[Parameter == parameters[i], ], aes(Standardized, mean)) + 
+    geom_vline(xintercept = 0.0, color = 'darkgrey') + 
+    geom_line(aes(color = FitType)) + 
+    geom_pointrange(aes(ymin = min, ymax = max, color = FitType)) +
+    ggtitle('Parameter response', subtitle = paste0(ConvertParam(parameters[i]),' - default value: ', paramvalue)) +
+    ylab('Fit to field data') +
+    xlab('Relative change in parameter') +
+    scale_color_tableau() +
+    facet_grid(~Species) +
+    ylim(NA, 1) +
+    theme_bw()
+    print(p)
+}
+paramvalue = GetParamValue(cfg, "GOOSE_MEM_MINMEMVALUE")
+  p = ggplot(minmem[Parameter == "GOOSE_MEM_MINMEMVALUE", ], aes(Standardized, mean)) + 
+    geom_vline(xintercept = 0.0, color = 'darkgrey') + 
+    geom_line(aes(color = FitType)) + 
+    geom_pointrange(aes(ymin = min, ymax = max, color = FitType)) +
+    ggtitle('Parameter response', subtitle = paste0(ConvertParam("GOOSE_MEM_MINMEMVALUE"),' - default value: ', paramvalue)) +
+    ylab('Fit to field data') +
+    xlab('Relative change in parameter') +
+    scale_color_tableau() +
+    facet_grid(~Species) +
+    ylim(NA, 1) +
+    theme_bw()
+    print(p)
+```
+
+## Fitting plots
+
 ```{r ThePlots, echo=FALSE, fig.width=12}
-allres = fread("/home/lars/temp/GooseParameterFitting_2017-01-31.txt")
+allres = fread("/home/lars/temp/GooseParameterFitting_2017-02-02.txt") 	
 # pdf(file = 'c:/Users/lada/Desktop/GPtoPrint2.pdf', width = 12, height = 8)
 for (i in seq_along(allres[,unique(Parameter)])) {
 	res = allres[Parameter == unique(Parameter)[i],]
@@ -101,7 +143,6 @@ for (i in seq_along(allres[,unique(Parameter)])) {
 }
 # dev.off()
 ```
-
 
 
 
