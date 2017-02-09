@@ -4,7 +4,7 @@ PFGOOSE_FOLLOWINGLIKELYHOOD; Goose following probability;  0
 GLGOOSE_FOLLOWINGLIKELYHOOD; Goose following probability;  0
 GOOSE_MAXAPPETITESCALER; The maximum a goose is allowed to eat in a day as a scaling of DEB without flying;  6.04
 GOOSE_FLIGHTCOST_PF; The pinkfoot cost of flight per m;  0.00486
-GOOSE_FLIGHTCOST_BG; The barnacle cost of flight per m;  0.00651
+GOOSE_FLIGHTCOST_BN; The barnacle cost of flight per m;  0.00651
 GOOSE_FLIGHTCOST_GL; The greylag cost of flight per m;  0.00753
 GOOSE_PINKFOOTWEIGHT; Mean weight of pinkfoot geese;  2307
 GOOSE_BARNACLEWEIGHT; Mean weight of barnacle geese;  1708
@@ -13,21 +13,6 @@ GOOSE_MAXENERGYRESERVEPROPORTION; The maximum proportion by weight that can to b
 GOOSE_METABOLICCONVCOSTS; The metabolic costs of converting tissue to energy or vice versa; 11.4
 GOOSE_MINFORAGEOPENNESS; The minimum openness score that a goose will tolerate for foraging;  400.0
 GOOSE_LEAVINGTHRESHOLD; The 5-day mean of body condition which triggers the bird to leave; 1.0
-GOOSE_PF_STARTNOS; Pink-footed geese family start numbers; 1000
-GOOSE_BN_STARTNOS; Barnacle geese family start numbers;  1000 
-GOOSE_GL_STARTNOS; Greylag geese family start numbers;  1000
-GOOSE_PF_ARRIVEDATESTART; The initial starting date for arrival for pink-foots to the simulation area; 265
-GOOSE_PF_ARRIVEDATEEND; The last date for arrival for pink-foots to the simulation area; 280
-GOOSE_BN_ARRIVEDATESTART; The initial starting date for arrival for barnacles to the simulation area; 277
-GOOSE_BN_ARRIVEDATEEND; The last date for arrival for barnacles to the simulation area; 298
-GOOSE_GL_ARRIVEDATESTART; The initial starting date for arrival for greylags to the simulation area; 212
-GOOSE_GL_ARRIVEDATEEND; The last date for arrival for greylags to the simulation area; 231
-GOOSE_PF_LEAVINGDATESTART; The initial starting date for pink-foots to leave the simulation area; 78
-GOOSE_PF_LEAVINGDATEEND; The last date for pink-foots to leave the simulation area; 104
-GOOSE_BN_LEAVINGDATESTART; The initial starting date for barnacles to leave  the simulation area; 90
-GOOSE_BN_LEAVINGDATEEND; The last date for barnacles to leave  the simulation area; 134
-GOOSE_GL_LEAVINGDATESTART; The initial starting date for greylags to leave  the simulation area; 58
-GOOSE_GL_LEAVINGDATEEND; The last date for greylags to leave  the simulation area; 68
 GOOSE_FORAGEDIST_PF; The maximum forage range in m for pink-footed geese; 20000
 GOOSE_FORAGEDIST_BN; The maximum forage range in m for barnacle geese; 10000
 GOOSE_FORAGEDIST_GL; The maximum forage range in m for greylag geese; 3000
@@ -41,6 +26,14 @@ GOOSE_FIELDFORAGEDIST_BN; The maximum forage range when already at a forage loca
 GOOSE_BMRCONSTANTA; The cost of BMR per kg goose - constant 1; 327.294
 GOOSE_BMRCONSTANTB; The cost of BMR per kg goose - constant 2; 0.72
 GOOSE_THERMALCONSTANTA_PF; Pinkfoot lower critical temperature for calculating thermal regulation cost. Constant 1; 11.4
-GOOSE_THERMALCONSTANTA_BG; Barnacle lower critical temperature for calculating thermal regulation cost. Constant 1; 12.1
-GOOSE_THERMALCONSTANTA_GL; Greylag lower critical temperature for calculating thermal regulation cost. Constant 1, 10.8
+GOOSE_THERMALCONSTANTA_BN; Barnacle lower critical temperature for calculating thermal regulation cost. Constant 1; 12.1
+GOOSE_THERMALCONSTANTA_GL; Greylag lower critical temperature for calculating thermal regulation cost. Constant 1; 10.8
 GOOSE_THERMALCONSTANTB; Thermal regulation cost Constant b; 30.528
+GOOSE_ENERGYCONTENTOFFAT; The energy content of fat; 39.8
+GOOSE_AFTERDARKTIME; The number of minutes that geese will be foraging after sunset; 30
+GOOSE_PF_YOUNG_PROPORTION; Pink-footed goose proportion of young at start; 0.40
+GOOSE_BN_YOUNG_PROPORTION; Barnacle goose proportion of young at start; 0.10
+GOOSE_GL_YOUNG_PROPORTION; Greylag goose proportion of young at start; 0.10
+GOOSE_ROOSTLEAVEDISTMEAN; The mean for the normal distribution which determines roost leave time; 30
+GOOSE_ROOSTLEAVEDISTSD; The standard deviation for the normal distribution which determines roost leave time; 10
+
