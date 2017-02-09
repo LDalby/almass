@@ -63,13 +63,11 @@ remodel = function(res, type = "minmax") {
 ## Standardized plots
 
 ```{r FittingPlot, echo=FALSE, fig.width=12}
-allres = fread("/home/lars/temp/GooseParameterFitting_2017-02-02.txt") 	
-invisible({parameters = allres[,unique(Parameter)]
- 	defaultvalues = rep(NA, length(parameters))
- 	for(i in seq_along(parameters)){
- 	  defaultvalues[i] = GetParamValue(cfg, parameters[i])
- 	}
- 	dt = data.table('Parameter' = parameters, 'Defaultvalues' = defaultvalues, key = 'Parameter')
+allres = fread("/home/lars/temp/GooseParameterFitting_2017-02-08.txt") 	
+invisible({
+  parameters = allres[,unique(Parameter)]
+ 	dt = data.table('Parameter' = allres[,unique(Parameter)], key = 'Parameter')
+ 	dt[, Defaultvalues:=sapply(Parameter, FUN = GetParamValue, config = cfg)]
  	res = remodel(allres, type = "minmax")
   setkey(res, Parameter)
  	DT = merge(res, dt)
@@ -77,10 +75,9 @@ invisible({parameters = allres[,unique(Parameter)]
   DT = DT[!FitType %in% c('PropDayInSim', 'OverallFit'),]
   minmem = copy(DT)
   DT = DT[Parameter != 'GOOSE_MEM_MINMEMVALUE',]
-    # DT[, Standardized:=Standardized-1]
   parameters = DT[,unique(Parameter)]})
 for(i in seq_along(parameters)) {
-  paramvalue = GetParamValue(cfg, parameters[i])
+  paramvalue = GetParamValue(parameters[i], config = cfg)
   p = ggplot(DT[Parameter == parameters[i], ], aes(Standardized, mean)) + 
     geom_vline(xintercept = 0.0, color = 'darkgrey') + 
     geom_line(aes(color = FitType)) + 
@@ -94,7 +91,7 @@ for(i in seq_along(parameters)) {
     theme_bw()
     print(p)
 }
-paramvalue = GetParamValue(cfg, "GOOSE_MEM_MINMEMVALUE")
+paramvalue = GetParamValue("GOOSE_MEM_MINMEMVALUE", config = cfg)
   p = ggplot(minmem[Parameter == "GOOSE_MEM_MINMEMVALUE", ], aes(Standardized, mean)) + 
     geom_vline(xintercept = 0.0, color = 'darkgrey') + 
     geom_line(aes(color = FitType)) + 
@@ -117,7 +114,7 @@ allres = fread("/home/lars/temp/GooseParameterFitting_2017-02-02.txt")
 for (i in seq_along(allres[,unique(Parameter)])) {
 	res = allres[Parameter == unique(Parameter)[i],]
  	param = res[,unique(Parameter)]
- 	paramvalue = GetParamValue(cfg, param)
+ 	paramvalue = GetParamValue(param, config = cfg)
 	res[FitType == 'PFBagOverlap', FitType:='BagOverlapPF']
 	res[FitType == 'GLBagOverlap', FitType:='BagOverlapGL']
 	res[FitType == 'PFTotalBag', FitType:='TotalBagPF']
