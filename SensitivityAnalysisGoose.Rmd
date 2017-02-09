@@ -2,7 +2,9 @@
 title: "Sensitivity analysis Goose model"
 author: "Lars Dalby"
 date: "February 8, 2017"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -25,6 +27,7 @@ cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg
 options(scipen = 99)
 invisible({
   inputparams = fread('~/git/almass/GooseInputParameters.csv')
+  inputparams[, No.:=1:.N]
   inputparams[, Value:=sapply(InputParameter, FUN = GetParamValue, config = cfg)]
 })
 kable(inputparams)
