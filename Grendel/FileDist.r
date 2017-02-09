@@ -46,21 +46,21 @@ cfg = readLines('/home/ldalby/workspace/Goose/RunDirectory/TIALMaSSConfig.cfg')
 # Distribute the paramter values to run:
 nsteps = 11  # the number of intervals to split the parameter in
 # Openness
-defaultvalue = GetParamValue(cfg, 'GOOSE_MINFORAGEOPENNESS')
+defaultvalue = GetParamValue('GOOSE_MINFORAGEOPENNESS', config = cfg)
 openval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 openval = openval[openval >= 0]
 # openval = round(seq(0, 100, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[1])
 GenerateParams('GOOSE_MINFORAGEOPENNESS' = openval, write = TRUE, path = wdpath)
 # Max appetite scaler
-defaultvalue = GetParamValue(cfg, 'GOOSE_MAXAPPETITESCALER')
+defaultvalue = GetParamValue('GOOSE_MAXAPPETITESCALER', config = cfg)
 appetiteval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 appetiteval = appetiteval[appetiteval >= 1]
 # appetiteval = seq(1, 5, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[2])
 GenerateParams('GOOSE_MAXAPPETITESCALER' = appetiteval, write = TRUE, path = wdpath)
 # Max energy reserve proportion
-defaultvalue = GetParamValue(cfg, 'GOOSE_MAXENERGYRESERVEPROPORTION')
+defaultvalue = GetParamValue('GOOSE_MAXENERGYRESERVEPROPORTION', config = cfg)
 energyval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 energyval = energyval[energyval >= 0 & energyval <= 1]
 # energyval = seq(0.15, 0.25, length.out = nsteps)
@@ -73,42 +73,42 @@ leavingval = seq(1.0, 1.2, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[4])
 GenerateParams('GOOSE_LEAVINGTHRESHOLD' = leavingval, write = TRUE, path = wdpath)
 # After dark time
-defaultvalue = GetParamValue(cfg, 'GOOSE_AFTERDARKTIME')
+defaultvalue = GetParamValue('GOOSE_AFTERDARKTIME', config = cfg)
 afterdarkval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 afterdarkval = afterdarkval[afterdarkval >= 0]
 # afterdarkval = round(seq(0, 90, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[5])
 GenerateParams('GOOSE_AFTERDARKTIME' = afterdarkval, write = TRUE, path = wdpath)
 # Min forage decay rate
-defaultvalue = GetParamValue(cfg, 'GOOSE_MINFORAGEDECAYRATE')
+defaultvalue = GetParamValue('GOOSE_MINFORAGEDECAYRATE', config = cfg)
 foragedecayval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 foragedecayval = foragedecayval[foragedecayval > 0 & foragedecayval <= 1]
 # foragedecayval = seq(0.001, 1, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[6])
 GenerateParams('GOOSE_MINFORAGEDECAYRATE' = foragedecayval, write = TRUE, path = wdpath)
 # Goose feeding time
-defaultvalue = GetParamValue(cfg, 'GOOSE_FEEDINGTIME')
+defaultvalue = GetParamValue('GOOSE_FEEDINGTIME', config = cfg)
 feedingval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 feedingval = feedingval[feedingval >= 0 & feedingval <= 1]
 # feedingval = seq(0.7, 0.85, length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[7])
 GenerateParams('GOOSE_FEEDINGTIME' = feedingval, write = TRUE, path = wdpath)
 # Roost leaving likelyhood
-defaultvalue = GetParamValue(cfg, 'GOOSE_ROOSTLEAVEDISTSD')
+defaultvalue = GetParamValue('GOOSE_ROOSTLEAVEDISTSD', config = cfg)
 leavedistsdval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 leavedistsdval = leavedistsdval[leavedistsdval >= 0]
 # leavedistsdval = round(seq(0, 30, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[8])
 GenerateParams('GOOSE_ROOSTLEAVEDISTSD' = leavedistsdval, write = TRUE, path = wdpath)
 # Expected foraging time
-defaultvalue = GetParamValue(cfg, 'GOOSE_MEM_EXPECTEDFORAGINGTIME')
+defaultvalue = GetParamValue('GOOSE_MEM_EXPECTEDFORAGINGTIME', config = cfg)
 expectedval = round(seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps))
 expectedval = expectedval[expectedval >= 20]
 # expectedval = round(seq(20, 300, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[9])
 GenerateParams('GOOSE_MEM_EXPECTEDFORAGINGTIME' = expectedval, write = TRUE, path = wdpath)
 # Grain decay rate
-defaultvalue = GetParamValue(cfg, 'GOOSE_GRAINDECAYRATE')
+defaultvalue = GetParamValue('GOOSE_GRAINDECAYRATE', config = cfg)
 grainval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 grainval = grainval[grainval <= 1 & grainval >= 0]
 # grainval = seq(0.985, 1, length.out = nsteps)
@@ -116,7 +116,7 @@ wdpath = file.path(pathtodirs, dirs[10])
 GenerateParams('GOOSE_GRAINDECAYRATE' = grainval, write = TRUE, path = wdpath)
 # Memory duration
 # +-25% doesn't really make sense here.
-# defaultvalue = GetParamValue(cfg, 'GOOSE_MEM_MINMEMVALUE')
+# defaultvalue = GetParamValue('GOOSE_MEM_MINMEMVALUE', config = cfg)
 # memoryval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 # memoryval = round(memoryval[memoryval >= 0])
 memoryval = round(seq(0, 10, length.out = nsteps))
@@ -125,31 +125,31 @@ GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, path = wdpath)
 # Following likelyhood
 rangemax = 10000
 # Following likelyhood - Barnacle
-defaultvalue = GetParamValue(cfg, 'BGOOSE_FOLLOWINGLIKELYHOOD')
+defaultvalue = GetParamValue('BGOOSE_FOLLOWINGLIKELYHOOD', config = cfg)
 followingval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
-followingval = round(followingval[followingval <= rangemax])
+followingval = round(c(followingval[followingval < rangemax], rangemax))
 # followingval = round(seq(8000, 10000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[12])
 GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
                write = TRUE, path = wdpath, expand = FALSE)
 # Following likelyhood - Pinkfoot
-defaultvalue = GetParamValue(cfg, 'PFGOOSE_FOLLOWINGLIKELYHOOD')
+defaultvalue = GetParamValue('PFGOOSE_FOLLOWINGLIKELYHOOD', config = cfg)
 followingval1 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
-followingval1 = round(followingval1[followingval1 <= rangemax])
+followingval1 = round(c(followingval1[followingval1 < rangemax], rangemax))
 # followingval1 = round(seq(8000, 10000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[13])
 GenerateParams('PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
                write = TRUE, path = wdpath, expand = FALSE)
 # Following likelyhood - Greylag
-defaultvalue = GetParamValue(cfg, 'GLGOOSE_FOLLOWINGLIKELYHOOD')
+defaultvalue = GetParamValue('GLGOOSE_FOLLOWINGLIKELYHOOD', config = cfg)
 followingval2 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
-followingval2 = round(followingval2[followingval2 <= rangemax])
+followingval2 = round(c(followingval2[followingval2 < rangemax], rangemax))
 # followingval2 = round(seq(8000, 10000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[14])
 GenerateParams('GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
                write = TRUE, path = wdpath, expand = FALSE)
 # Forage distance
-defaultvalue = GetParamValue(cfg, 'GOOSE_FORAGEDIST_GL')
+defaultvalue = GetParamValue('GOOSE_FORAGEDIST_GL', config = cfg)
 foragedistval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 foragedistval = foragedistval[foragedistval >= 0]
 # foragedistval = round(seq(1000, 5000, length.out = nsteps))
