@@ -1,0 +1,33 @@
+---
+title: "Sensitivity analysis Goose model"
+author: "Lars Dalby"
+date: "February 8, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8)
+```
+
+```{r load, echo=FALSE,message=FALSE, warning=FALSE, include=FALSE}
+# 'rgl',
+packs = c('data.table', 'ralmass', 'ggplot2', 'RColorBrewer', 'knitr',  'stringr', 'viridis', 'ggthemes')
+sapply(packs, FUN = require, character.only = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+ScipenDefault = getOption('scipen')
+# Read in the config so we can print the default values onto the plots
+cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg')
+```
+
+#Input parameters
+
+```{r inputparameters, echo=FALSE}
+options(scipen = 99)
+invisible({
+  inputparams = fread('~/git/almass/GooseInputParameters.csv')
+  inputparams[, Value:=sapply(InputParameter, FUN = GetParamValue, config = cfg)]
+})
+kable(inputparams)
+options(scipen = ScipenDefault)  # Reset scipen option to default
+```
+
