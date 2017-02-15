@@ -5,7 +5,6 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-A round with +-25% of default parameter value (where possible).
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 8)
@@ -17,16 +16,19 @@ packs = c('data.table', 'ralmass', 'ggplot2', 'RColorBrewer', 'knitr',  'stringr
 sapply(packs, FUN = require, character.only = TRUE)
 pathtodirs = 'e:/almass/WorkDirectories/Goose'
 knitr::opts_chunk$set(echo = FALSE)
-# knit_hooks$set(webgl = hook_webgl)
-destdir = 'o:/ST_GooseProject/ALMaSS/GooseParameterFitting/'
-doc = file.path(destdir, 'ParameterFittingGoose.html')
-newname = paste0('ParameterFittingGoose', Sys.Date(), '.html')
-if(file.exists(doc)) {
-  file.copy(from = doc, to = file.path(destdir, newname), overwrite = TRUE)
-}
 # Read in the config so we can print the default values onto the plots
 cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg')
+resultfilename = 'GooseParameterFitting_2017-02-15.txt'
+
 ```
+
+File: `r resultfilename` 
+
+A round with +-25% of default parameter value (where possible).
+    
+* Have added range max to following likelyhood to see what if this will cause a drop in fit.
+* Have also increased the max appetite scaler a bit.
+
 
 
 ## Plots
@@ -63,7 +65,7 @@ remodel = function(res, type = "minmax") {
 ## Standardized plots
 
 ```{r FittingPlot, echo=FALSE, fig.width=12}
-allres = fread("/home/lars/temp/GooseParameterFitting_2017-02-08.txt") 	
+allres = fread(file.path("~/temp/", resultfilename)) 	
 invisible({
   parameters = allres[,unique(Parameter)]
  	dt = data.table('Parameter' = allres[,unique(Parameter)], key = 'Parameter')
