@@ -2,7 +2,7 @@ InputParameter; Description; Value
 BGOOSE_FOLLOWINGLIKELYHOOD; Goose following probability;  0
 PFGOOSE_FOLLOWINGLIKELYHOOD; Goose following probability;  0
 GLGOOSE_FOLLOWINGLIKELYHOOD; Goose following probability;  0
-GOOSE_MAXAPPETITESCALER; The maximum a goose is allowed to eat in a day as a scaling of DEB without flying;  6.04
+GOOSE_MAXAPPETITESCALER; The maximum a goose is allowed to eat per day as a scaling of DEB without flying;  6.04
 GOOSE_FLIGHTCOST_PF; The pinkfoot cost of flight per m;  0.00486
 GOOSE_FLIGHTCOST_BN; The barnacle cost of flight per m;  0.00651
 GOOSE_FLIGHTCOST_GL; The greylag cost of flight per m;  0.00753
@@ -25,9 +25,9 @@ GOOSE_FIELDFORAGEDIST_GL; The maximum forage range when already at a forage loca
 GOOSE_FIELDFORAGEDIST_BN; The maximum forage range when already at a forage location for barnacle geese; 5000
 GOOSE_BMRCONSTANTA; The cost of BMR per kg goose - constant 1; 327.294
 GOOSE_BMRCONSTANTB; The cost of BMR per kg goose - constant 2; 0.72
-GOOSE_THERMALCONSTANTA_PF; Pinkfoot lower critical temperature for calculating thermal regulation cost. Constant 1; 11.4
-GOOSE_THERMALCONSTANTA_BN; Barnacle lower critical temperature for calculating thermal regulation cost. Constant 1; 12.1
-GOOSE_THERMALCONSTANTA_GL; Greylag lower critical temperature for calculating thermal regulation cost. Constant 1; 10.8
+GOOSE_THERMALCONSTANTA_PF; Pinkfoot LCT for calculating thermal regulation cost. Constant 1; 11.4
+GOOSE_THERMALCONSTANTA_BN; Barnacle LCT for calculating thermal regulation cost. Constant 1; 12.1
+GOOSE_THERMALCONSTANTA_GL; Greylag LCT for calculating thermal regulation cost. Constant 1; 10.8
 GOOSE_THERMALCONSTANTB; Thermal regulation cost Constant b; 30.528
 GOOSE_ENERGYCONTENTOFFAT; The energy content of fat; 39.8
 GOOSE_AFTERDARKTIME; The number of minutes that geese will be foraging after sunset; 30
@@ -35,5 +35,5 @@ GOOSE_PF_YOUNG_PROPORTION; Pink-footed goose proportion of young at start; 0.40
 GOOSE_BN_YOUNG_PROPORTION; Barnacle goose proportion of young at start; 0.10
 GOOSE_GL_YOUNG_PROPORTION; Greylag goose proportion of young at start; 0.10
 GOOSE_ROOSTLEAVEDISTMEAN; The mean for the normal distribution which determines roost leave time; 30
-GOOSE_ROOSTLEAVEDISTSD; The standard deviation for the normal distribution which determines roost leave time; 10
+GOOSE_ROOSTLEAVEDISTSD; The std. deviation for the normal distribution which determines roost leave time; 10
 
