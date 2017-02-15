@@ -125,28 +125,28 @@ GenerateParams('GOOSE_MEM_MINMEMVALUE' = memoryval, write = TRUE, path = wdpath)
 # Following likelyhood
 rangemax = 10000
 # Following likelyhood - Barnacle
-defaultvalue = GetParamValue('BGOOSE_FOLLOWINGLIKELYHOOD', config = cfg)
+defaultvalue = GetParamValue('GOOSE_FOLLOWINGLIKELYHOOD_BN', config = cfg)
 followingval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 followingval = round(c(followingval[followingval < rangemax], rangemax))
 # followingval = round(seq(8000, 10000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[12])
-GenerateParams('BGOOSE_FOLLOWINGLIKELYHOOD' = followingval,
+GenerateParams('GOOSE_FOLLOWINGLIKELYHOOD_BN' = followingval,
                write = TRUE, path = wdpath, expand = FALSE)
 # Following likelyhood - Pinkfoot
-defaultvalue = GetParamValue('PFGOOSE_FOLLOWINGLIKELYHOOD', config = cfg)
+defaultvalue = GetParamValue('GOOSE_FOLLOWINGLIKELYHOOD_PF', config = cfg)
 followingval1 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 followingval1 = round(c(followingval1[followingval1 < rangemax], rangemax))
 # followingval1 = round(seq(8000, 10000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[13])
-GenerateParams('PFGOOSE_FOLLOWINGLIKELYHOOD' = followingval1,
+GenerateParams('GOOSE_FOLLOWINGLIKELYHOOD_PF' = followingval1,
                write = TRUE, path = wdpath, expand = FALSE)
 # Following likelyhood - Greylag
-defaultvalue = GetParamValue('GLGOOSE_FOLLOWINGLIKELYHOOD', config = cfg)
+defaultvalue = GetParamValue('GOOSE_FOLLOWINGLIKELYHOOD_GL', config = cfg)
 followingval2 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 followingval2 = round(c(followingval2[followingval2 < rangemax], rangemax))
 # followingval2 = round(seq(8000, 10000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[14])
-GenerateParams('GLGOOSE_FOLLOWINGLIKELYHOOD' = followingval2,
+GenerateParams('GOOSE_FOLLOWINGLIKELYHOOD_GL' = followingval2,
                write = TRUE, path = wdpath, expand = FALSE)
 # Forage distance
 defaultvalue = GetParamValue('GOOSE_FORAGEDIST_GL', config = cfg)
