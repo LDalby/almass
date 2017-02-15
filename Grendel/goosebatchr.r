@@ -56,7 +56,7 @@ if(!file.exists("GooseFieldForageData.txt"))
 	lines = readLines('ParameterValues.txt')
 	for (i in 1:numberofparams) {
 		param = GetParamString(config = lines[lineno[counter]+(i-1)])    # Get the parameter name
-		value = GetParamValue(lines[lineno[counter]+(i-1)], param)  # Get the value
+		value = GetParamValue(config = lines[lineno[counter]+(i-1)], param = param)  # Get the value
 		line = paste(param, value, NA, NA, sep = '\t')
 		write(line, file = file.path(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
 	}
