@@ -2,9 +2,8 @@
 title: "Sensitivity analysis Goose model"
 author: "Lars Dalby"
 date: "February 8, 2017"
-output:
-  pdf_document: default
-  html_document: default
+output: pdf_document
+classoption: landscape  
 ---
 
 ```{r setup, include=FALSE}
