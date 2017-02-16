@@ -1,0 +1,13 @@
+#!/bin/csh
+#SBATCH --job-name=ALMaSSjob_std
+#SBATCH --partition=q28
+#SBATCH --ntasks=1
+#SBATCH --mem=50G
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=2
+#SBATCH --time=04:00:00
+
+echo "========= Job started at `date` =========="
+sh /home/ldalby/workspace/Goose/StandardRun/StartStandardRun.sh
+echo "========= Job finished at `date` =========="
+#
