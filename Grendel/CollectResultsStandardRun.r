@@ -16,9 +16,9 @@ args = commandArgs(trailingOnly=TRUE)
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
 filenames = c('GooseFieldForageData.txt', 'GoosePopulationData.txt', 'GooseWeightStats.txt')
-destdir = '/home/ldalby/workspace/Goose/StandardRun/'  # Files are copied here
+destdir = '/home/ldalby/workspace/Goose/StandardRun/Output/'  # Files are copied here
 
-npar = 1  # Specifies the number of run directories that was being used
+npar = 2  # Specifies the number of run directories that was being used
 basename = 'WD'  # The prefix to the directories
 
 # Copy all the files
@@ -26,6 +26,7 @@ for (i in 1:npar)
 {
 	wd = paste0(basename,i)
 	pathtofiles = file.path(pathtodirs, wd)
+	dir.create(file.path(destdir,wd))
 	filenames = file.path(pathtofiles, filenames)
-	sapply(filenames, FUN = file.copy, to = destdir)
+	sapply(filenames, FUN = file.copy, to = file.path(destdir, wd))
 }
