@@ -125,6 +125,31 @@ defaultvalue = GetParamValue('GOOSE_THERMALCONSTANTA_GL', config = cfg)
 thermalconstantaglval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[16])
 GenerateParams('GOOSE_THERMALCONSTANTA_GL' = thermalconstantaglval, write = TRUE, path = wdpath)
+# Energycontent of fat
+defaultvalue = GetParamValue('GOOSE_ENERGYCONTENTOFFAT', config = cfg)
+energycontentoffatval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[17])
+GenerateParams('GOOSE_ENERGYCONTENTOFFAT' = energycontentoffatval, write = TRUE, path = wdpath)
+# Young proportion - pinkfoot
+defaultvalue = GetParamValue('GOOSE_PF_YOUNG_PROPORTION', config = cfg)
+youngproportionpfval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[18])
+GenerateParams('GOOSE_PF_YOUNG_PROPORTION' = youngproportionpfval, write = TRUE, path = wdpath)
+# Young proportion - barnacle
+defaultvalue = GetParamValue('GOOSE_BN_YOUNG_PROPORTION', config = cfg)
+youngproportionbnval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[19])
+GenerateParams('GOOSE_BN_YOUNG_PROPORTION' = youngproportionbnval, write = TRUE, path = wdpath)
+# Young proportion - greylag
+defaultvalue = GetParamValue('GOOSE_GL_YOUNG_PROPORTION', config = cfg)
+youngproportionbnval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[20])
+GenerateParams('GOOSE_GL_YOUNG_PROPORTION' = youngproportionbnval, write = TRUE, path = wdpath)
+# Roost leave dist mean
+defaultvalue = GetParamValue('GOOSE_ROOSTLEAVEDISTMEAN', config = cfg)
+roostdistleavemeanval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[21])
+GenerateParams('GOOSE_ROOSTLEAVEDISTMEAN' = roostdistleavemeanval, write = TRUE, path = wdpath)
 
 
 # Edit the bat, ini and cfg files to match the parameters set above:
