@@ -50,7 +50,7 @@ defaultvalue = GetParamValue('GOOSE_FLIGHTCOST_PF', config = cfg)
 flightpfval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[1])
 GenerateParams('GOOSE_FLIGHTCOST_PF' = flightpfval, write = TRUE, path = wdpath)
-# Flight cost - barnnacle
+# Flight cost - barnacle
 defaultvalue = GetParamValue('GOOSE_FLIGHTCOST_BN', config = cfg)
 flightbnval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[2])
@@ -60,6 +60,46 @@ defaultvalue = GetParamValue('GOOSE_FLIGHTCOST_GL', config = cfg)
 flightglval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[3])
 GenerateParams('GOOSE_FLIGHTCOST_GL' = flightglval, write = TRUE, path = wdpath)
+# Weight - pinkfoot
+defaultvalue = GetParamValue('GOOSE_PINKFOOTWEIGHT', config = cfg)
+weightpfval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[4])
+GenerateParams('GOOSE_PINKFOOTWEIGHT' = weightpfval, write = TRUE, path = wdpath)
+# Weight - barnacle
+defaultvalue = GetParamValue('GOOSE_BARNACLEWEIGHT', config = cfg)
+weightbnval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[5])
+GenerateParams('GOOSE_BARNACLEWEIGHT' = weightbnval, write = TRUE, path = wdpath)
+# Weight - greylag
+defaultvalue = GetParamValue('GOOSE_GREYLAGWEIGHT', config = cfg)
+weightglval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[6])
+GenerateParams('GOOSE_GREYLAGWEIGHT' = weightglval, write = TRUE, path = wdpath)
+# Metabolic conversion
+defaultvalue = GetParamValue('GOOSE_METABOLICCONVCOSTS', config = cfg)
+metabolicval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[7])
+GenerateParams('GOOSE_METABOLICCONVCOSTS' = metabolicval, write = TRUE, path = wdpath)
+# Timed counts
+defaultvalue = GetParamValue('GOOSE_TIMEDCOUNTS', config = cfg)
+timedcountsval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[8])
+GenerateParams('GOOSE_TIMEDCOUNTS' = timedcountsval, write = TRUE, path = wdpath)
+# Field forage distance - pinkfoot
+defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_PF', config = cfg)
+fieldforagepfval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[9])
+GenerateParams('GOOSE_FIELDFORAGEDIST_PF' = fieldforagepfval, write = TRUE, path = wdpath)
+# Field forage distance - barnacle
+defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_BN', config = cfg)
+fieldforagebnval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[10])
+GenerateParams('GOOSE_FIELDFORAGEDIST_BN' = fieldforagebnval, write = TRUE, path = wdpath)
+# Field forage distance - greylag
+defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_GL', config = cfg)
+fieldforageglval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[11])
+GenerateParams('GOOSE_FIELDFORAGEDIST_GL' = fieldforageglval, write = TRUE, path = wdpath)
 
 
 # Edit the bat, ini and cfg files to match the parameters set above:
