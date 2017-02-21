@@ -13,5 +13,5 @@ done
 wait
 
 cd /home/ldalby/workspace/Goose/SensitivityAnalysis
-chmod +x CollectResults.r
-/home/com/R/3.1.2/bin/Rscript CollectResults.r $SLURM_JOB_ID
+chmod +x CollectResultsSensitivityAnalysis.r
+/home/com/R/3.1.2/bin/Rscript CollectResultsSensitivityAnalysis.r $SLURM_JOB_ID
