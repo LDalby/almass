@@ -1,5 +1,5 @@
 #!/bin/csh
-#SBATCH --job-name=ALMaSSjob
+#SBATCH --job-name=ALMaSSjob_paramfit
 #SBATCH --partition=q28
 #SBATCH --ntasks=1
 #SBATCH --mem=150G
