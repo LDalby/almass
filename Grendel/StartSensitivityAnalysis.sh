@@ -1,9 +1,9 @@
 #!/bin/bash
-cd /home/ldalby/workspace/Goose/ParamFitting
-chmod +x FileDist.r
-/home/com/R/3.1.2/bin/Rscript FileDist.r $SLURM_JOB_ID
+cd /home/ldalby/workspace/Goose/SensitivityAnalysis
+chmod +x FileDistSensitivityAnalysis.r
+/home/com/R/3.1.2/bin/Rscript FileDistSensitivityAnalysis.r $SLURM_JOB_ID
 
-for i in {1..15}; do
+for i in {1..22}; do
 	cd /scratch/$SLURM_JOB_ID/WD"$i"
 	chmod +x _01_BatchLoop.sh
 	./_01_BatchLoop.sh > out &
@@ -12,6 +12,6 @@ done
 
 wait
 
-cd /home/ldalby/workspace/Goose/ParamFitting
+cd /home/ldalby/workspace/Goose/SensitivityAnalysis
 chmod +x CollectResults.r
 /home/com/R/3.1.2/bin/Rscript CollectResults.r $SLURM_JOB_ID
