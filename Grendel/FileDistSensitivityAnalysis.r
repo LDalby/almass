@@ -100,6 +100,31 @@ defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_GL', config = cfg)
 fieldforageglval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[11])
 GenerateParams('GOOSE_FIELDFORAGEDIST_GL' = fieldforageglval, write = TRUE, path = wdpath)
+# BMR constant A
+defaultvalue = GetParamValue('GOOSE_BMRCONSTANTA', config = cfg)
+bmrconstantaval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[12])
+GenerateParams('GOOSE_BMRCONSTANTA' = bmrconstantaval, write = TRUE, path = wdpath)
+# BMR constant B
+defaultvalue = GetParamValue('GOOSE_BMRCONSTANTB', config = cfg)
+bmrconstantbval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[13])
+GenerateParams('GOOSE_BMRCONSTANTB' = bmrconstantbval, write = TRUE, path = wdpath)
+# Thermal constant A - pinkfoot
+defaultvalue = GetParamValue('GOOSE_THERMALCONSTANTA_PF', config = cfg)
+thermalconstantapfval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[14])
+GenerateParams('GOOSE_THERMALCONSTANTA_PF' = thermalconstantapfval, write = TRUE, path = wdpath)
+# Thermal constant A - barnacle
+defaultvalue = GetParamValue('GOOSE_THERMALCONSTANTA_BN', config = cfg)
+thermalconstantabnval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[15])
+GenerateParams('GOOSE_THERMALCONSTANTA_BN' = thermalconstantabnval, write = TRUE, path = wdpath)
+# Thermal constant A - greylag
+defaultvalue = GetParamValue('GOOSE_THERMALCONSTANTA_GL', config = cfg)
+thermalconstantaglval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[16])
+GenerateParams('GOOSE_THERMALCONSTANTA_GL' = thermalconstantaglval, write = TRUE, path = wdpath)
 
 
 # Edit the bat, ini and cfg files to match the parameters set above:
