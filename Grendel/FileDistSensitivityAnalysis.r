@@ -125,6 +125,11 @@ defaultvalue = GetParamValue('GOOSE_THERMALCONSTANTA_GL', config = cfg)
 thermalconstantaglval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[16])
 GenerateParams('GOOSE_THERMALCONSTANTA_GL' = thermalconstantaglval, write = TRUE, path = wdpath)
+# Thermal constant B
+defaultvalue = GetParamValue('GOOSE_THERMALCONSTANTB', config = cfg)
+thermalconstantbval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+wdpath = file.path(pathtodirs, dirs[16])
+GenerateParams('GOOSE_THERMALCONSTANTB' = thermalconstantbval, write = TRUE, path = wdpath)
 # Energycontent of fat
 defaultvalue = GetParamValue('GOOSE_ENERGYCONTENTOFFAT', config = cfg)
 energycontentoffatval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
