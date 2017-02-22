@@ -15,7 +15,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
-filename = 'SensitivityAnalysisResults.txt'
+filename = 'ParameterFittingResults.txt'  # Due to reuse of goosebatchr.r
 npar = 22  # Specifies the number of run directories that was being used
 basename = 'WD'  # The prefix to the directories
 # Read all the files into a list
