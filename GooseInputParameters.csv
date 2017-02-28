@@ -39,4 +39,7 @@ GOOSE_ROOSTLEAVEDISTMEAN; The mean for the normal distribution which determines 
 GOOSE_ROOSTLEAVEDISTSD; The std. deviation for the normal distribution which determines roost leave time; 10
 GOOSE_DAYTIMEBMRMULTIPLIER; Multiple of BMR spent during daytime (DEB calculations); 2.2
 GOOSE_NIGHTTIMEBMRMULTIPLIER; Multiple of BMR spent during nighttime (DEB calculations); 1.3
+GOOSE_ROOSTCHANGECHANCE_PF; Chance of changing roosts for pink-footed geese; 0.0
+GOOSE_ROOSTCHANGECHANCE_BN; Chance of changing roosts for barnacle geese; 0.0
+GOOSE_ROOSTCHANGECHANCE_GL; Chance of changing roosts for greylag geese; 0.0
 
