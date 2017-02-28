@@ -3,7 +3,7 @@ cd /home/ldalby/workspace/Goose/SensitivityAnalysis
 chmod +x FileDistSensitivityAnalysis.r
 /home/com/R/3.1.2/bin/Rscript FileDistSensitivityAnalysis.r $SLURM_JOB_ID
 
-for i in {1..22}; do
+for i in {1..26}; do
 	cd /scratch/$SLURM_JOB_ID/WD"$i"
 	chmod +x _01_BatchLoop.sh
 	./_01_BatchLoop.sh > out &

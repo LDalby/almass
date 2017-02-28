@@ -20,7 +20,7 @@ basedir = '/home/ldalby/workspace/Goose/RunDirectory'
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
 # Setup the directories
-npar = 22  # Specifies the number of run directories
+npar = 26  # Specifies the number of run directories
 basename = 'WD'  # The prefix to the directories
 # Make the directories and copy the files:
 for (i in 1:npar) 
@@ -158,6 +158,30 @@ defaultvalue = GetParamValue('GOOSE_ROOSTLEAVEDISTMEAN', config = cfg)
 roostdistleavemeanval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
 wdpath = file.path(pathtodirs, dirs[22])
 GenerateParams('GOOSE_ROOSTLEAVEDISTMEAN' = roostdistleavemeanval, write = TRUE, path = wdpath)
+# Roost change chance - pinkfoot
+defaultvalue = GetParamValue('GOOSE_ROOSTCHANGECHANCE_PF', config = cfg)
+roostchangepfval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+roostchangepfval = roostchangepfval[roostchangepfval >= 0]
+wdpath = file.path(pathtodirs, dirs[22])
+GenerateParams('GOOSE_ROOSTCHANGECHANCE_PF' = roostchangepfval, write = TRUE, path = wdpath)
+# Roost change chance - barnacle
+defaultvalue = GetParamValue('GOOSE_ROOSTCHANGECHANCE_BN', config = cfg)
+roostchangebnval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+roostchangebnval = roostchangebnval[roostchangebnval >= 0]
+wdpath = file.path(pathtodirs, dirs[22])
+GenerateParams('GOOSE_ROOSTCHANGECHANCE_BN' = roostchangebnval, write = TRUE, path = wdpath)
+# Roost change chance - greylag
+defaultvalue = GetParamValue('GOOSE_ROOSTCHANGECHANCE_GL', config = cfg)
+roostchangeglval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+roostchangeglval = roostchangeglval[roostchangeglval >= 0]
+wdpath = file.path(pathtodirs, dirs[22])
+GenerateParams('GOOSE_ROOSTCHANGECHANCE_GL' = roostchangeglval, write = TRUE, path = wdpath)
+# Initial energy reserve proportion
+defaultvalue = GetParamValue('GOOSE_INITIALENERGYRESERVEPROPORTION', config = cfg)
+initialenergyval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+initialenergyval = initialenergyval[initialenergyval >= 1]
+wdpath = file.path(pathtodirs, dirs[22])
+GenerateParams('GOOSE_INITIALENERGYRESERVEPROPORTION' = initialenergyval, write = TRUE, path = wdpath)
 
 
 # Edit the bat, ini and cfg files to match the parameters set above:
