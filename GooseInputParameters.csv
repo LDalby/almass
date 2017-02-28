@@ -10,6 +10,7 @@ GOOSE_PINKFOOTWEIGHT; Mean weight of pinkfoot geese;  2307
 GOOSE_BARNACLEWEIGHT; Mean weight of barnacle geese;  1708
 GOOSE_GREYLAGWEIGHT; Mean weight of greylag geese;  2795
 GOOSE_MAXENERGYRESERVEPROPORTION; The maximum proportion by weight that can to be stored as energy reserves;  0.27
+GOOSE_INITIALENERGYRESERVEPROPORTION; The initial proportion by weight that can to be stored as energy reserves;  0.1
 GOOSE_METABOLICCONVCOSTS; The metabolic costs of converting tissue to energy or vice versa; 11.4
 GOOSE_MINFORAGEOPENNESS; The minimum openness score that a goose will tolerate for foraging;  400.0
 GOOSE_LEAVINGTHRESHOLD; The 5-day mean of body condition which triggers the bird to leave; 1.0
@@ -36,4 +37,6 @@ GOOSE_BN_YOUNG_PROPORTION; Barnacle goose proportion of young at start; 0.10
 GOOSE_GL_YOUNG_PROPORTION; Greylag goose proportion of young at start; 0.10
 GOOSE_ROOSTLEAVEDISTMEAN; The mean for the normal distribution which determines roost leave time; 30
 GOOSE_ROOSTLEAVEDISTSD; The std. deviation for the normal distribution which determines roost leave time; 10
+GOOSE_DAYTIMEBMRMULTIPLIER; Multiple of BMR spent during daytime (DEB calculations); 2.2
+GOOSE_NIGHTTIMEBMRMULTIPLIER; Multiple of BMR spent during nighttime (DEB calculations); 1.3
 
