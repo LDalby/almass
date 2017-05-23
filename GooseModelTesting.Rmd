@@ -77,54 +77,46 @@ Turn off this chunk to save time when the document complies.
 
 ## Weight development
 ```{r weight, echo=FALSE, fig.width=10, message=FALSE, warning=FALSE}
-invisible({
-  massdropcols = c("BodyCondition", "MinForageRate")
-energy = fread(file.path(resultpath, 'GooseEnergeticsData.txt'), showProgress = FALSE, drop = massdropcols)
-energy[,Day:=Day-365]
-energy[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
-# mass = copy(energy)
-# mass = mass[month(Date) %in% c(9:12,1:2)]
-# mass = mass[GooseType %in% c('PFF', 'PFNB'),]
-# api = read_excel('o:/ST_GooseProject/Field data/observations_PG_01Jan2010-18Jan2016_API.xlsx')
-# api = as.data.table(api)
-# api = api[SEXE == 'M']
-# field = CleanAPIData(api)
+weights = fread(file.path(resultpath, 'GooseWeightStats.txt'), showProgress = FALSE) %>% 
+    filter(MeanWeight != -1) %>% 
+    mutate(Day = Day-365,
+           Date = as.Date(Day, origin = as.Date('2009-01-01')),
+           SEupper = MeanWeight+StdError,
+           SElower = MeanWeight-StdError)
+
+weights %>% ggplot(aes(Date, MeanWeight)) +
+      geom_point() +
+      geom_errorbar(aes(ymin = SElower, ymax = SEupper), width = 0.5) + 
+      facet_wrap(~Species, scales = 'free_y')
+
 field = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/APIdata.txt')
-# fits = CalcWeightFit(mass, field)
-})
- # ggplot(energy[sample(nrow(energy), 0.01*nrow(energy)),][grep('NB',GooseType),], aes(Date, Weight)) + geom_point(alpha = 1/50) + geom_smooth() + facet_wrap(~GooseType, scales = 'free_y')
-
-# png(file = 'o:/ST_Lada/Projekter/GBB/Figures/Weights.png', height = 480*2, width = 480*2, res = 200)
-# p = PlotEnergetics(SimData = mass[SeasonNumber == 1,], FieldData = field, Sample = 0.25)
-# p + coord_cartesian(ylim = c(2500, 3050))
-# dev.off()
-invisible({
-weights = fread(file.path(resultpath, 'GooseWeightStats.txt'), showProgress = FALSE)
-weights = weights[MeanWeight != -1,]  
-weights[,Day:=Day-365]
-weights[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
-weights[, SEupper:=MeanWeight+StdError] 
-weights[, SElower:=MeanWeight-StdError] 
-
-})
 fits = CalcWeightFit(weights, field, measure = 'LS')
-ggplot(weights, aes(Date, MeanWeight)) + geom_point() + geom_errorbar(aes(ymin = SElower, ymax = SEupper), width = 0.5) + facet_wrap(~Species, scales = 'free_y')
-
 ```
 
 Fit(s) were `r fits`.
 
 ## Distance flown
 ```{r flightdistance, echo=FALSE, fig.height=6, fig.width=10}
-invisible({ energy[, MeanDist:=mean(FlightDistance), by = c('Day', 'GooseType') ]
-energy[, MeanDist:=MeanDist/1000]
-dist = unique(energy[, .(Date, GooseType, MeanDist, Season)]) })
-ggplot(dist, aes(Date, MeanDist)) + geom_line(aes(color = GooseType)) + ylab('Mean distance flown per day (km)') + scale_color_brewer(palette = 'Paired') + scale_x_date(date_breaks = "1 month", date_labels = "%b") + facet_wrap(~Season, scales = 'free_x')
+massdropcols = c("BodyCondition", "MinForageRate")
+energy <- fread(file.path(resultpath, 'GooseEnergeticsData.txt'), showProgress = FALSE, drop = massdropcols) %>% 
+  as.tibble() %>% 
+  mutate(Day = Day-365,
+         Date = as.Date(Day, origin = as.Date('2009-01-01'))) %>% 
+  group_by(Day, GooseType) %>% 
+  mutate(MeanDist = mean(FlightDistance)/1000)
+energy %>% select(Day, Date, GooseType, MeanDist, Season) %>% 
+  distinct(.keep_all = TRUE) %>% 
+  ggplot(aes(Date, MeanDist)) +
+    geom_line(aes(color = GooseType)) +
+    ylab('Mean distance flown per day (km)') +
+    scale_color_brewer(palette = 'Paired') +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
+    facet_wrap(~Season, scales = 'free_x')
 ```
 
 ## Full time
 ```{r fulltime, echo=FALSE, fig.height=5, fig.width=10}
-ggplot(energy, aes(Day, FullTime)) +
+energy %>% ggplot( aes(Day, FullTime)) +
   geom_hex(show.legend = TRUE) +
   scale_fill_viridis() +
   facet_grid(~GooseType)
