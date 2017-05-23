@@ -26,8 +26,6 @@ resultpath = 'c:/MSV/WorkDirectory/'
 sim = ''
 extention = '.res'
 
-# library(slackr)
-# slackrSetup(channel="#goosemodel", api_token = 'xoxp-2759174392-2762329132-3001986356-3329d2', username = 'laRs')
 ```
 
 This is a workdocument for collecting output from the **ALMaSS** Goose management model.
@@ -153,7 +151,7 @@ ggplot(energy, aes(Day, FullTime)) +
 # May 1. 2017. Code converted to dplyr version and checked with setequal. 
 forage_tb %>%
   filter(Geese > 0) %>%    
-  select(Day, Greylag, Barnacle, Pinkfoot, Season) %>%
+  select(Day, GreylagTimed, BarnacleTimed, PinkfootTimed, Season) %>%
   reshape2::melt(id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species') %>%
   filter(Numbers > 0) %>%
   group_by(Day, Species) %>%
@@ -163,14 +161,15 @@ forage_tb %>%
     facet_wrap(~Species, scales = 'free') +
     ylab('Flock numbers')
 
-forage_tb %>%
-  filter(Geese > 0) %>%    
-  select(Day, GreylagTimed, BarnacleTimed, PinkfootTimed, Season) %>%
-  reshape2::melt(id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species') %>%
-  filter(Numbers > 0) %>%
-  group_by(Day, Species) %>%
-  mutate(N = n()) %>% 
-  filter(N > 1)
+# Check for number of flocks
+# forage_tb %>%
+#   filter(Geese > 0) %>%    
+#   select(Day, GreylagTimed, BarnacleTimed, PinkfootTimed, Season) %>%
+#   reshape2::melt(id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species') %>%
+#   filter(Numbers > 0) %>%
+#   group_by(Day, Species) %>%
+#   mutate(N = n()) %>% 
+#   filter(N > 1)
 
 
 ```
