@@ -126,36 +126,16 @@ energy %>% ggplot( aes(Day, FullTime)) +
 ## Number of flocks per day
 
 ```{r flocknumbers, echo=FALSE, fig.width=10}
-#invisible({ temp = forage[Geese > 0, .(Day, Greylag, Barnacle, Pinkfoot, Season)]
-#temp = melt(temp, id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species')
-#temp = temp[Numbers != 0,]
-#temp[, N:=.N, by = c('Day', 'Species')] })
-# ggplot(temp, aes(Day, N)) + geom_line() + facet_grid(Season~Species, scales = 'free') + ylab('Flock numbers')
-#ggplot(temp, aes(Day, N)) + geom_line() + facet_wrap(~Species, scales = 'free') + ylab('Flock numbers')
-# May 1. 2017. Code converted to dplyr version and checked with setequal. 
-forage_tb %>%
-  filter(Geese > 0) %>%    
+forage %>%
   select(Day, GreylagTimed, BarnacleTimed, PinkfootTimed, Season) %>%
-  reshape2::melt(id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species') %>%
+  gather_(value_col = 'Numbers', key_col = 'Species', gather_cols = c("GreylagTimed", "BarnacleTimed", "PinkfootTimed")) %>%
   filter(Numbers > 0) %>%
   group_by(Day, Species) %>%
   mutate(N = n()) %>% 
   ggplot(aes(Day, N)) +
-    geom_line() +
-    facet_wrap(~Species, scales = 'free') +
-    ylab('Flock numbers')
-
-# Check for number of flocks
-# forage_tb %>%
-#   filter(Geese > 0) %>%    
-#   select(Day, GreylagTimed, BarnacleTimed, PinkfootTimed, Season) %>%
-#   reshape2::melt(id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species') %>%
-#   filter(Numbers > 0) %>%
-#   group_by(Day, Species) %>%
-#   mutate(N = n()) %>% 
-#   filter(N > 1)
-
-
+  geom_line() +
+  facet_wrap(~Species, scales = 'free') +
+  ylab('Flock numbers')
 ```
 
 
@@ -170,16 +150,14 @@ PlotGoosePopulation(data = popn, dates = TRUE)
 
 ## Leave reason
 ```{r leavereason, echo=FALSE, fig.height=8, fig.width=10}
-invisible({ leavereason = fread(file.path(resultpath, 'GooseLeaveReasonStats.txt'))
-leavereason = leavereason[N > 0,]
-leavereason[, Day:=Day-365]
-})
+leavereason = read_tsv(file.path(resultpath, 'GooseLeaveReasonStats.txt'), col_types = "iiicci") %>% 
+  filter(N > 0, Day = Day-365)
 if(nrow(leavereason) > 0){
-ggplot(leavereason, aes(Day, N)) + geom_line(aes(color = LeaveReason)) + facet_grid(LeaveReason~SpeciesType, scales = 'free_y')
+  ggplot(leavereason, aes(Day, N)) + 
+    geom_line(aes(color = LeaveReason)) + 
+    facet_grid(LeaveReason~SpeciesType, scales = 'free_y')
 }
-  
 ```
-
 
 ## Flock sizes
 ```{r flocks, echo=FALSE, fig.height=8, fig.width=10}
