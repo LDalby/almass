@@ -46,37 +46,29 @@ Date stamp on ALMaSS exe file: `r file.info(paste0(resultpath, 'ALMaSS_CmdLine.e
 
 ## Available forage
 ```{r forage, echo=FALSE, fig.width=14, fig.height=16, warning=FALSE}
-forage = fread(file.path(resultpath, 'GooseFieldForageData.txt'), showProgress = FALSE)
+coltypes = "iiiiiiiiiiiidddddcddicc"
+forage = read_tsv(file.path(resultpath, 'GooseFieldForageData.txt'), col_types = coltypes) %>% 
+  mutate(Day = Day-365, Date = as.Date(Day, origin = as.Date('2009-01-01'))) %>% 
+  filter(month(Date) %in% c(8:12,1:2), Geese > 0) %>% 
+  ClassifyHabitatUse(species = 'goose')
 
-if(nrow(forage[VegTypeChr == 'WinterRye' & PreviousCrop == 'WinterRye',]) > 0){
-  cat('Warning - WR following WR')
-}
-invisible({
-forage[, Day:=Day-365]
-forage[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
-forage = forage[month(Date) %in% c(8:12,1:2)]
-forage = ClassifyHabitatUse(forage, species = 'goose')
-forage_tb = tbl_df(forage)
 # First melt the numbers:
-keycols = c('Day', 'Polyref')
-numbers = melt(forage[Geese > 0,], id.vars = c(keycols, 'Grain', 'Maize'),  measure.vars = c("Barnacle", "Pinkfoot", "Greylag"), variable.name = "Species", value.name = "Number")
+numbers_tb = forage %>%
+  select(Day, Polyref, Grain, Maize, Barnacle, Pinkfoot, Greylag) %>% 
+  gather_(key_col = "Species", value_col = "Number", gather_cols = c("Barnacle", "Pinkfoot", "Greylag"))
+  
 # Then melt the grass forage
-grassforage = melt(forage[Geese > 0,], id.vars = c(keycols),  measure.vars = patterns('^Grass'),
- variable.name = "Species", value.name = "KjAvailable")
-grassforage[, Species:=str_sub(Species, start = 6)]
-# Then merge
-keycols = c(keycols, 'Species')
-setkeyv(numbers, keycols)
-setkeyv(grassforage, keycols)
-final = merge(numbers, grassforage)
-setnames(final, old = 'KjAvailable', new = 'Grass')
-final = melt(final, id.vars = c(keycols, 'Number'),  measure.vars = c('Grain', 'Maize', 'Grass'),
- variable.name = "Type", value.name = "KjAvailable")
-final = final[Number > 0,]
-final = final[KjAvailable > 0.01,]
-})
+grassforage_tb = forage %>%
+  select(Day, Polyref, GrassPinkfoot, GrassBarnacle, GrassBarnacle) %>% 
+  gather_(key_col = "Species", value_col = "KjAvailable", gather_cols = c("GrassPinkfoot", "GrassBarnacle", "GrassBarnacle")) %>% 
+  mutate(Species = str_sub(Species, start = 6))
 
-ggplot(final, aes(Day, KjAvailable)) + geom_point(alpha = 1/10, aes(size = log10(Number))) +
+# Then merge and plot
+left_join(numbers_tb, grassforage_tb, by = c('Day', 'Polyref', 'Species')) %>% 
+  rename(Grass = KjAvailable) %>% 
+  gather_(key_col = "Type", value_col = "KjAvailable", gather_cols = c('Grain', 'Maize', 'Grass')) %>% 
+  filter(Number > 0, KjAvailable > 0.01) %>% 
+  ggplot(aes(Day, KjAvailable)) + geom_point(alpha = 1/10, aes(size = log10(Number))) +
   facet_grid(Type~Species, scales = 'free_y') + theme_bw()
 ```
 Plot characters and lines all have the same grey color, so black chunks are the result of overplotting. Only fields where the geese where actually foraging on are plotted. Dots are scaled to the logarithm of the numbers present on a field.
