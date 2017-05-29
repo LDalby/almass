@@ -161,77 +161,59 @@ if(nrow(leavereason) > 0){
 
 ## Flock sizes
 ```{r flocks, echo=FALSE, fig.height=8, fig.width=10}
-invisible({ 
-  fieldobs = fread('o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv')
-flocks = fieldobs[Month %in% c(12,1) & Hour >= 11 & Hour <= 13,]
-# flocks[, .N, by = Species]  # Okay reasonable numbers
-flocks[, c('Month', 'Hour'):=NULL]
-setcolorder(flocks, c('Species', 'Numbers', 'Type'))
+# Define helper function:
+switch_names <-function(x) {
+  switch(EXPR = x,
+         "BarnacleTimed" = "Barnacle",
+         "PinkfootTimed" = "Pinkfoot",
+         "GreylagTimed" = "Greylag")
+}
+
+
+flocks <- read_csv('o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv') %>% 
+  filter(Month %in% c(12,1) & Hour >= 11 & Hour <= 13) %>% 
+  select(-Month, -Hour)
 
 # Simulated data - max number on day
-simflocks = forage[Geese > 0 ,.(Day, Barnacle, Pinkfoot, Greylag)]
-simflocks[,ObsDato:=as.Date(Day, origin = '2014-01-01')]
-simflocks[, Day:=NULL]
-melted = data.table::melt(simflocks, id.vars = 'ObsDato', variable.name = 'Species', value.name = 'Numbers')
-melted = melted[Numbers != 0,]
-melted[ ,ObsDato:=NULL]
-melted[, Type:='Simulated']
-dists = rbind(melted, flocks)
-dists[, Numbers:=log10(Numbers)]
-dists[, Count:='DailyMax']
+dists <- forage %>% 
+  select(Day, Barnacle, Pinkfoot, Greylag) %>% 
+  mutate(ObsDato = as.Date(Day, origin = '2014-01-01')) %>% 
+  filter(month(ObsDato) %in% c(12,1)) %>% 
+  select(-Day) %>% 
+  gather_(key_col = 'Species', value_col = 'Numbers', gather_cols = c("Barnacle", "Pinkfoot", "Greylag")) %>% 
+  filter(Numbers != 0) %>% 
+  select(-ObsDato) %>% 
+  mutate(Type = "Simulated") %>% 
+  bind_rows(flocks) %>% 
+  mutate(Numbers = log10(Numbers), Count = "DailyMax")
 
 DegreeOverlapB = round(CalcOverlap(dists, species = 'Barnacle', metric = 'Numbers'), digits = 2)
 DegreeOverlapP = round(CalcOverlap(dists, species = 'Pinkfoot', metric = 'Numbers'), digits = 2)
 DegreeOverlapG = round(CalcOverlap(dists, species = 'Greylag', metric = 'Numbers'), digits = 2)
 
 # Timed counts:
-
-simflocks = forage[Geese > 0,.(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
-simflocks[, ObsDato:=as.Date(Day, origin = '2014-01-01')]
-simflocks = simflocks[month(ObsDato) %in% c(12,1),]
-simflocks[, Day:=NULL]
-melted = data.table::melt(simflocks, id.vars = 'ObsDato', variable.name = 'Species', value.name = 'Numbers')
-melted = melted[Numbers != 0,]
-melted[, ObsDato:=NULL]
-melted[, Type:='Simulated']
-dists1 = rbind(melted, flocks)
-dists1[, Numbers:=log10(Numbers)]
-dists1[, Count:='Timed']
-# Quick fix for multiple names for one type
-index = match(c("BarnacleTimed", "PinkfootTimed", "GreylagTimed"), levels(dists1$Species))
-levels(dists1$Species)[index] = c('Barnacle', 'Pinkfoot', 'Greylag')
+dists1 <- forage %>% 
+  select(Day, BarnacleTimed, PinkfootTimed, GreylagTimed) %>% 
+  mutate(ObsDato = as.Date(Day, origin = '2014-01-01')) %>% 
+  filter(month(ObsDato) %in% c(12,1)) %>% 
+  select(-Day) %>% 
+  gather_(key_col = 'Species', value_col = 'Numbers', gather_cols = c("BarnacleTimed", "PinkfootTimed", "GreylagTimed")) %>% 
+  filter(Numbers != 0) %>% 
+  select(-ObsDato) %>% 
+  mutate(Type = "Simulated") %>% 
+  mutate(Species = map_chr(Species, .f = switch_names)) %>% 
+  bind_rows(flocks) %>% 
+  mutate(Numbers = log10(Numbers), Count = "Timed")
 
 DegreeOverlapBT = round(CalcOverlap(dists1, species = 'Barnacle', metric = 'Numbers'), digits = 2)
 DegreeOverlapPT = round(CalcOverlap(dists1, species = 'Pinkfoot', metric = 'Numbers'), digits = 2)
 DegreeOverlapGT = round(CalcOverlap(dists1, species = 'Greylag', metric = 'Numbers'), digits = 2)
 
-TheDists = rbind(dists, dists1) })
-ggplot(TheDists, aes(x = Numbers, fill = Type)) +
+bind_rows(dists, dists1) %>% 
+  ggplot(aes(x = Numbers, fill = Type)) +
   geom_density(alpha = 0.5, colour = NA) +
   facet_grid(Count ~ Species, scales = 'free_x') +
   theme_bw()
-
-# png(file = 'o:/ST_Lada/Projekter/GBB/Figures/FlockSizes.png', height = 480*2.5, width = 480*4, res = 400)
-# ggplot(TheDists[Count == 'Timed',], aes(x = Numbers, fill = Type)) +
-#   geom_density(alpha = 0.5, colour = NA) +
-#   facet_wrap(~Species, scales = 'free_x') + 
-#   xlab('Flock size (log10)') + 
-#   theme_bw()
-# dev.off()
-
-# Dk version:
-# TheDists[, Species:=as.factor(Species)]
-# levels(TheDists$Species) = c('Bramgås', 'Grågås', 'Kortnæbbet')
-# TheDists[, Type:=as.factor(Type)]
-# levels(TheDists$Type) = c('Feltobs', 'Simuleret')
-# ggplot(TheDists[Count == "Timed",],aes(x = Numbers, fill = Type)) +
-#   geom_density(alpha = 0.5, colour = NA) + 
-#   facet_wrap(~Species) +
-#   theme_bw() +
-#   xlab('Flokstørrelse') +
-#   ylab('Densitet')
-
-
 ```
 
 The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlapP`, & Greylag `r DegreeOverlapG`. For the timed counts the degree of overlap is: Barnacle `r DegreeOverlapBT`, Pinkfoot `r DegreeOverlapPT`, & Greylag `r DegreeOverlapGT`.
