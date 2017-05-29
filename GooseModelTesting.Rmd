@@ -239,24 +239,40 @@ The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlap
 # }
 # convertedobs = rbindlist(TheList)
 # write.table(convertedobs, file = paste0('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost', Sys.Date(), '.txt'), row.names = FALSE, quote = FALSE)
-invisible({
-poly = fread(paste0(resultpath, 'Vejlerne2015_polyrefs_RenumFBHBOp.txt'), skip = 1, verbose = FALSE)
-fieldobs = fread('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt')
-roost = fread(paste0(resultpath,'GooseRoosts.txt'), skip = 1)
+col_types <- "iidiiiiii"
+poly <- read_tsv(paste0(resultpath, 'Vejlerne2015_polyrefs_RenumFBHBOp.txt'), skip = 1, col_types = col_types)
+col_types_field <- "iddddiic"
+fieldobs <- read_delim('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt', delim = ' ', col_types = col_types_field)
+roost = read_tsv(paste0(resultpath,'GooseRoosts.txt'), skip = 1, col_names = FALSE, col_types = "iii")
 
-DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage, polyref = poly, species = c('Pinkfoot', 'Barnacle', 'Greylag'), fieldobs = FALSE)
-DistToNearestRoostSim[, Type:='Simulated']
-DistToNearestRoostField = CalcDistToRoosts(roost = roost, fields = fieldobs, polyref = poly, species = c('Pinkfoot', 'Barnacle', 'Greylag'), fieldobs = TRUE)
-DistToNearestRoostField[, Type:='Fieldobs']
-Distances = rbind(DistToNearestRoostSim[,.(Shortest, Species, Type)], DistToNearestRoostField[,.(Shortest, Species, Type)])
+DistToNearestRoostSim <- CalcDistToRoosts(roost = roost,
+                                          fields = forage,
+                                          polyref = poly,
+                                          species = c('Pinkfoot', 'Barnacle', 'Greylag'),
+                                          fieldobs = FALSE) %>% 
+                          mutate(Type = "Simulated") %>% 
+                          select(Shortest, Species, Type)
 
-RoostDistFitGL = CalcOverlap(Distances, species = 'Greylag', metric = 'Shortest')
-RoostDistFitPF = CalcOverlap(Distances, species = 'Pinkfoot', metric = 'Shortest')
-RoostDistFitBN = CalcOverlap(Distances, species = 'Barnacle', metric = 'Shortest')
-})
+DistToNearestRoostField <- CalcDistToRoosts(roost = roost,
+                                            fields = fieldobs,
+                                            polyref = poly,
+                                            species = c('Pinkfoot', 'Barnacle', 'Greylag'),
+                                            fieldobs = TRUE) %>% 
+                          mutate(Type = "Fieldobs") %>% 
+                          select(Shortest, Species, Type)
+
+distances <- bind_rows(DistToNearestRoostSim, DistToNearestRoostField)
+
+RoostDistFitGL <- CalcOverlap(distances, species = 'Greylag', metric = 'Shortest')
+RoostDistFitPF <- CalcOverlap(distances, species = 'Pinkfoot', metric = 'Shortest')
+RoostDistFitBN <- CalcOverlap(distances, species = 'Barnacle', metric = 'Shortest')
+
 # ggplot(Dists, aes(x=Shortest)) + geom_histogram(binwidth = 1000) + theme_bw() + facet_wrap(~Species)
 # png(file = 'o:/ST_Lada/Projekter/GBB/Figures/DistanceToRoost.png', height = 480*2.5, width = 480*4, res = 400)
-ggplot(Distances, aes(x = log10(Shortest), fill = Type)) + geom_density(alpha = 0.5, colour = NA) + facet_wrap(~Species, scales = 'free_x') + theme_bw()
+ggplot(distances, aes(x = log10(Shortest), fill = Type)) +
+  geom_density(alpha = 0.5, colour = NA) +
+  facet_wrap(~Species, scales = 'free_x') +
+  theme_bw()
 # dev.off()
 ``` 
 The degree of overlap is: Barnacle `r RoostDistFitBN`, Pinkfoot `r RoostDistFitPF`, & Greylag `r RoostDistFitGL`.
