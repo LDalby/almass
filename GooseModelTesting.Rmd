@@ -59,8 +59,8 @@ numbers_tb = forage %>%
   
 # Then melt the grass forage
 grassforage_tb = forage %>%
-  select(Day, Polyref, GrassPinkfoot, GrassBarnacle, GrassBarnacle) %>% 
-  gather_(key_col = "Species", value_col = "KjAvailable", gather_cols = c("GrassPinkfoot", "GrassBarnacle", "GrassBarnacle")) %>% 
+  select(Day, Polyref, GrassPinkfoot, GrassBarnacle, GrassGreylag) %>% 
+  gather_(key_col = "Species", value_col = "KjAvailable", gather_cols = c("GrassPinkfoot", "GrassBarnacle", "GrassGreylag")) %>% 
   mutate(Species = str_sub(Species, start = 6))
 
 # Then merge and plot
@@ -151,7 +151,8 @@ PlotGoosePopulation(data = popn, dates = TRUE)
 ## Leave reason
 ```{r leavereason, echo=FALSE, fig.height=8, fig.width=10}
 leavereason = read_tsv(file.path(resultpath, 'GooseLeaveReasonStats.txt'), col_types = "iiicci") %>% 
-  filter(N > 0, Day = Day-365)
+  filter(N > 0) %>% 
+  mutate(Day = Day-365)
 if(nrow(leavereason) > 0){
   ggplot(leavereason, aes(Day, N)) + 
     geom_line(aes(color = LeaveReason)) + 
@@ -289,6 +290,7 @@ FieldData = FieldData[HabitatUse != 'Plowed',]
 FieldData[, NMTotal:=sum(N), by=.(Month, Species)]
 FieldData[, Prop:=N/NMTotal]
 
+forage = as.data.table(forage)
 forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]
 HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'LS')
 HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'SSSE')
