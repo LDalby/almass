@@ -158,24 +158,24 @@ GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpat
 
 # Field forage distance - pinkfoot
 defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_PF', config = cfg)
-foragedistval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
-foragedistval = foragedistval[foragedistval >= 0]
+fieldforagedistval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+fieldforagedistval = fieldforagedistval[fieldforagedistval >= 0]
 wdpath = file.path(pathtodirs, dirs[16])
-GenerateParams('GOOSE_FIELDFORAGEDIST_PF' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
+GenerateParams('GOOSE_FIELDFORAGEDIST_PF' = fieldforagedistval, write = TRUE, path = wdpath, expand = FALSE)
 
 # Field forage distance - greylag
 defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_GL', config = cfg)
-foragedistval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
-foragedistval = foragedistval[foragedistval >= 0]
+fieldforagedistval1 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+fieldforagedistval1 = fieldforagedistval1[fieldforagedistval1 >= 0]
 wdpath = file.path(pathtodirs, dirs[17])
-GenerateParams('GOOSE_FIELDFORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
+GenerateParams('GOOSE_FIELDFORAGEDIST_GL' = fieldforagedistval1, write = TRUE, path = wdpath, expand = FALSE)
 
 # Field forage distance - barnacle
 defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_BN', config = cfg)
-foragedistval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
-foragedistval = foragedistval[foragedistval >= 0]
+fieldforagedistval2 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+fieldforagedistval2 = fieldforagedistval2[fieldforagedistval2 >= 0]
 wdpath = file.path(pathtodirs, dirs[18])
-GenerateParams('GOOSE_FIELDFORAGEDIST_BN' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
+GenerateParams('GOOSE_FIELDFORAGEDIST_BN' = fieldforagedistval2, write = TRUE, path = wdpath, expand = FALSE)
 
 
 # Edit the bat, ini and cfg files to match the parameters set above:
