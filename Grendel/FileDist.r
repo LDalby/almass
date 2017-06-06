@@ -18,7 +18,7 @@ basedir = '/home/ldalby/workspace/Goose/RunDirectory'
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
 # Setup the directories
-npar = 15  # Specifies the number of run directories
+npar = 18  # Specifies the number of run directories
 basename = 'WD'  # The prefix to the directories
 # Make the directories and copy the files:
 for (i in 1:npar) 
@@ -155,6 +155,27 @@ foragedistval = foragedistval[foragedistval >= 0]
 # foragedistval = round(seq(1000, 5000, length.out = nsteps))
 wdpath = file.path(pathtodirs, dirs[15])
 GenerateParams('GOOSE_FORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
+
+# Field forage distance - pinkfoot
+defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_PF', config = cfg)
+foragedistval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+foragedistval = foragedistval[foragedistval >= 0]
+wdpath = file.path(pathtodirs, dirs[16])
+GenerateParams('GOOSE_FIELDFORAGEDIST_PF' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
+
+# Field forage distance - greylag
+defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_GL', config = cfg)
+foragedistval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+foragedistval = foragedistval[foragedistval >= 0]
+wdpath = file.path(pathtodirs, dirs[17])
+GenerateParams('GOOSE_FIELDFORAGEDIST_GL' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
+
+# Field forage distance - barnacle
+defaultvalue = GetParamValue('GOOSE_FIELDFORAGEDIST_BN', config = cfg)
+foragedistval = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+foragedistval = foragedistval[foragedistval >= 0]
+wdpath = file.path(pathtodirs, dirs[18])
+GenerateParams('GOOSE_FIELDFORAGEDIST_BN' = foragedistval, write = TRUE, path = wdpath, expand = FALSE)
 
 
 # Edit the bat, ini and cfg files to match the parameters set above:
