@@ -18,7 +18,7 @@ pathtodirs = 'e:/almass/WorkDirectories/Goose'
 knitr::opts_chunk$set(echo = FALSE)
 # Read in the config so we can print the default values onto the plots
 cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg')
-resultfilename = 'GooseParameterFitting_2017-02-15.txt'
+resultfilename = 'GooseParameterFitting_2017-06-01.txt'
 
 ```
 
@@ -26,8 +26,7 @@ File: `r resultfilename`
 
 A round with +-25% of default parameter value (where possible).
     
-* Have added range max to following likelyhood to see what if this will cause a drop in fit.
-* Have also increased the max appetite scaler a bit.
+* Initial fitting after major code update. 
 
 
 
@@ -65,7 +64,9 @@ remodel = function(res, type = "minmax") {
 ## Standardized plots
 
 ```{r FittingPlot, echo=FALSE, fig.width=12}
-allres = fread(file.path("~/temp/", resultfilename)) 	
+pth <- file.path("C:/Users/lada/Google Drev/", resultfilename)
+# pth <- file.path("~/temp/", resultfilename)
+allres = fread(pth) 	
 invisible({
   parameters = allres[,unique(Parameter)]
  	dt = data.table('Parameter' = allres[,unique(Parameter)], key = 'Parameter')
@@ -111,7 +112,6 @@ paramvalue = GetParamValue("GOOSE_MEM_MINMEMVALUE", config = cfg)
 ## Fitting plots
 
 ```{r ThePlots, echo=FALSE, fig.width=12}
-allres = fread("/home/lars/temp/GooseParameterFitting_2017-02-02.txt") 	
 # pdf(file = 'c:/Users/lada/Desktop/GPtoPrint2.pdf', width = 12, height = 8)
 for (i in seq_along(allres[,unique(Parameter)])) {
 	res = allres[Parameter == unique(Parameter)[i],]

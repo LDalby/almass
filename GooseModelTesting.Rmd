@@ -42,7 +42,7 @@ Date stamp on ALMaSS exe file: `r file.info(paste0(resultpath, 'ALMaSS_CmdLine.e
 `r Sys.Date()`. Things modified:
 
 + See the config table below for the settings used for the goose model. 
-+ Testing new logic in the followinglikelyhood code.
++ Testing a grain decay setting which apparently caused a hang on Grendel
 
 ## Available forage
 ```{r forage, echo=FALSE, fig.width=14, fig.height=16, warning=FALSE}
