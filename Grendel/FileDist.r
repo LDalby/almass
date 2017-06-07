@@ -18,7 +18,7 @@ basedir = '/home/ldalby/workspace/Goose/RunDirectory'
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
 # Setup the directories
-npar = 18  # Specifies the number of run directories
+npar = 21  # Specifies the number of run directories
 basename = 'WD'  # The prefix to the directories
 # Make the directories and copy the files:
 for (i in 1:npar) 
@@ -176,6 +176,30 @@ fieldforagedistval2 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(default
 fieldforagedistval2 = fieldforagedistval2[fieldforagedistval2 >= 0]
 wdpath = file.path(pathtodirs, dirs[18])
 GenerateParams('GOOSE_FIELDFORAGEDIST_BN' = fieldforagedistval2, write = TRUE, path = wdpath, expand = FALSE)
+
+# Roost change chance - pinkfoot
+defaultvalue = GetParamValue('GOOSE_ROOSTCHANGECHANCE_PF', config = cfg)
+if(defalutvalue == 0) {defaultvalue = 0.5}
+roostchangechance = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+roostchangechance = roostchangechance[roostchangechance >= 0]
+wdpath = file.path(pathtodirs, dirs[19])
+GenerateParams('GOOSE_ROOSTCHANGECHANCE_PF' = roostchangechance, write = TRUE, path = wdpath, expand = FALSE)
+
+# Roost change chance - greylag
+defaultvalue = GetParamValue('GOOSE_ROOSTCHANGECHANCE_GL', config = cfg)
+if(defalutvalue == 0) {defaultvalue = 0.5}
+roostchangechance1 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+roostchangechance1 = roostchangechance1[roostchangechance1 >= 0]
+wdpath = file.path(pathtodirs, dirs[20])
+GenerateParams('GOOSE_ROOSTCHANGECHANCE_GL' = roostchangechance1, write = TRUE, path = wdpath, expand = FALSE)
+
+# Roost change chance - barnacle
+defaultvalue = GetParamValue('GOOSE_ROOSTCHANGECHANCE_BN', config = cfg)
+if(defalutvalue == 0) {defaultvalue = 0.5}
+roostchangechance2 = seq(defaultvalue-(defaultvalue*.25), defaultvalue+(defaultvalue*.25), length.out = nsteps)
+roostchangechance2 = roostchangechance2[roostchangechance2 >= 0]
+wdpath = file.path(pathtodirs, dirs[21])
+GenerateParams('GOOSE_ROOSTCHANGECHANCE_BN' = roostchangechance2, write = TRUE, path = wdpath, expand = FALSE)
 
 
 # Edit the bat, ini and cfg files to match the parameters set above:
