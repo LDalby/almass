@@ -14,7 +14,7 @@ assign("depthtrigger", 60, data.table:::.global)  # To prevent data.table printi
 ```{r load, echo=FALSE,message=FALSE, warning=FALSE, include=FALSE}
 # library(devtools)
 # install_github('LDalby/ralmass')
-packs = c('xtable', 'RColorBrewer', 'ralmass', 'gridExtra', 'knitr', 'lubridate', 'viridis', 'tidyverse', 'data.table', 'stringr', 'readxl', 'ggvis', "sf", "raster")
+packs = c('xtable', 'RColorBrewer', 'ralmass', 'gridExtra', 'knitr', 'lubridate', 'viridis', 'tidyverse', 'data.table', 'stringr', 'readxl', 'ggvis', "sf", "raster", "ggmap", "broom")
 sapply(packs, FUN = require, character.only = TRUE)
 runinfo = readLines('c:/MSV/WorkDirectory/BatchALMaSS.ini')
 simyears = as.numeric(runinfo[length(runinfo)-1])
@@ -42,7 +42,7 @@ Date stamp on ALMaSS exe file: `r file.info(paste0(resultpath, 'ALMaSS_CmdLine.e
 `r Sys.Date()`. Things modified:
 
 + See the config table below for the settings used for the goose model. 
-+ Testing some new values for following likelyhood.
++ Follow field and fix xy dump
 
 ## Available forage
 ```{r forage, echo=FALSE, fig.width=14, fig.height=16, warning=FALSE}
@@ -132,6 +132,8 @@ forage %>%
   filter(Numbers > 0) %>%
   group_by(Day, Species) %>%
   mutate(N = n()) %>% 
+  # filter(Day == 300 & Species == "PinkfootTimed")
+  # write_delim(path = "o:/ST_GooseProject/ALMaSS/GooseParameterFitting/flock_sizes_1.txt")
   ggplot(aes(Day, N)) +
   geom_line() +
   facet_wrap(~Species, scales = 'free') +
@@ -139,39 +141,67 @@ forage %>%
 ```
 
 ## AOR grid
-```{r, AOR_grid, echo=FALSE, fig.height=6, fig.width=10}
-# Make spatial object of xy dump file
-points <- read_tsv("C:/MSV/WorkDirectory/GooseXYDump.txt", col_types = "ii") %>% 
-  UtmToALMaSS(points, long = "X", lat = "Y", toalmass = FALSE, map = "VejlerneBigMap") %>% 
-  dplyr::select(ALong, ALat)
-  
-coordinates(points) <- ~ALong+ALat  
+```{r, AOR_grid, echo=FALSE, fig.height=6, fig.width=10, message=FALSE}
+# Define projection:
+utm32 <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+# Define AOR grid size
+grid_size = 1000
 # Define template raster
-r1 <- raster(nrows=24000/1000, 
-             ncols=36000/1000,
-             xmn=484378,
-             xmx=484378+36000,
+r1 <- raster(nrows=24000/grid_size, 
+             ncols=36000/grid_size,
+             xmn = 484378,
+             xmx = 484378+36000,
              ymn = 6335161-24000,
              ymx = 6335161,
-             crs = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+             crs = utm32)
 # Get the default value for FL  
 cfg <- readLines(paste(resultpath, 'TIALMaSSConfig.cfg', sep = ''))
 defaultval = GetParamValue(param = "GOOSE_FOLLOWINGLIKELYHOOD_PF",
                            config = cfg)
-# Tally occurences in cells and plot
-points %>% 
+# Make spatial object of xy dump file
+polygons <- read_tsv("C:/MSV/WorkDirectory/GooseXYDump.txt", col_types = "ii") %>% 
+  UtmToALMaSS(points, long = "X", lat = "Y", toalmass = FALSE, map = "VejlerneBigMap") %>% 
+  dplyr::select(ALong, ALat) %>% 
+  SpatialPoints(proj4string = CRS(utm32)) %>% 
+  # Tally occurences in cells and plot
   rasterize(y = r1, fun = "count") %>% 
-  rasterToPolygons(r2) %>% 
-  st_as_sf() %>% 
+  rasterToPolygons() %>% 
+  # st_as_sf() %>% 
+  # st_transform(crs = "+init=epsg:4326") %>% 
+  # ggplot() +
+  #   geom_sf(aes(fill = layer)) +
+  #   ylim(56.935, 57.15) +
+  #   xlim(8.73, 9.35) +
+  #   ggtitle("Grid cell occupancy - Pinkfoot",
+  #           sub = paste0("Grid size = 1000m. Followinglikelyhood ", defaultval))
+  spTransform(CRSobj = CRS("+init=epsg:4326"))
+# Get a map background
+map <- st_read(dsn="O:/ST_GooseProject/ALMaSS/GooseModelTesting", layer="vejlerne_outline") %>% 
   st_transform(crs = "+init=epsg:4326") %>% 
-  ggplot(polygons) +
-    geom_sf(aes(fill = layer)) +
-    ylim(56.935, 57.15) +
-    xlim(8.73, 9.35) +
-    ggtitle("Grid cell occupancy - Pinkfoot",
-            sub = paste0("Grid size = 1000m. Followinglikelyhood ", defaultval))
+  st_bbox() %>% 
+  as.numeric() %>% 
+  get_stamenmap(zoom = 11, maptype = "toner-lite")
+# Ugly hack to make the plot work. Will be much nicer when geom_sf is fully implemented
+tmp <- tidy(polygons)
+tmp2 <- polygons@data
+tmp2$id <- row.names(tmp2)
+tmp3 <- left_join(tmp, tmp2)
+# pdf(file = "C:/Users/lada/test.pdf")
+ggmap(map) + 
+  geom_polygon(data = tmp3, aes(long, lat, group = id, fill = layer)) + 
+  scale_fill_gradient(guide = guide_legend(title = "Count")) +
+  ggtitle("Grid cell occupancy - Pinkfeet",
+          sub = paste0("Grid size = ", grid_size, "m. Followinglikelyhood ", defaultval))
+# dev.off()
 
+  
 ```
+
+## AOR table - WIP
+```{r AOR_table, echo=FALSE, message=FALSE}
+aor_tab <- read_tsv("C:/MSV/WorkDirectory/AORPinkfeet.txt")
+```
+
 
 
 
