@@ -18,7 +18,7 @@ basedir = '/home/ldalby/workspace/Goose/RunDirectory'
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
 # Setup the directories
-npar = 21  # Specifies the number of run directories
+npar = 22  # Specifies the number of run directories
 basename = 'WD'  # The prefix to the directories
 # Make the directories and copy the files:
 for (i in 1:npar) 
@@ -201,13 +201,18 @@ roostchangechance2 = roostchangechance2[roostchangechance2 >= 0]
 wdpath = file.path(pathtodirs, dirs[21])
 GenerateParams('GOOSE_ROOSTCHANGECHANCE_BN' = roostchangechance2, write = TRUE, path = wdpath, expand = FALSE)
 
+# Lambda in the exponential decay of probability for selecting field with distance when following
+defaultvalue = GetParamValue('GOOSE_DIST_WEIGHTING_POWER', config = cfg)
+lambda = 0:10
+wdpath = file.path(pathtodirs, dirs[22])
+GenerateParams('GOOSE_DIST_WEIGHTING_POWER' = lambda, write = TRUE, path = wdpath, expand = FALSE)
 
 # Edit the bat, ini and cfg files to match the parameters set above:
 years = 5  # the number of seasons to run (goose sims run over the year boundary)
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditBat(wd)
-	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
-	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 134+years*365)
+	EditIni(WorkDir = wd, Model = 'goose', NYear = years + 1)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 134 + years*365)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = 'Vejlerne2013-2014.pre')
 }
