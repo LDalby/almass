@@ -2,7 +2,7 @@
 #SBATCH --job-name=ALMaSSjob_paramfit
 #SBATCH --partition=q28
 #SBATCH --ntasks=1
-#SBATCH --mem=210G
+#SBATCH --mem=220G
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=22
 #SBATCH --time=24:00:00
