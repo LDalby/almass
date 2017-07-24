@@ -12,11 +12,11 @@ if(!'/home/ldalby/R/packages' %in% .libPaths()) {
 library(methods)  # to avoid warning when calling lubridate
 library(data.table)
 library(ralmass)
-
+library(tidyverse)
 # Setup work directory (done automatically when distributing the files, therefore blank):
 
 # To get the line number in the parameter list we make a vector of line numbers for the
-# first of the parameters in each run:
+# first of the parameters in each run:library(tidyverse
 paramvals = fread('ParameterValues.txt')  # To figure out how many runs we have
 if(nrow(paramvals) == 0) {
 	numberofparams = 1
@@ -74,7 +74,7 @@ if(file.exists("GooseFieldForageData.txt"))
 	forage = fread('GooseFieldForageData.txt', showProgress = FALSE)
 	forage[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
 	forage = forage[data.table::month(Date) %in% c(9:12,1:3)]
-	forage = ClassifyHabitatUse(forage, species = 'goose', timed = TRUE)
+	forage = as.data.table(ClassifyHabitatUse(forage, species = 'goose', timed = TRUE))
 	# Field data:
 	# Currently 2015 data from months: 9,10,11,12,1,2 & 3. See o:\ST_GooseProject\R\ConvertObsToALMaSS.r
 	# for details on the data handling
@@ -147,12 +147,23 @@ if(file.exists("GooseFieldForageData.txt"))
 	RoostDistFitPF = NA
 	RoostDistFitBN = NA
 	for (i in seq_along(seasons)) {
-		DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage[Season == seasons[i],],
-												 polyref = poly, species = sp, fieldobs = FALSE)
-
-		RoostDistFitGL[i] = CalcForageDistFit(Sim = DistToNearestRoostSim, Obs = DistToNearestRoostField, species = 'Greylag', measure = fitmeasure)
-		RoostDistFitPF[i] = CalcForageDistFit(Sim = DistToNearestRoostSim, Obs = DistToNearestRoostField, species = 'Pinkfoot', measure = fitmeasure)
-		RoostDistFitBN[i] = CalcForageDistFit(Sim = DistToNearestRoostSim, Obs = DistToNearestRoostField, species = 'Barnacle', measure = fitmeasure)
+		DistToNearestRoostSim = CalcDistToRoosts(roost = roost,
+		                                         fields = forage[Season == seasons[i],],
+												                     polyref = poly,
+												                     species = sp,
+												                     fieldobs = FALSE)
+		RoostDistFitGL[i] = CalcForageDistFit(Sim = DistToNearestRoostSim,
+		                                      Obs = DistToNearestRoostField, 
+		                                      species = 'Greylag',
+		                                      measure = fitmeasure)
+		RoostDistFitPF[i] = CalcForageDistFit(Sim = DistToNearestRoostSim,
+		                                      Obs = DistToNearestRoostField,
+		                                      species = 'Pinkfoot',
+		                                      measure = fitmeasure)
+		RoostDistFitBN[i] = CalcForageDistFit(Sim = DistToNearestRoostSim,
+		                                      Obs = DistToNearestRoostField,
+		                                      species = 'Barnacle',
+		                                      measure = fitmeasure)
 	}
 
 # --------------------------------------------------------------------------------------------#
@@ -168,6 +179,26 @@ if(file.exists("GooseFieldForageData.txt"))
 	PropDayInSimBN = popn[,list(BNNonBreeders=sum(BNNonBreeders != 0)/bnlos), by = Season][,BNNonBreeders]
 	PropDayInSimPF = popn[,list(PFNonBreeders=sum(PFNonBreeders != 0)/pflos), by = Season][,PFNonBreeders]
 
+
+	# --------------------------------------------------------------------------------------------#
+	#                                     Get AOR occupancy                                       #
+	# --------------------------------------------------------------------------------------------#
+		aor_pf <- read_tsv("AORPinkfeet.txt", col_types = "iiiiiiiiiii") %>% 
+	  tidy_aor(species = "Pinkfoot") %>% 
+	  filter(dim == 400) %>% 
+		pull(prop_occupied)
+	
+	aor_bn <- read_tsv("AORBarnacles.txt", col_types = "iiiiiiiiiii") %>% 
+	  tidy_aor(species = "Barnacle") %>% 
+	  filter(dim == 400) %>% 
+	  pull(prop_occupied)
+	
+	aor_gl <- read_tsv("AORGreylags.txt", col_types = "iiiiiiiiiii") %>% 
+	  tidy_aor(species = "Greylag") %>% 
+	  filter(dim == 400) %>% 
+	  pull(prop_occupied)
+	
+		
 # --------------------------------------------------------------------------------------------#
 #                                   Collect and write out                                     #
 # --------------------------------------------------------------------------------------------#
@@ -185,11 +216,11 @@ if(file.exists("GooseFieldForageData.txt"))
 		FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
 			HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
 			RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
-			PropDayInSimGL[k], PropDayInSimBN[k])
+			PropDayInSimGL[k], PropDayInSimBN[k], aor_pf[k], aor_gl[k], aor_bn[k])
 		FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 			'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 			'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
-			'PropDayInSimGL', 'PropDayInSimBN')
+			'PropDayInSimGL', 'PropDayInSimBN', "PropOccupiedPF", "PropOccupiedGL", "PropOccupiedBN")
 		lines = readLines('ParameterValues.txt')
 		for (i in 1:numberofparams) {
 			param = GetParamString(config = lines[lineno[counter]+(i-1)])    # Get the parameter name
