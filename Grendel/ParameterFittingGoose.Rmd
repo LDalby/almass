@@ -106,16 +106,16 @@ paramvalue = GetParamValue("GOOSE_MEM_MINMEMVALUE", config = cfg)
 ## Fitting plots
 
 ```{r ThePlots, echo=FALSE, fig.width=12}
-allres = fread("/home/lars/temp/GooseParameterFitting_2017-02-02.txt") 	
+allres = fread(file.path("~/temp/", resultfilename)) 	
 # pdf(file = 'c:/Users/lada/Desktop/GPtoPrint2.pdf', width = 12, height = 8)
 for (i in seq_along(allres[,unique(Parameter)])) {
 	res = allres[Parameter == unique(Parameter)[i],]
  	param = res[,unique(Parameter)]
  	paramvalue = GetParamValue(param, config = cfg)
-	res[FitType == 'PFBagOverlap', FitType:='BagOverlapPF']
-	res[FitType == 'GLBagOverlap', FitType:='BagOverlapGL']
-	res[FitType == 'PFTotalBag', FitType:='TotalBagPF']
-	res[FitType == 'GLTotalBag', FitType:='TotalBagGL']
+	res[FitType == 'PFBagOverlap', FitType := 'BagOverlapPF']
+	res[FitType == 'GLBagOverlap', FitType := 'BagOverlapGL']
+	res[FitType == 'PFTotalBag', FitType := 'TotalBagPF']
+	res[FitType == 'GLTotalBag', FitType := 'TotalBagGL']
 	res = remodel(res, type = "minmax")
 
 	p = ggplot(res, aes(Value, mean)) +
@@ -123,14 +123,14 @@ for (i in seq_along(allres[,unique(Parameter)])) {
 	 geom_vline(xintercept = paramvalue, color = 'grey') +
    geom_pointrange(aes(ymin = min, ymax = max, color = FitType)) + 
 	 facet_grid(Species~Type, scales = 'free_y') + 
-	 scale_color_viridis(discrete=TRUE) +
-	 theme(legend.text=element_text(size=10)) +
+	 scale_color_viridis(discrete = TRUE) +
+	 theme(legend.text = element_text(size = 10)) +
 	 theme_bw() +
 	 ylab('Fit')
-	if(length(param) == 1) {
+	if (length(param) == 1) {
 		p = p + ggtitle(ConvertParam(param), subtitle = paste0('Default value: ', paramvalue))
 	}
-	if(length(param) > 1) {
+	if (length(param) > 1) {
 		p = p + xlab(sapply(param, FUN = ConvertParam)) + ggtitle(sapply(param, FUN = ConvertParam))
 	}
 	print(p)
