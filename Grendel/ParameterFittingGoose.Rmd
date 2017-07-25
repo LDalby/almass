@@ -32,25 +32,25 @@ The **Individual** panel is showing the individual fits (raw values) and the **O
 ```{r Remodel, echo=FALSE}
 se = function(x) sd(x, na.rm = TRUE)/sqrt(length(na.omit(x)))
 remodel = function(res, type = "minmax") {
-	res[c(grep('PF', FitType), grep('PT', FitType), grep('Pinkfoot', FitType)), Species:='Pinkfoot']
-  res[FitType == 'Weightfit', Species:='Pinkfoot']	
-	res[c(grep('BN', FitType), grep('BT', FitType), grep('Barnacle', FitType)), Species:='Barnacle']
-	res[c(grep('GL', FitType), grep('GT', FitType), grep('Greylag', FitType)), Species:='Greylag']
-	res[FitType %in% c('BarnacleFit', 'GreylagFit', 'PinkfootFit'), FitType:='OverallFit']
-	res[!FitType %in% c('Weightfit', 'OverallFit'), FitType:=str_sub(FitType, end = -3)]
-	if(type == "minmax"){
+	res[c(grep('PF', FitType), grep('PT', FitType), grep('Pinkfoot', FitType)), Species := 'Pinkfoot']
+  res[FitType == 'Weightfit', Species := 'Pinkfoot']	
+	res[c(grep('BN', FitType), grep('BT', FitType), grep('Barnacle', FitType)), Species := 'Barnacle']
+	res[c(grep('GL', FitType), grep('GT', FitType), grep('Greylag', FitType)), Species := 'Greylag']
+	res[FitType %in% c('BarnacleFit', 'GreylagFit', 'PinkfootFit'), FitType := 'OverallFit']
+	res[!FitType %in% c('Weightfit', 'OverallFit'), FitType := str_sub(FitType, end = -3)]
+	if (type == "minmax") {
 	 res[, c("mean", "min", "max") := .(mean(Fit), min(Fit), max(Fit)), by = .(Parameter, Species, Value, FitType)] 
 	}
-	if(type == "sd"){
+	if (type == "sd") {
     res[, c("mean", "min", "max") := .(mean(Fit), mean - sd(Fit), mean + sd(Fit)), by = .(Parameter, Species, Value, FitType)]	  
 	}
-	if(type == "se"){
+	if (type == "se") {
     res[, c("mean", "min", "max") := .(mean(Fit), mean - se(Fit), mean + se(Fit)), by = .(Parameter, Species, Value, FitType)]	  
 	}
 	fitres = unique(res[,.(Species, Parameter, Value, FitType, mean, min, max)])
-	fitres[, Type:='Individual']
-	fitres[FitType == 'OverallFit' , Type:='Overall']
-	fitres[grep('Prop', FitType), Type:='Timings']
+	fitres[, Type := 'Individual']
+	fitres[FitType == 'OverallFit' , Type := 'Overall']
+	fitres[grep('Prop', FitType), Type := 'Timings']
 	return(fitres)
 }
 
@@ -64,16 +64,16 @@ allres = fread(file.path("~/temp/", resultfilename))
 invisible({
   parameters = allres[,unique(Parameter)]
  	dt = data.table('Parameter' = allres[,unique(Parameter)], key = 'Parameter')
- 	dt[, Defaultvalues:=sapply(Parameter, FUN = GetParamValue, config = cfg)]
+ 	dt[, Defaultvalues := sapply(Parameter, FUN = GetParamValue, config = cfg)]
  	res = remodel(allres, type = "minmax")
   setkey(res, Parameter)
  	DT = merge(res, dt)
-  DT[, Standardized:=(Value/Defaultvalues)-1]
+  DT[, Standardized := (Value/Defaultvalues) - 1]
   DT = DT[!FitType %in% c('PropDayInSim', 'OverallFit'),]
   minmem = copy(DT)
   DT = DT[Parameter != 'GOOSE_MEM_MINMEMVALUE',]
   parameters = DT[,unique(Parameter)]})
-for(i in seq_along(parameters)) {
+for (i in seq_along(parameters)) {
   paramvalue = GetParamValue(parameters[i], config = cfg)
   p = ggplot(DT[Parameter == parameters[i], ], aes(Standardized, mean)) + 
     geom_vline(xintercept = 0.0, color = 'darkgrey') + 
