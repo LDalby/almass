@@ -207,20 +207,25 @@ if(file.exists("GooseFieldForageData.txt"))
 	# Goose-only runs:
 		PinkfootFit = Weightfit[k]^2 + HabUsePF[k]^2 + DegreeOverlapPT[k]^2 + RoostDistFitPF[k]^2 + PropDayInSimPF[k]^2
 		PinkfootFit = PinkfootFit/5
+		PinkfootWFit =  DegreeOverlapPT[k] + (HabUsePF[k] * .8) + (RoostDistFitPF[k]*.6) + (Weightfit[k] * .5)
 		GreylagFit = HabUseGL[k]^2 + DegreeOverlapGT[k]^2 + RoostDistFitGL[k]^2 + PropDayInSimGL[k]^2 
 		GreylagFit = GreylagFit/4
+		GreylagWFit =  DegreeOverlapGT[k] + (HabUseGL[k] * .8) + (RoostDistFitGL[k]*.6)
 		BarnacleFit = HabUseBN[k]^2 + DegreeOverlapBT[k]^2 + RoostDistFitBN[k]^2 + PropDayInSimBN[k]^2
 		BarnacleFit = BarnacleFit/4
+		BarnacleWFit =  DegreeOverlapBT[k] + (HabUseBN[k] * .8) + (RoostDistFitBN[k]*.6)
 
 	# Write out the results of the parameter fitting and prepare for next run:
 		FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
 			HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
 			RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
-			PropDayInSimGL[k], PropDayInSimBN[k], aor_pf[k], aor_gl[k], aor_bn[k])
+			PropDayInSimGL[k], PropDayInSimBN[k], aor_pf[k], aor_gl[k], aor_bn[k], PinkfootWFit[k], 
+			GreylagWFit[k], BarnacleWFit[k])
 		FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 			'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 			'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
-			'PropDayInSimGL', 'PropDayInSimBN', "PropOccupiedPF", "PropOccupiedGL", "PropOccupiedBN")
+			'PropDayInSimGL', 'PropDayInSimBN', "PropOccupiedPF", "PropOccupiedGL", "PropOccupiedBN",
+			"PinkfootWFit", "GreylagWFit", "BarnacleWFit")
 		lines = readLines('ParameterValues.txt')
 		for (i in 1:numberofparams) {
 			param = GetParamString(config = lines[lineno[counter]+(i-1)])    # Get the parameter name
@@ -236,18 +241,18 @@ if(file.exists("GooseFieldForageData.txt"))
 	# run might still be sitting in the run directory and we would simply analyze these 
 	# as if they were a new run 
 
-	if(file.exists("GooseEnergeticsData.txt") && !singlerun)
+	if (file.exists("GooseEnergeticsData.txt") && !singlerun)
 	{
 		file.remove("GooseEnergeticsData.txt")
 	}
 
-	if(file.exists("GooseFieldForageData.txt") && !singlerun)
+	if (file.exists("GooseFieldForageData.txt") && !singlerun)
 	{
 		file.remove("GooseFieldForageData.txt")
 	}
 }
 # Grab the result file and copy it to a safe place
-if(counter == runs){
+if (counter == runs) {
   resfilename = paste(basename(getwd()), Sys.Date(), 'ParameterFittingResults.txt', sep = '_')
   file.copy(from = file.path(resultpath, 'ParameterFittingResults.txt'),
             to = file.path(finalreslocation, resfilename))
@@ -263,8 +268,9 @@ report = paste(workstation, basename(getwd()), '- run number', counter, '\n', se
 cat(report)
 
 # Very last thing is to update the counter:
-if(!singlerun) 
+if (!singlerun) 
 {
-	counter = counter+1  
+	counter = counter + 1  
 	write(counter, file = 'counter.txt', append = FALSE)
 }
+F
