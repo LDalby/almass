@@ -36,9 +36,13 @@ find_closest <- function(x, y, sp) {
     return()
 }
 
-tmp %>% 
+p <- tmp %>% 
   mutate(dist = pmap_dbl(list(CentroidX, CentroidY, Species), .f = find_closest)) %>% 
-  group_by(Day, Species) %>% 
+  group_by(Season, Day, Species) %>% 
   dplyr::summarise(mean_dist = mean(dist)) %>% 
-  ggplot(aes(Day, mean_dist)) + geom_line() + facet_wrap(~Species, scales = "free_y")
+  ggplot(aes(as.Date(Day - (365 * Season), origin = "2015-01-01"), mean_dist/1000)) + 
+    geom_line(aes(color = factor(Season))) +
+    facet_wrap(~Species, scales = "free") +
+    ylab("Mean distance (km)") + xlab("Day")  
 
+p + scale_color_discrete(guide = guide_legend(title = "Season"))
