@@ -1,6 +1,6 @@
 # WIP. Plot temporal development of distance to roost
 library(tidyverse)
-
+library(ggthemes)
 # Read the field forage file
 col_types <- "iiiiiiiiiiicicc"
 forage <- read_tsv("~/ALMaSS/WorkDirectory/GooseFieldForageData.txt",
@@ -42,7 +42,11 @@ p <- tmp %>%
   dplyr::summarise(mean_dist = mean(dist)) %>% 
   ggplot(aes(as.Date(Day - (365 * Season), origin = "2015-01-01"), mean_dist/1000)) + 
     geom_line(aes(color = factor(Season))) +
-    facet_wrap(~Species, scales = "free") +
-    ylab("Mean distance (km)") + xlab("Day")  
+    facet_wrap(~Species, scales = "free_y") +
+    ylab("Mean distance (km)") + 
+    xlab("Date")
+    
 
-p + scale_color_discrete(guide = guide_legend(title = "Season"))
+  p <- p + scale_x_date(date_breaks = "1 month", date_labels = "%b", limits = c(as.Date("2015-09-01", "%Y-%m-%d"), as.Date("2016-03-31", "%Y-%m-%d"))) 
+  p <- p + scale_color_tableau(guide = guide_legend(title = "Season"))
+  
