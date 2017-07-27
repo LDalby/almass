@@ -17,17 +17,20 @@ poly <- read_tsv("~/ALMaSS/WorkDirectory/VejlerneOpenMay2016PolyRef.txt",
 
 tmp <- left_join(forage, poly, by = c("Polyref" = "PolyRefNum"))
 
-find_closest <- function(x, y, sp) {
-  x1 <- c(9954, 21167)
-  y1 <- c(16132, 12947)
-  if (sp == "Greylag") {
-    x1 <- c(x1, 17861, 17472)
-    y1 <- c(y1, 9394, 6117)
+find_closest <- function(x, y, species) {
+  if (species %in% c("Pinkfoot", "Barnacle")) {
+    x1 <- c(9954, 21167)
+    y1 <- c(16132, 12947)  
+  }
+  
+  if (species == "Greylag") {
+    x1 <- c(9954, 21167, 17861, 17472)
+    y1 <- c(16132, 12947, 9394, 6117)
   }
   
   X <- c(x, x1)
   Y <- c(y, y1)
-  m <- matrix(data = c(X, Y), ncol = 2) %>%
+  m <- matrix(data = c(X, Y), ncol = 2, byrow = FALSE) %>%
     dist() %>%
     as.matrix()
   
