@@ -219,8 +219,8 @@ if(file.exists("GooseFieldForageData.txt"))
 		FitVect = c(Weightfit[k], DegreeOverlapPT[k], DegreeOverlapGT[k], DegreeOverlapBT[k],
 			HabUsePF[k], HabUseGL[k], HabUseBN[k], RoostDistFitPF[k], RoostDistFitGL[k], 
 			RoostDistFitBN[k], PinkfootFit, GreylagFit, BarnacleFit, PropDayInSimPF[k],
-			PropDayInSimGL[k], PropDayInSimBN[k], aor_pf[k], aor_gl[k], aor_bn[k], PinkfootWFit[k], 
-			GreylagWFit[k], BarnacleWFit[k])
+			PropDayInSimGL[k], PropDayInSimBN[k], aor_pf[k], aor_gl[k], aor_bn[k], PinkfootWFit, 
+			GreylagWFit, BarnacleWFit)
 		FitNames = c('Weightfit', 'FlockSizeFitPT', 'FlockSizeFitGT', 'FlockSizeFitBT',
 			'HabUsePF', 'HabUseGL', 'HabUseBN', 'RoostDistFitPF', 'RoostDistFitGL', 
 			'RoostDistFitBN', 'PinkfootFit', 'GreylagFit', 'BarnacleFit', 'PropDayInSimPF',
@@ -228,8 +228,8 @@ if(file.exists("GooseFieldForageData.txt"))
 			"PinkfootWFit", "GreylagWFit", "BarnacleWFit")
 		lines = readLines('ParameterValues.txt')
 		for (i in 1:numberofparams) {
-			param = GetParamString(config = lines[lineno[counter]+(i-1)])    # Get the parameter name
-			value = GetParamValue(config = lines[lineno[counter]+(i-1)], param = param)  # Get the value
+			param = GetParamString(config = lines[lineno[counter] + (i - 1)])    # Get the parameter name
+			value = GetParamValue(config = lines[lineno[counter] + (i - 1)], param = param)  # Get the value
 			for (j in seq_along(FitNames)) {
 				line = paste(param, value, FitNames[j], FitVect[j], sep = '\t')
 				write(line, file = file.path(resultpath, 'ParameterFittingResults.txt'), append = TRUE)
