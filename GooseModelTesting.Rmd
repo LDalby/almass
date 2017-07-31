@@ -17,12 +17,19 @@ assign("depthtrigger", 60, data.table:::.global)  # To prevent data.table printi
 packs = c('xtable', 'RColorBrewer', 'ralmass', 'gridExtra', 'knitr', 'lubridate', 'viridis', 'tidyverse',
           'data.table', 'stringr', 'readxl', 'ggvis', "sf", "raster", "ggmap", "broom", "maptools")
 sapply(packs, FUN = require, character.only = TRUE)
-runinfo = readLines('c:/MSV/WorkDirectory/BatchALMaSS.ini')
+sysinfo <- Sys.info()
+if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
+  resultpath = '~/ALMaSS/WorkDirectory/'
+}
+if ("Windows" == sysinfo[match("sysname", names(sysinfo))]) {
+  resultpath = 'c:/MSV/WorkDirectory/'
+}
+runinfo = readLines(file.path(resultpath, 'BatchALMaSS.ini'))
 simyears = as.numeric(runinfo[length(runinfo) - 1])
 
 extention = ''
 
-resultpath = 'c:/MSV/WorkDirectory/'
+
 
 sim = ''
 extention = '.res'
