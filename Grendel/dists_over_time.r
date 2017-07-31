@@ -54,6 +54,14 @@ p <- tmp %>%
   p <- p + scale_x_date(date_breaks = "1 month", date_labels = "%b", limits = c(as.Date("2015-09-01", "%Y-%m-%d"), as.Date("2016-03-31", "%Y-%m-%d"))) 
   p <- p + scale_color_tableau(guide = guide_legend(title = "Season"))
   
+  # Calculate the distances on the field data:
+  col_types_field <- "iddddiic"
+  pth_to_fielddata <- "/run/user/1000/gvfs/smb-share:server=uni.au.dk,share=dfs/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt"
+  fieldobs <- read_delim(pth_to_fielddata,
+                         delim = ' ', col_types = col_types_field)
+  fieldobs %>% 
+    mutate(dist = pmap_dbl(list(ALong, ALat, Species), .f = find_closest)) 
+# Now we need to figure out the dates...
 
   col_types <- "iiiiiiiiiiiidddddcddicc"
   full_forage <- read_tsv("~/ALMaSS/WorkDirectory/GooseFieldForageData.txt", col_types = col_types) %>% 
