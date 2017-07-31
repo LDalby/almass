@@ -1,23 +1,34 @@
 # WIP. Plot temporal development of distance to roost
 library(tidyverse)
 library(ggthemes)
-library(devtools)
-
-install_github("ldalby/ralmass", ref = "devel")
-
 library(ralmass)
+library(lubridate)
+# library(devtools)
+# install_github("ldalby/ralmass", ref = "devel")
 
 # Read the field forage file
 col_types <- "iiiiiiiiiiicicc"
 col_types <- "iiiiiiiiiiiidddddcddicc"
 forage <- read_tsv("~/ALMaSS/WorkDirectory/GooseFieldForageData.txt",
                    col_types = col_types) %>% 
-  select(Season, Day, Polyref, Barnacle, Pinkfoot, Greylag) %>% 
-  gather_(value_col = "Numbers", key_col = "Species", gather_cols = c("Barnacle", "Pinkfoot", "Greylag")) %>% 
+  select(Season, Day, Polyref, Barnacle, Pinkfoot, Greylag) %>%
+  gather_(value_col = "Numbers", key_col = "Species", gather_cols = c("Barnacle", "Pinkfoot", "Greylag")) %>%
+  # select(Season, Day, Polyref, ends_with("Timed")) %>%
+  # gather_(value_col = "Numbers", key_col = "Species", gather_cols = paste0(c("Barnacle", "Pinkfoot", "Greylag"), "Timed")) %>%
   filter(Numbers > 0) %>% 
   mutate(week = week(as.Date(Day, origin = "2015-01-01"))) %>% 
   mutate(week = if_else(week < 25, week + 55, week))
   
+
+forage %>% 
+  group_by(Season, week, Species) %>%
+  summarize(flocks = n()) %>% 
+  ggplot(aes(week, flocks)) + 
+    geom_line(aes(color = factor(Season))) + 
+    facet_wrap(~Species) +
+    xlab("Julian week") +
+    ylab("Number of flocks per week") + 
+    scale_color_tableau(guide = guide_legend(title = "Season"))
 
 # Get the field centroids from the polyref file
 poly <- read_tsv("~/ALMaSS/WorkDirectory/VejlerneOpenMay2016PolyRef.txt",
