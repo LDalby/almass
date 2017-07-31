@@ -19,10 +19,12 @@ packs = c('xtable', 'RColorBrewer', 'ralmass', 'gridExtra', 'knitr', 'lubridate'
 sapply(packs, FUN = require, character.only = TRUE)
 sysinfo <- Sys.info()
 if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
-  resultpath = '~/ALMaSS/WorkDirectory/'
+  resultpath <- '~/ALMaSS/WorkDirectory/'
+  o_drive <- "/run/user/1000/gvfs/smb-share:server=uni.au.dk,share=dfs/ST_GooseProject/"
 }
 if ("Windows" == sysinfo[match("sysname", names(sysinfo))]) {
-  resultpath = 'c:/MSV/WorkDirectory/'
+  resultpath <- 'c:/MSV/WorkDirectory/'
+  o_drive <- "o:/ST_GooseProject/"
 }
 runinfo = readLines(file.path(resultpath, 'BatchALMaSS.ini'))
 simyears = as.numeric(runinfo[length(runinfo) - 1])
@@ -307,24 +309,45 @@ The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlap
 ## Distance from foraging sites to nearest roost
 ```{r distances, echo=FALSE, fig.height=6, fig.width=12, message=FALSE}
 # Data was handled here:
-# polys = read_excel('o:/ST_GooseProject/Field data/Fugledata_Obslist_20160414_clean.xlsx', sheet = 'Polygon')
-# polys = as.data.table(polys)
-# obs = read_excel('o:/ST_GooseProject/Field data/Fugledata_Obslist_20160414_clean.xlsx', sheet = 'Observation')
-# obs = as.data.table(obs)
-# obs = obs[Year == 2015 & Month %in% c(9,10,11,12,1,2,3),]
-# spIDs = c(63, 59, 67)
-# spNames = c('Pinkfoot', 'Greylag', 'Barnacle')
-# TheList = vector('list', length(spNames))
-# for (i in seq_along(spIDs)) {
-# 	observations = obs[ArtID == spIDs[i],]  # Subset to species
-# 	polygons = polys[PolyID %in% observations$PolygonID,]  # Only get those polygons where the species were observed
-# 	centroids = CalcPseudoCentroid(data = polygons, project = TRUE)  # Estimate the centroids
-# 	temp = UtmToALMaSS(data = centroids, long = 'UtmX', lat = 'UtmY', map = 'VejlerneBigMap', subset = TRUE)
-# 	temp[, Species:=spNames[i]]
-# 	TheList[[i]] = temp
-# }
-# convertedobs = rbindlist(TheList)
-# write.table(convertedobs, file = paste0('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost', Sys.Date(), '.txt'), row.names = FALSE, quote = FALSE)
+# Load function that was previous part of the ralmass package:
+source("~/git/almass/calc_pseudo_centroid.r")
+polys <- read_excel(file.path(o_drive, 'Field data/Fugledata_Obslist_20160414_clean.xlsx'), sheet = 'Polygon') %>% 
+  dplyr::select(PolyID, PolygonData) %>% 
+  CalcPseudoCentroid(project = TRUE) %>% 
+  UtmToALMaSS(long = 'UtmX', lat = 'UtmY', map = 'VejlerneBigMap', subset = TRUE) %>% 
+  dplyr::select(PolyID, X = ALong, Y = ALat)
+  
+obs <- read_excel(file.path(o_drive, 'Field data/Fugledata_Obslist_20160414_clean.xlsx'), sheet = 'Observation') %>% 
+  dplyr::filter(Year == 2015, Month %in% c(9,10,11,12,1,2,3), ArtID %in% c(63, 59, 67)) %>% 
+  dplyr::select(PolygonID, Year, Month, ArtID, Antal) %>% 
+  mutate(Species = map_chr(.x = ArtID, .f = SwapType))
+  
+
+
+SwapType = function(Type) {
+	switch(EXPR = as.character(Type),
+		'63' = 'Pinkfoot',
+		'59' = 'Barnacle',
+		'67' = 'Greylag',
+		'Undefined species')
+}
+
+spIDs = c(63, 59, 67)
+
+spNames = c('Pinkfoot', 'Greylag', 'Barnacle')
+TheList = vector('list', length(spNames))
+for (i in seq_along(spIDs)) {
+	observations = obs[ArtID == spIDs[i],]  # Subset to species
+	polygons = polys[PolyID %in% observations$PolygonID,]  # Only get those polygons where the species were observed
+	centroids = CalcPseudoCentroid(data = polygons, project = TRUE)  # Estimate the centroids
+	temp = UtmToALMaSS(data = centroids, long = 'UtmX', lat = 'UtmY', map = 'VejlerneBigMap', subset = TRUE)
+	temp[, Species := spNames[i]]
+	TheList[[i]] = temp
+}
+convertedobs = rbindlist(TheList)
+pth <- paste0('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost', Sys.Date(), '.txt')
+fwrite(convertedobs, file = pth, row.names = FALSE, quote = FALSE)
+
 col_types <- "iidiiiiii"
 poly <- read_tsv(paste0(resultpath, 'Vejlerne2015_polyrefs_RenumFBHBOp.txt'), skip = 1, col_types = col_types)
 col_types_field <- "iddddiic"
