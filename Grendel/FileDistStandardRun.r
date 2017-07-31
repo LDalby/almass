@@ -36,6 +36,6 @@ years = 10  # the number of seasons to run (goose sims run over the year boundar
 for (i in seq_along(dirs)) {
 	wd = file.path(pathtodirs, dirs[i])
 	EditIni(WorkDir = wd, Model = 'goose', NYear = years+1)
-	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 365+134+years*365)
+	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'GOOSE_MODELEXITDAY', value = 134+years*365)
 	EditConfig(file = file.path(wd, 'TIALMaSSConfig.cfg'), config = 'MAP_WEATHER_FILE', value = 'Vejlerne2013-2014.pre')
 }

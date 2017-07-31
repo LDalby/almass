@@ -18,12 +18,12 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 8)
 # 'rgl',
 packs = c('data.table', 'ralmass', 'ggplot2', 'RColorBrewer', 'knitr',  'stringr', 'viridis', 'ggthemes')
 sapply(packs, FUN = require, character.only = TRUE)
-pathtodirs = 'e:/almass/WorkDirectories/Goose'
 knitr::opts_chunk$set(echo = FALSE)
 # Read in the config so we can print the default values onto the plots
 # cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg')  #ubuntu
 cfg = readLines('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg')  #win
-resultfilename = 'GooseParameterFitting_2017-06-06.txt'
+resultfilename = 'GooseParameterFitting_2017-07-25.txt'
+
 
 ```
 
@@ -31,9 +31,8 @@ File: `r resultfilename`
 
 A round with +-25% of default parameter value (where possible).
     
+
 * Goose feeding time now 1.0 as default. Added field forage distance as param. 
-
-
 
 ## Plots
 The **Individual** panel is showing the individual fits (raw values) and the **Overall** panel is showing the average sum of the squared species specific fits. Grey vertical line is showing the default value.
@@ -41,25 +40,25 @@ The **Individual** panel is showing the individual fits (raw values) and the **O
 ```{r Remodel, echo=FALSE}
 se = function(x) sd(x, na.rm = TRUE)/sqrt(length(na.omit(x)))
 remodel = function(res, type = "minmax") {
-	res[c(grep('PF', FitType), grep('PT', FitType), grep('Pinkfoot', FitType)), Species:='Pinkfoot']
-  res[FitType == 'Weightfit', Species:='Pinkfoot']	
-	res[c(grep('BN', FitType), grep('BT', FitType), grep('Barnacle', FitType)), Species:='Barnacle']
-	res[c(grep('GL', FitType), grep('GT', FitType), grep('Greylag', FitType)), Species:='Greylag']
-	res[FitType %in% c('BarnacleFit', 'GreylagFit', 'PinkfootFit'), FitType:='OverallFit']
-	res[!FitType %in% c('Weightfit', 'OverallFit'), FitType:=str_sub(FitType, end = -3)]
-	if(type == "minmax"){
+	res[c(grep('PF', FitType), grep('PT', FitType), grep('Pinkfoot', FitType)), Species := 'Pinkfoot']
+  res[FitType == 'Weightfit', Species := 'Pinkfoot']	
+	res[c(grep('BN', FitType), grep('BT', FitType), grep('Barnacle', FitType)), Species := 'Barnacle']
+	res[c(grep('GL', FitType), grep('GT', FitType), grep('Greylag', FitType)), Species := 'Greylag']
+	res[FitType %in% c('BarnacleFit', 'GreylagFit', 'PinkfootFit'), FitType := 'OverallFit']
+	res[!FitType %in% c('Weightfit', 'OverallFit'), FitType := str_sub(FitType, end = -3)]
+	if (type == "minmax") {
 	 res[, c("mean", "min", "max") := .(mean(Fit), min(Fit), max(Fit)), by = .(Parameter, Species, Value, FitType)] 
 	}
-	if(type == "sd"){
+	if (type == "sd") {
     res[, c("mean", "min", "max") := .(mean(Fit), mean - sd(Fit), mean + sd(Fit)), by = .(Parameter, Species, Value, FitType)]	  
 	}
-	if(type == "se"){
+	if (type == "se") {
     res[, c("mean", "min", "max") := .(mean(Fit), mean - se(Fit), mean + se(Fit)), by = .(Parameter, Species, Value, FitType)]	  
 	}
 	fitres = unique(res[,.(Species, Parameter, Value, FitType, mean, min, max)])
-	fitres[, Type:='Individual']
-	fitres[FitType == 'OverallFit' , Type:='Overall']
-	fitres[grep('Prop', FitType), Type:='Timings']
+	fitres[, Type := 'Individual']
+	fitres[FitType == 'OverallFit' , Type := 'Overall']
+	fitres[grep('Prop', FitType), Type := 'Timings']
 	return(fitres)
 }
 
@@ -69,22 +68,22 @@ remodel = function(res, type = "minmax") {
 ## Standardized plots
 
 ```{r FittingPlot, echo=FALSE, fig.width=12}
-pth <- file.path("o:/ST_GooseProject/ALMaSS/GooseParameterFitting/ParamFittingResults/Grendel/", resultfilename)
-# pth <- file.path("~/temp/", resultfilename)
+pth <- file.path("~/temp/", resultfilename)
 allres = fread(pth) 	
+
 invisible({
   parameters = allres[,unique(Parameter)]
  	dt = data.table('Parameter' = allres[,unique(Parameter)], key = 'Parameter')
- 	dt[, Defaultvalues:=sapply(Parameter, FUN = GetParamValue, config = cfg)]
+ 	dt[, Defaultvalues := sapply(Parameter, FUN = GetParamValue, config = cfg)]
  	res = remodel(allres, type = "minmax")
   setkey(res, Parameter)
  	DT = merge(res, dt)
-  DT[, Standardized:=(Value/Defaultvalues)-1]
+  DT[, Standardized := (Value/Defaultvalues) - 1]
   DT = DT[!FitType %in% c('PropDayInSim', 'OverallFit'),]
   minmem = copy(DT)
   DT = DT[Parameter != 'GOOSE_MEM_MINMEMVALUE',]
   parameters = DT[,unique(Parameter)]})
-for(i in seq_along(parameters)) {
+for (i in seq_along(parameters)) {
   paramvalue = GetParamValue(parameters[i], config = cfg)
   p = ggplot(DT[Parameter == parameters[i], ], aes(Standardized, mean)) + 
     geom_vline(xintercept = 0.0, color = 'darkgrey') + 
@@ -117,15 +116,17 @@ paramvalue = GetParamValue("GOOSE_MEM_MINMEMVALUE", config = cfg)
 ## Fitting plots
 
 ```{r ThePlots, echo=FALSE, fig.width=12}
+allres = fread(file.path("~/temp/ParameterFittingGoose/", resultfilename)) 	
+
 # pdf(file = 'c:/Users/lada/Desktop/GPtoPrint2.pdf', width = 12, height = 8)
 for (i in seq_along(allres[,unique(Parameter)])) {
 	res = allres[Parameter == unique(Parameter)[i],]
  	param = res[,unique(Parameter)]
  	paramvalue = GetParamValue(param, config = cfg)
-	res[FitType == 'PFBagOverlap', FitType:='BagOverlapPF']
-	res[FitType == 'GLBagOverlap', FitType:='BagOverlapGL']
-	res[FitType == 'PFTotalBag', FitType:='TotalBagPF']
-	res[FitType == 'GLTotalBag', FitType:='TotalBagGL']
+	res[FitType == 'PFBagOverlap', FitType := 'BagOverlapPF']
+	res[FitType == 'GLBagOverlap', FitType := 'BagOverlapGL']
+	res[FitType == 'PFTotalBag', FitType := 'TotalBagPF']
+	res[FitType == 'GLTotalBag', FitType := 'TotalBagGL']
 	res = remodel(res, type = "minmax")
 
 	p = ggplot(res, aes(Value, mean)) +
@@ -133,43 +134,17 @@ for (i in seq_along(allres[,unique(Parameter)])) {
 	 geom_vline(xintercept = paramvalue, color = 'grey') +
    geom_pointrange(aes(ymin = min, ymax = max, color = FitType)) + 
 	 facet_grid(Species~Type, scales = 'free_y') + 
-	 scale_color_viridis(discrete=TRUE) +
-	 theme(legend.text=element_text(size=10)) +
+	 scale_color_viridis(discrete = TRUE) +
+	 theme(legend.text = element_text(size = 10)) +
 	 theme_bw() +
 	 ylab('Fit')
-	if(length(param) == 1) {
+	if (length(param) == 1) {
 		p = p + ggtitle(ConvertParam(param), subtitle = paste0('Default value: ', paramvalue))
 	}
-	if(length(param) > 1) {
+	if (length(param) > 1) {
 		p = p + xlab(sapply(param, FUN = ConvertParam)) + ggtitle(sapply(param, FUN = ConvertParam))
 	}
 	print(p)
 }
 # dev.off()
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

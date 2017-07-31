@@ -30,5 +30,5 @@ for (i in 1:npar)
 }
 allres = rbindlist(reslist)
 destdir = '/home/ldalby/workspace/Goose/SensitivityAnalysis/Results/'
-resfilename = paste0('SensitivityAnalysisFitting_', Sys.Date(), '.txt')
+resfilename = paste0('SensitivityAnalysis_', Sys.Date(), '.txt')
 fwrite(allres, file = file.path(destdir, resfilename))

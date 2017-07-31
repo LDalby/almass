@@ -5,18 +5,18 @@
 # write that to a safe place on Grendel.
 
 # Set the local R package library (if not done already)
-if(!'/home/ldalby/R/packages' %in% .libPaths()) {
+if (!'/home/ldalby/R/packages' %in% .libPaths()) {
 	.libPaths('/home/ldalby/R/packages')
 }
 
 library(data.table)
 # Get the slurm job-id (is being passed in from the shell script calling this R script)
-args = commandArgs(trailingOnly=TRUE)
+args = commandArgs(trailingOnly = TRUE)
 
 # The parent directory of all the work directories
 pathtodirs = file.path('/scratch', args)
 filename = 'ParameterFittingResults.txt'
-npar = 15  # Specifies the number of run directories that was being used
+npar = 22  # Specifies the number of run directories that was being used
 basename = 'WD'  # The prefix to the directories
 # Read all the files into a list
 reslist = vector('list', npar)
@@ -25,7 +25,7 @@ for (i in 1:npar)
 	wd = paste0(basename,i)
 	pathtofile = file.path(pathtodirs, wd, 'Results')
 	tmp = fread(file.path(pathtofile, filename))
-	tmp[, WD:=wd]
+	tmp[, WD := wd]
 	reslist[[i]] = tmp
 }
 allres = rbindlist(reslist)

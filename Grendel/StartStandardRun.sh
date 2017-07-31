@@ -15,3 +15,5 @@ wait
 cd /home/ldalby/workspace/Goose/StandardRun
 chmod +x CollectResultsStandardRun.r
 /home/com/R/3.1.2/bin/Rscript CollectResultsStandardRun.r $SLURM_JOB_ID
+
+wait
