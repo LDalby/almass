@@ -17,7 +17,7 @@ sapply(packs, FUN = require, character.only = TRUE)
 knitr::opts_chunk$set(echo = FALSE)
 # Read in the config so we can print the default values onto the plots
 cfg = readLines('~/git/ALMaSS_inputs/GooseManagement/Vejlerne/TIALMaSSConfig.cfg')
-resultfilename = 'GooseParameterFitting_2017-07-20.txt'
+resultfilename = 'GooseParameterFitting_2017-07-25.txt'
 
 ```
 
@@ -60,7 +60,7 @@ remodel = function(res, type = "minmax") {
 ## Standardized plots
 
 ```{r FittingPlot, echo=FALSE, fig.width=12}
-allres = fread(file.path("~/temp/", resultfilename)) 	
+allres = fread(file.path("~/temp/ParameterFittingGoose/", resultfilename)) 	
 invisible({
   parameters = allres[,unique(Parameter)]
  	dt = data.table('Parameter' = allres[,unique(Parameter)], key = 'Parameter')
@@ -106,7 +106,7 @@ paramvalue = GetParamValue("GOOSE_MEM_MINMEMVALUE", config = cfg)
 ## Fitting plots
 
 ```{r ThePlots, echo=FALSE, fig.width=12}
-allres = fread(file.path("~/temp/", resultfilename)) 	
+allres = fread(file.path("~/temp/ParameterFittingGoose/", resultfilename)) 	
 # pdf(file = 'c:/Users/lada/Desktop/GPtoPrint2.pdf', width = 12, height = 8)
 for (i in seq_along(allres[,unique(Parameter)])) {
 	res = allres[Parameter == unique(Parameter)[i],]
@@ -137,29 +137,3 @@ for (i in seq_along(allres[,unique(Parameter)])) {
 }
 # dev.off()
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
