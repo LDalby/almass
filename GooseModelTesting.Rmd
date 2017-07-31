@@ -13,21 +13,27 @@ assign("depthtrigger", 60, data.table:::.global)  # To prevent data.table printi
 
 ```{r load, echo=FALSE,message=FALSE, warning=FALSE, include=FALSE}
 # library(devtools)
-# install_github('LDalby/ralmass') 
-packs = c('xtable', 'RColorBrewer', 'ralmass', 'gridExtra', 'knitr', 'lubridate', 'viridis', 'tidyverse', 'data.table', 'stringr', 'readxl', 'ggvis')
+# install_github('LDalby/ralmass')
+packs = c('xtable', 'RColorBrewer', 'ralmass', 'gridExtra', 'knitr', 'lubridate', 'viridis', 'tidyverse',
+          'data.table', 'stringr', 'readxl', 'ggvis', "sf", "raster", "ggmap", "broom", "maptools")
 sapply(packs, FUN = require, character.only = TRUE)
-runinfo = readLines('c:/MSV/WorkDirectory/BatchALMaSS.ini')
-simyears = as.numeric(runinfo[length(runinfo)-1])
+sysinfo <- Sys.info()
+if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
+  resultpath = '~/ALMaSS/WorkDirectory/'
+}
+if ("Windows" == sysinfo[match("sysname", names(sysinfo))]) {
+  resultpath = 'c:/MSV/WorkDirectory/'
+}
+runinfo = readLines(file.path(resultpath, 'BatchALMaSS.ini'))
+simyears = as.numeric(runinfo[length(runinfo) - 1])
 
 extention = ''
 
-resultpath = 'c:/MSV/WorkDirectory/'
+
 
 sim = ''
 extention = '.res'
 
-# library(slackr)
-# slackrSetup(channel="#goosemodel", api_token = 'xoxp-2759174392-2762329132-3001986356-3329d2', username = 'laRs')
 ```
 
 This is a workdocument for collecting output from the **ALMaSS** Goose management model.
@@ -44,41 +50,35 @@ Date stamp on ALMaSS exe file: `r file.info(paste0(resultpath, 'ALMaSS_CmdLine.e
 `r Sys.Date()`. Things modified:
 
 + See the config table below for the settings used for the goose model. 
-+ Testing new logic in the followinglikelyhood code.
++ Testing different curves - see config table for settings
+
+
 
 ## Available forage
 ```{r forage, echo=FALSE, fig.width=14, fig.height=16, warning=FALSE}
-forage = fread(file.path(resultpath, 'GooseFieldForageData.txt'), showProgress = FALSE)
+coltypes = "iiiiiiiiiiiidddddcddicc"
+forage = read_tsv(file.path(resultpath, 'GooseFieldForageData.txt'), col_types = coltypes) %>% 
+  mutate(Day = Day - 365, Date = as.Date(Day, origin = as.Date('2009-01-01'))) %>% 
+  filter(month(Date) %in% c(8:12,1:2), Geese > 0) %>% 
+  ClassifyHabitatUse(species = 'goose', timed = TRUE)
 
-if(nrow(forage[VegTypeChr == 'WinterRye' & PreviousCrop == 'WinterRye',]) > 0){
-  cat('Warning - WR following WR')
-}
-invisible({
-forage[, Day:=Day-365]
-forage[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
-forage = forage[month(Date) %in% c(8:12,1:2)]
-forage = ClassifyHabitatUse(forage, species = 'goose')
-forage_tb = tbl_df(forage)
 # First melt the numbers:
-keycols = c('Day', 'Polyref')
-numbers = melt(forage[Geese > 0,], id.vars = c(keycols, 'Grain', 'Maize'),  measure.vars = c("Barnacle", "Pinkfoot", "Greylag"), variable.name = "Species", value.name = "Number")
+numbers_tb = forage %>%
+  dplyr::select(Day, Polyref, Grain, Maize, Barnacle, Pinkfoot, Greylag) %>% 
+  gather_(key_col = "Species", value_col = "Number", gather_cols = c("Barnacle", "Pinkfoot", "Greylag"))
+  
 # Then melt the grass forage
-grassforage = melt(forage[Geese > 0,], id.vars = c(keycols),  measure.vars = patterns('^Grass'),
- variable.name = "Species", value.name = "KjAvailable")
-grassforage[, Species:=str_sub(Species, start = 6)]
-# Then merge
-keycols = c(keycols, 'Species')
-setkeyv(numbers, keycols)
-setkeyv(grassforage, keycols)
-final = merge(numbers, grassforage)
-setnames(final, old = 'KjAvailable', new = 'Grass')
-final = melt(final, id.vars = c(keycols, 'Number'),  measure.vars = c('Grain', 'Maize', 'Grass'),
- variable.name = "Type", value.name = "KjAvailable")
-final = final[Number > 0,]
-final = final[KjAvailable > 0.01,]
-})
+grassforage_tb = forage %>%
+  dplyr::select(Day, Polyref, GrassPinkfoot, GrassBarnacle, GrassGreylag) %>% 
+  gather_(key_col = "Species", value_col = "KjAvailable", gather_cols = c("GrassPinkfoot", "GrassBarnacle", "GrassGreylag")) %>% 
+  mutate(Species = str_sub(Species, start = 6))
 
-ggplot(final, aes(Day, KjAvailable)) + geom_point(alpha = 1/10, aes(size = log10(Number))) +
+# Then merge and plot
+left_join(numbers_tb, grassforage_tb, by = c('Day', 'Polyref', 'Species')) %>% 
+  rename(Grass = KjAvailable) %>% 
+  gather_(key_col = "Type", value_col = "KjAvailable", gather_cols = c('Grain', 'Maize', 'Grass')) %>% 
+  filter(Number > 0, KjAvailable > 0.01) %>% 
+  ggplot(aes(Day, KjAvailable)) + geom_point(alpha = 1/10, aes(size = log10(Number))) +
   facet_grid(Type~Species, scales = 'free_y') + theme_bw()
 ```
 Plot characters and lines all have the same grey color, so black chunks are the result of overplotting. Only fields where the geese where actually foraging on are plotted. Dots are scaled to the logarithm of the numbers present on a field.
@@ -87,54 +87,46 @@ Turn off this chunk to save time when the document complies.
 
 ## Weight development
 ```{r weight, echo=FALSE, fig.width=10, message=FALSE, warning=FALSE}
-invisible({
-  massdropcols = c("BodyCondition", "MinForageRate")
-energy = fread(file.path(resultpath, 'GooseEnergeticsData.txt'), showProgress = FALSE, drop = massdropcols)
-energy[,Day:=Day-365]
-energy[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
-# mass = copy(energy)
-# mass = mass[month(Date) %in% c(9:12,1:2)]
-# mass = mass[GooseType %in% c('PFF', 'PFNB'),]
-# api = read_excel('o:/ST_GooseProject/Field data/observations_PG_01Jan2010-18Jan2016_API.xlsx')
-# api = as.data.table(api)
-# api = api[SEXE == 'M']
-# field = CleanAPIData(api)
+weights = fread(file.path(resultpath, 'GooseWeightStats.txt'), showProgress = FALSE) %>% 
+    filter(MeanWeight != -1) %>% 
+    mutate(Day = Day - 365,
+           Date = as.Date(Day, origin = as.Date('2009-01-01')),
+           SEupper = MeanWeight + StdError,
+           SElower = MeanWeight - StdError)
+
+weights %>% ggplot(aes(Date, MeanWeight)) +
+      geom_point() +
+      geom_errorbar(aes(ymin = SElower, ymax = SEupper), width = 0.5) + 
+      facet_wrap(~Species, scales = 'free_y')
+
 field = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/APIdata.txt')
-# fits = CalcWeightFit(mass, field)
-})
- # ggplot(energy[sample(nrow(energy), 0.01*nrow(energy)),][grep('NB',GooseType),], aes(Date, Weight)) + geom_point(alpha = 1/50) + geom_smooth() + facet_wrap(~GooseType, scales = 'free_y')
-
-# png(file = 'o:/ST_Lada/Projekter/GBB/Figures/Weights.png', height = 480*2, width = 480*2, res = 200)
-# p = PlotEnergetics(SimData = mass[SeasonNumber == 1,], FieldData = field, Sample = 0.25)
-# p + coord_cartesian(ylim = c(2500, 3050))
-# dev.off()
-invisible({
-weights = fread(file.path(resultpath, 'GooseWeightStats.txt'), showProgress = FALSE)
-weights = weights[MeanWeight != -1,]  
-weights[,Day:=Day-365]
-weights[, Date:=as.Date(Day, origin = as.Date('2009-01-01'))]
-weights[, SEupper:=MeanWeight+StdError] 
-weights[, SElower:=MeanWeight-StdError] 
-
-})
 fits = CalcWeightFit(weights, field, measure = 'LS')
-ggplot(weights, aes(Date, MeanWeight)) + geom_point() + geom_errorbar(aes(ymin = SElower, ymax = SEupper), width = 0.5) + facet_wrap(~Species, scales = 'free_y')
-
 ```
 
 Fit(s) were `r fits`.
 
 ## Distance flown
 ```{r flightdistance, echo=FALSE, fig.height=6, fig.width=10}
-invisible({ energy[, MeanDist:=mean(FlightDistance), by = c('Day', 'GooseType') ]
-energy[, MeanDist:=MeanDist/1000]
-dist = unique(energy[, .(Date, GooseType, MeanDist, Season)]) })
-ggplot(dist, aes(Date, MeanDist)) + geom_line(aes(color = GooseType)) + ylab('Mean distance flown per day (km)') + scale_color_brewer(palette = 'Paired') + scale_x_date(date_breaks = "1 month", date_labels = "%b") + facet_wrap(~Season, scales = 'free_x')
+massdropcols = c("BodyCondition", "MinForageRate")
+energy <- fread(file.path(resultpath, 'GooseEnergeticsData.txt'), showProgress = FALSE, drop = massdropcols) %>% 
+  as.tibble() %>% 
+  mutate(Day = Day - 365,
+         Date = as.Date(Day, origin = as.Date('2009-01-01'))) %>% 
+  group_by(Day, GooseType) %>% 
+  mutate(MeanDist = mean(FlightDistance)/1000)
+energy %>% dplyr::select(Day, Date, GooseType, MeanDist, Season) %>% 
+  distinct(.keep_all = TRUE) %>% 
+  ggplot(aes(Date, MeanDist)) +
+    geom_line(aes(color = GooseType)) +
+    ylab('Mean distance flown per day (km)') +
+    scale_color_brewer(palette = 'Paired') +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
+    facet_wrap(~Season, scales = 'free_x')
 ```
 
 ## Full time
 ```{r fulltime, echo=FALSE, fig.height=5, fig.width=10}
-ggplot(energy, aes(Day, FullTime)) +
+energy %>% ggplot( aes(Day, FullTime)) +
   geom_hex(show.legend = TRUE) +
   scale_fill_viridis() +
   facet_grid(~GooseType)
@@ -144,42 +136,97 @@ ggplot(energy, aes(Day, FullTime)) +
 ## Number of flocks per day
 
 ```{r flocknumbers, echo=FALSE, fig.width=10}
-#invisible({ temp = forage[Geese > 0, .(Day, Greylag, Barnacle, Pinkfoot, Season)]
-#temp = melt(temp, id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species')
-#temp = temp[Numbers != 0,]
-#temp[, N:=.N, by = c('Day', 'Species')] })
-# ggplot(temp, aes(Day, N)) + geom_line() + facet_grid(Season~Species, scales = 'free') + ylab('Flock numbers')
-#ggplot(temp, aes(Day, N)) + geom_line() + facet_wrap(~Species, scales = 'free') + ylab('Flock numbers')
-# May 1. 2017. Code converted to dplyr version and checked with setequal. 
-forage_tb %>%
-  filter(Geese > 0) %>%    
-  select(Day, Greylag, Barnacle, Pinkfoot, Season) %>%
-  reshape2::melt(id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species') %>%
+forage %>%
+  dplyr::select(Day, GreylagTimed, BarnacleTimed, PinkfootTimed, Season) %>%
+  gather_(value_col = 'Numbers', key_col = 'Species', gather_cols = c("GreylagTimed", "BarnacleTimed", "PinkfootTimed")) %>%
   filter(Numbers > 0) %>%
   group_by(Day, Species) %>%
   mutate(N = n()) %>% 
+  # filter(Day == 300 & Species == "PinkfootTimed")
+  # write_delim(path = "o:/ST_GooseProject/ALMaSS/GooseParameterFitting/flock_sizes_1.txt")
   ggplot(aes(Day, N)) +
-    geom_line() +
-    facet_wrap(~Species, scales = 'free') +
-    ylab('Flock numbers')
-
-forage_tb %>%
-  filter(Geese > 0) %>%    
-  select(Day, GreylagTimed, BarnacleTimed, PinkfootTimed, Season) %>%
-  reshape2::melt(id.vars = c('Day', 'Season'), value.name = 'Numbers', variable.name = 'Species') %>%
-  filter(Numbers > 0) %>%
-  group_by(Day, Species) %>%
-  mutate(N = n()) %>% 
-  filter(N > 1)
-
-
+  geom_line() +
+  facet_wrap(~Species, scales = 'free') +
+  ylab('Flock numbers')
 ```
+
+## AOR grid
+```{r AOR_grid, echo=FALSE, fig.height=6, fig.width=10, message=FALSE}
+# Define projection:
+utm32 <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+# Define AOR grid size
+grid_size = 1000
+ext <- readShapePoly("O:/ST_GooseProject/ALMaSS/GooseModelTesting/vejlerne_outline.shp",
+                     proj4string = CRS("+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs")) %>% 
+  # spTransform(CRSobj = CRS(utm32)) %>% 
+  extent()
+# Define template raster
+r1 <- raster(nrows = 24000/grid_size, 
+             ncols = 36000/grid_size,
+             ext = ext,
+             crs = "+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs")
+# Get the default value for FL  
+cfg <- readLines(paste(resultpath, 'TIALMaSSConfig.cfg', sep = ''))
+defaultval = GetParamValue(param = "GOOSE_FOLLOWINGLIKELYHOOD_PF",
+                           config = cfg)
+# Make spatial object of xy dump file
+polygons <- read_tsv("C:/MSV/WorkDirectory/GooseXYDump.txt", col_types = "iiiiii") %>% 
+  UtmToALMaSS(long = "X", lat = "Y", toalmass = FALSE, map = "VejlerneBigMap") %>% 
+  dplyr::select(ALong, ALat) %>% 
+  SpatialPoints(proj4string = CRS("+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs")) %>% 
+  # Tally occurences in cells and plot
+  rasterize(y = r1, fun = "count") %>% 
+  # plot()
+  rasterToPolygons() %>% 
+  # st_as_sf() %>% 
+  # st_transform(crs = "+init=epsg:4326") %>% 
+  # ggplot() +
+  #   geom_sf(aes(fill = layer)) +
+  #   ylim(56.935, 57.15) +
+  #   xlim(8.73, 9.35) +
+  #   ggtitle("Grid cell occupancy - Pinkfoot",
+  #           sub = paste0("Grid size = 1000m. Followinglikelyhood ", defaultval))
+  spTransform(CRSobj = CRS("+init=epsg:4326"))
+# Get a map background
+# fields <- readShapePoly("C:/Users/lada/Git/shiny/vejlerne/Data/fields.shp",
+#                         proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs")) %>% 
+#   spTransform(CRSobj = CRS("+init=epsg:4326")) %>% 
+
+  
+map <- st_read(dsn = "O:/ST_GooseProject/ALMaSS/GooseModelTesting", layer = "vejlerne_outline") %>% 
+  st_transform(crs = "+init=epsg:4326") %>% 
+  st_bbox() %>% 
+  as.numeric() %>% 
+  get_stamenmap(zoom = 11, maptype = "toner-lite")
+# Ugly hack to make the plot work. Will be much nicer when geom_sf is fully implemented
+# tmp <- tidy(fields)
+tmp <- tidy(polygons)
+tmp2 <- polygons@data
+tmp2$id <- row.names(tmp2)
+tmp3 <- left_join(tmp, tmp2)
+# pdf(file = "C:/Users/lada/test.pdf")
+ggmap(map) + 
+  geom_polygon(data = tmp3, aes(long, lat, group = id, fill = layer)) + 
+  scale_fill_gradient(guide = guide_legend(title = "Count")) +
+  ggtitle("Grid cell occupancy - Pinkfeet",
+          sub = paste0("Grid size = ", grid_size, "m. Followinglikelyhood ", defaultval))
+# dev.off()
+
+  
+```
+
+## AOR table - WIP
+```{r AOR_table, echo=FALSE, message=FALSE}
+aor_tab <- read_tsv("C:/MSV/WorkDirectory/AORPinkfeet.txt")
+```
+
+
 
 
 ## Numbers
 ```{r numbers, echo=FALSE, fig.height=6, fig.width=10}
-invisible({ popn = fread(file.path(resultpath, 'GoosePopulationData.txt'))
-popn[, Day:=Day-365] })
+invisible({popn = fread(file.path(resultpath, 'GoosePopulationData.txt'))
+popn[, Day := Day - 365] })
 #popn = SubsetOutput(popn, CutOff) 
 PlotGoosePopulation(data = popn, dates = TRUE)
 ```
@@ -187,90 +234,72 @@ PlotGoosePopulation(data = popn, dates = TRUE)
 
 ## Leave reason
 ```{r leavereason, echo=FALSE, fig.height=8, fig.width=10}
-invisible({ leavereason = fread(file.path(resultpath, 'GooseLeaveReasonStats.txt'))
-leavereason = leavereason[N > 0,]
-leavereason[, Day:=Day-365]
-})
-if(nrow(leavereason) > 0){
-ggplot(leavereason, aes(Day, N)) + geom_line(aes(color = LeaveReason)) + facet_grid(LeaveReason~SpeciesType, scales = 'free_y')
+leavereason = read_tsv(file.path(resultpath, 'GooseLeaveReasonStats.txt'), col_types = "iiicci") %>% 
+  filter(N > 0) %>% 
+  mutate(Day = Day - 365)
+if (nrow(leavereason) > 0) {
+  ggplot(leavereason, aes(Day, N)) + 
+    geom_line(aes(color = LeaveReason)) + 
+    facet_grid(LeaveReason~SpeciesType, scales = 'free_y')
 }
-  
 ```
-
 
 ## Flock sizes
 ```{r flocks, echo=FALSE, fig.height=8, fig.width=10}
-invisible({ 
-  fieldobs = fread('o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv')
-flocks = fieldobs[Month %in% c(12,1) & Hour >= 11 & Hour <= 13,]
-# flocks[, .N, by = Species]  # Okay reasonable numbers
-flocks[, c('Month', 'Hour'):=NULL]
-setcolorder(flocks, c('Species', 'Numbers', 'Type'))
+# Define helper function:
+switch_names <- function(x) {
+  switch(EXPR = x,
+         "BarnacleTimed" = "Barnacle",
+         "PinkfootTimed" = "Pinkfoot",
+         "GreylagTimed" = "Greylag")
+}
+
+
+flocks <- read_csv('o:/ST_GooseProject/Field data/Fugledata/fugledata_20150320_obs_clean.csv',
+                   col_types = "iiicc") %>% 
+  filter(Month %in% c(9:12,1:3) & Hour >= 11 & Hour <= 13) %>% 
+  dplyr::select(-Month, -Hour)
 
 # Simulated data - max number on day
-simflocks = forage[Geese > 0 ,.(Day, Barnacle, Pinkfoot, Greylag)]
-simflocks[,ObsDato:=as.Date(Day, origin = '2014-01-01')]
-simflocks[, Day:=NULL]
-melted = data.table::melt(simflocks, id.vars = 'ObsDato', variable.name = 'Species', value.name = 'Numbers')
-melted = melted[Numbers != 0,]
-melted[ ,ObsDato:=NULL]
-melted[, Type:='Simulated']
-dists = rbind(melted, flocks)
-dists[, Numbers:=log10(Numbers)]
-dists[, Count:='DailyMax']
+dists <- forage %>% 
+  dplyr::select(Day, Barnacle, Pinkfoot, Greylag) %>% 
+  mutate(ObsDato = as.Date(Day, origin = '2014-01-01')) %>% 
+  filter(month(ObsDato) %in% c(9:12,1:3)) %>% 
+  dplyr::select(-Day) %>% 
+  gather_(key_col = 'Species', value_col = 'Numbers', gather_cols = c("Barnacle", "Pinkfoot", "Greylag")) %>% 
+  filter(Numbers != 0) %>% 
+  dplyr::select(-ObsDato) %>% 
+  mutate(Type = "Simulated") %>% 
+  bind_rows(flocks) %>% 
+  mutate(Numbers = log10(Numbers), Count = "DailyMax")
 
 DegreeOverlapB = round(CalcOverlap(dists, species = 'Barnacle', metric = 'Numbers'), digits = 2)
 DegreeOverlapP = round(CalcOverlap(dists, species = 'Pinkfoot', metric = 'Numbers'), digits = 2)
 DegreeOverlapG = round(CalcOverlap(dists, species = 'Greylag', metric = 'Numbers'), digits = 2)
 
 # Timed counts:
-
-simflocks = forage[Geese > 0,.(Day, BarnacleTimed, PinkfootTimed, GreylagTimed)]
-simflocks[, ObsDato:=as.Date(Day, origin = '2014-01-01')]
-simflocks = simflocks[month(ObsDato) %in% c(12,1),]
-simflocks[, Day:=NULL]
-melted = data.table::melt(simflocks, id.vars = 'ObsDato', variable.name = 'Species', value.name = 'Numbers')
-melted = melted[Numbers != 0,]
-melted[, ObsDato:=NULL]
-melted[, Type:='Simulated']
-dists1 = rbind(melted, flocks)
-dists1[, Numbers:=log10(Numbers)]
-dists1[, Count:='Timed']
-# Quick fix for multiple names for one type
-index = match(c("BarnacleTimed", "PinkfootTimed", "GreylagTimed"), levels(dists1$Species))
-levels(dists1$Species)[index] = c('Barnacle', 'Pinkfoot', 'Greylag')
+dists1 <- forage %>% 
+  dplyr::select(Day, BarnacleTimed, PinkfootTimed, GreylagTimed) %>% 
+  mutate(ObsDato = as.Date(Day, origin = '2014-01-01')) %>% 
+  filter(month(ObsDato) %in% c(9:12,1:3)) %>% 
+  dplyr::select(-Day) %>% 
+  gather_(key_col = 'Species', value_col = 'Numbers', gather_cols = c("BarnacleTimed", "PinkfootTimed", "GreylagTimed")) %>% 
+  filter(Numbers != 0) %>% 
+  dplyr::select(-ObsDato) %>% 
+  mutate(Type = "Simulated") %>% 
+  mutate(Species = map_chr(Species, .f = switch_names)) %>% 
+  bind_rows(flocks) %>% 
+  mutate(Numbers = log10(Numbers), Count = "Timed")
 
 DegreeOverlapBT = round(CalcOverlap(dists1, species = 'Barnacle', metric = 'Numbers'), digits = 2)
 DegreeOverlapPT = round(CalcOverlap(dists1, species = 'Pinkfoot', metric = 'Numbers'), digits = 2)
 DegreeOverlapGT = round(CalcOverlap(dists1, species = 'Greylag', metric = 'Numbers'), digits = 2)
 
-TheDists = rbind(dists, dists1) })
-ggplot(TheDists, aes(x = Numbers, fill = Type)) +
+bind_rows(dists, dists1) %>% 
+  ggplot(aes(x = Numbers, fill = Type)) +
   geom_density(alpha = 0.5, colour = NA) +
   facet_grid(Count ~ Species, scales = 'free_x') +
   theme_bw()
-
-# png(file = 'o:/ST_Lada/Projekter/GBB/Figures/FlockSizes.png', height = 480*2.5, width = 480*4, res = 400)
-# ggplot(TheDists[Count == 'Timed',], aes(x = Numbers, fill = Type)) +
-#   geom_density(alpha = 0.5, colour = NA) +
-#   facet_wrap(~Species, scales = 'free_x') + 
-#   xlab('Flock size (log10)') + 
-#   theme_bw()
-# dev.off()
-
-# Dk version:
-# TheDists[, Species:=as.factor(Species)]
-# levels(TheDists$Species) = c('Bramgås', 'Grågås', 'Kortnæbbet')
-# TheDists[, Type:=as.factor(Type)]
-# levels(TheDists$Type) = c('Feltobs', 'Simuleret')
-# ggplot(TheDists[Count == "Timed",],aes(x = Numbers, fill = Type)) +
-#   geom_density(alpha = 0.5, colour = NA) + 
-#   facet_wrap(~Species) +
-#   theme_bw() +
-#   xlab('Flokstørrelse') +
-#   ylab('Densitet')
-
-
 ```
 
 The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlapP`, & Greylag `r DegreeOverlapG`. For the timed counts the degree of overlap is: Barnacle `r DegreeOverlapBT`, Pinkfoot `r DegreeOverlapPT`, & Greylag `r DegreeOverlapGT`.
@@ -296,24 +325,40 @@ The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlap
 # }
 # convertedobs = rbindlist(TheList)
 # write.table(convertedobs, file = paste0('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost', Sys.Date(), '.txt'), row.names = FALSE, quote = FALSE)
-invisible({
-poly = fread(paste0(resultpath, 'Vejlerne2015_polyrefs_RenumFBHBOp.txt'), skip = 1, verbose = FALSE)
-fieldobs = fread('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt')
-roost = fread(paste0(resultpath,'GooseRoosts.txt'), skip = 1)
+col_types <- "iidiiiiii"
+poly <- read_tsv(paste0(resultpath, 'Vejlerne2015_polyrefs_RenumFBHBOp.txt'), skip = 1, col_types = col_types)
+col_types_field <- "iddddiic"
+fieldobs <- read_delim('o:/ST_GooseProject/Field data/FieldobsDistancesFromRoost2016-04-25.txt', delim = ' ', col_types = col_types_field)
+roost = read_tsv(paste0(resultpath,'GooseRoosts.txt'), skip = 1, col_names = FALSE, col_types = "iii")
 
-DistToNearestRoostSim = CalcDistToRoosts(roost = roost, fields = forage, polyref = poly, species = c('Pinkfoot', 'Barnacle', 'Greylag'), fieldobs = FALSE)
-DistToNearestRoostSim[, Type:='Simulated']
-DistToNearestRoostField = CalcDistToRoosts(roost = roost, fields = fieldobs, polyref = poly, species = c('Pinkfoot', 'Barnacle', 'Greylag'), fieldobs = TRUE)
-DistToNearestRoostField[, Type:='Fieldobs']
-Distances = rbind(DistToNearestRoostSim[,.(Shortest, Species, Type)], DistToNearestRoostField[,.(Shortest, Species, Type)])
+DistToNearestRoostSim <- CalcDistToRoosts(roost = roost,
+                                          fields = forage,
+                                          polyref = poly,
+                                          species = c('Pinkfoot', 'Barnacle', 'Greylag'),
+                                          fieldobs = FALSE) %>% 
+                          mutate(Type = "Simulated") %>% 
+                          dplyr::select(Shortest, Species, Type)
 
-RoostDistFitGL = CalcOverlap(Distances, species = 'Greylag', metric = 'Shortest')
-RoostDistFitPF = CalcOverlap(Distances, species = 'Pinkfoot', metric = 'Shortest')
-RoostDistFitBN = CalcOverlap(Distances, species = 'Barnacle', metric = 'Shortest')
-})
+DistToNearestRoostField <- CalcDistToRoosts(roost = roost,
+                                            fields = fieldobs,
+                                            polyref = poly,
+                                            species = c('Pinkfoot', 'Barnacle', 'Greylag'),
+                                            fieldobs = TRUE) %>% 
+                          mutate(Type = "Fieldobs") %>% 
+                          dplyr::select(Shortest, Species, Type)
+
+distances <- bind_rows(DistToNearestRoostSim, DistToNearestRoostField)
+
+RoostDistFitGL <- CalcOverlap(distances, species = 'Greylag', metric = 'Shortest')
+RoostDistFitPF <- CalcOverlap(distances, species = 'Pinkfoot', metric = 'Shortest')
+RoostDistFitBN <- CalcOverlap(distances, species = 'Barnacle', metric = 'Shortest')
+
 # ggplot(Dists, aes(x=Shortest)) + geom_histogram(binwidth = 1000) + theme_bw() + facet_wrap(~Species)
 # png(file = 'o:/ST_Lada/Projekter/GBB/Figures/DistanceToRoost.png', height = 480*2.5, width = 480*4, res = 400)
-ggplot(Distances, aes(x = log10(Shortest), fill = Type)) + geom_density(alpha = 0.5, colour = NA) + facet_wrap(~Species, scales = 'free_x') + theme_bw()
+ggplot(distances, aes(x = log10(Shortest), fill = Type)) +
+  geom_density(alpha = 0.5, colour = NA) +
+  facet_wrap(~Species, scales = 'free_x') +
+  theme_bw()
 # dev.off()
 ``` 
 The degree of overlap is: Barnacle `r RoostDistFitBN`, Pinkfoot `r RoostDistFitPF`, & Greylag `r RoostDistFitGL`.
@@ -324,13 +369,14 @@ The degree of overlap is: Barnacle `r RoostDistFitBN`, Pinkfoot `r RoostDistFitP
 invisible({
 FieldData = fread('o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv')
 # habuse[, N:=sum(N), by=.(Month, HabitatUse, Species)]
-FieldData[HabitatUse == 'Stubble undersown', HabitatUse:='Stubble']
-FieldData[HabitatUse == 'UnharvestedBarley', HabitatUse:='Stubble']
+FieldData[HabitatUse == 'Stubble undersown', HabitatUse := 'Stubble']
+FieldData[HabitatUse == 'UnharvestedBarley', HabitatUse := 'Stubble']
 FieldData = FieldData[HabitatUse != 'Plowed',]
-FieldData[, NMTotal:=sum(N), by=.(Month, Species)]
-FieldData[, Prop:=N/NMTotal]
+FieldData[, NMTotal := sum(N), by = .(Month, Species)]
+FieldData[, Prop := N/NMTotal]
 
-forage[, Month:=month(as.Date(Day, origin = '2012-01-01'))]
+forage = as.data.table(forage)
+forage[, Month := month(as.Date(Day, origin = '2012-01-01'))]
 HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'LS')
 HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'SSSE')
 HabUsePF = HabitatUseFit[Species == 'Pinkfoot', Fit]
@@ -338,30 +384,30 @@ HabUseGL = HabitatUseFit[Species == 'Greylag', Fit]
 HabUseBN = HabitatUseFit[Species == 'Barnacle', Fit]
 	
 hbpf = forage[Month > 8 | Month == 1, .(PinkfootTimed, HabitatUsePF, Month)]
-hbpf[, Species:='Pinkfoot']
+hbpf[, Species := 'Pinkfoot']
 hbpf = hbpf[complete.cases(hbpf),]
 setnames(hbpf, old = c('HabitatUsePF', 'PinkfootTimed'), new = c('HabitatUse', 'N'))
 
 hbgl = forage[Month > 8 | Month == 1, .(GreylagTimed, HabitatUseGL, Month)]
-hbgl[, Species:='Greylag']
+hbgl[, Species := 'Greylag']
 hbgl = hbgl[complete.cases(hbgl),]
 setnames(hbgl, old = c('HabitatUseGL', 'GreylagTimed'), new = c('HabitatUse', 'N'))
 
 hbbn = forage[Month > 8 | Month == 1, .(BarnacleTimed, HabitatUseBN, Month)]
-hbbn[, Species:='Barnacle']
+hbbn[, Species := 'Barnacle']
 hbbn = hbbn[complete.cases(hbbn),]
 setnames(hbbn, old = c('HabitatUseBN', 'BarnacleTimed'), new = c('HabitatUse', 'N'))
 hb = rbind(hbpf, hbbn, hbgl)
 setkeyv(hb, c('Species', 'Month'))
 
-hb[,NMTotal:=sum(N), by=.(Month, Species)]
-hb[, Prop:=N/NMTotal]
-hb[, Month:=as.factor(Month)]
+hb[,NMTotal := sum(N), by = .(Month, Species)]
+hb[, Prop := N/NMTotal]
+hb[, Month := as.factor(Month)]
 setkeyv(hb, c('Species', 'Month'))
 
-FieldData[, Type:='FieldObs']
+FieldData[, Type := 'FieldObs']
 FieldData = FieldData[rep(seq(.N),N), .(Month, HabitatUse, N, Species, NMTotal, Prop, Type), by = Species]
-hb[, Type:='Simulated']
+hb[, Type := 'Simulated']
 SimData = hb[rep(seq(.N),N), .(Month, HabitatUse, N, Species, NMTotal, Prop, Type), by = Species]
 dt = rbind(FieldData, SimData)
 })
@@ -375,12 +421,12 @@ ggplot(dt, aes(Month, fill = HabitatUse)) + geom_bar(position = 'fill') + theme_
 # dt[, Type:=as.factor(Type)]
 # levels(dt$Type) = c('Feltobs', 'Simuleret')
 # dt[, HabitatUse:=as.factor(HabitatUse)]
-# levels(dt$HabitatUse) = c('Græs', 'Majs', 'Raps', 'Stub', 'Vintersæd')
+# levels(dt$HabitatUse) = c('Gr?s', 'Majs', 'Raps', 'Stub', 'Vinters?d')
 # dt[, Species:=as.factor(Species)]
-# levels(dt$Species) = c('Bramgås', 'Grågås', 'Kortnæbbet')
+# levels(dt$Species) = c('Bramg?s', 'Gr?g?s', 'Kortn?bbet')
 # 
 # ggplot(dt, aes(Month, fill = HabitatUse)) + geom_bar(position = 'fill') + theme_bw() +
-#  facet_grid(Type~Species) + scale_fill_brewer(palette = "Set2", guide = guide_legend(title = "Habitat")) + xlab('Måned') + ylab('Andel')
+#  facet_grid(Type~Species) + scale_fill_brewer(palette = "Set2", guide = guide_legend(title = "Habitat")) + xlab('M?ned') + ylab('Andel')
 
 
 
@@ -433,10 +479,10 @@ tmp = unique(simbag[, .(Wings, Fortnight, Species)])
 tmp[, PropBag:=Wings/sum(Wings), by = Species]
 setnames(tmp, 'Species', 'Art')
 tmp[, Art:=as.factor(Art)]
-levels(tmp$Art) = c('Grågås', 'Kortnæb')
+levels(tmp$Art) = c('Gr?g?s', 'Kortn?b')
 ggplot(tmp) + geom_bar(aes(x = Fortnight, y=PropBag, fill = Art), position="dodge", stat = 'identity') + 
 	ylab('Andel af udbytte') + 
-  xlab('Halvmåned')+
+  xlab('Halvm?ned')+
 	scale_fill_viridis(discrete=TRUE) + 
 	theme_bw()
 
@@ -448,17 +494,17 @@ invisible({
 # Maize:
 IntakeBN = fread(paste0(resultpath,'CurvePointsKJIntakeAtDiffMaizeDensitiesHoll_BN.txt'))
 IntakeBN = IntakeBN[V1 <= 1000,]
-IntakeBN[, Species:='Barnacle']
-IntakeBN[, V2:=V2*0.87]
+IntakeBN[, Species := 'Barnacle']
+IntakeBN[, V2 := V2 * 0.87]
 IntakePF = copy(IntakeBN)
-IntakePF = IntakePF[, V2:=V2*1.26582]
-IntakePF[, Species:='Pinkfeet']
+IntakePF = IntakePF[, V2 := V2 * 1.26582]
+IntakePF[, Species := 'Pinkfeet']
 IntakeGL = copy(IntakeBN)
-IntakeGL = IntakeGL[, V2:=V2*1.46835]
-IntakeGL[, Species:='Greylag']
+IntakeGL = IntakeGL[, V2 := V2 * 1.46835]
+IntakeGL[, Species := 'Greylag']
 
 maize = rbind(rbind(IntakeBN, IntakePF), IntakeGL)
-maize[, Response:='Maize']
+maize[, Response := 'Maize']
 p = ggplot(maize, aes(V1, V2, colour = Species)) + geom_line(size = 1) + theme_bw() + xlab(expression(paste('kJ/', m^2))) + ylab('kJ per min')
 # p = p + annotate('point', x = 119.1825 * 17.022, y =  26.77176744)
 # p = p + annotate('point', x = 52.97 * 17.022, y =  18.50017869)
@@ -468,17 +514,17 @@ p = p + ggtitle('Maize')
 # Grain:
 IntakePF = fread(paste0(resultpath, 'CurvePointsKJIntakeAtDiffGrainDensitiesHollNolet_PF.txt'))
 IntakePF = IntakePF[V1 <= 2500,]
-IntakePF[, Species:='Pinkfeet']
-IntakePF[, V2:=V2 * 17.67 * 0.695 * 60]
+IntakePF[, Species := 'Pinkfeet']
+IntakePF[, V2 := V2 * 17.67 * 0.695 * 60]
 IntakeBN = copy(IntakePF)
-IntakeBN = IntakeBN[, V2:=V2*.79]
-IntakeBN[, Species:='Barnacle']
-IntakeGL= copy(IntakePF)
-IntakeGL= IntakeGL[, V2:=V2*1.16]
-IntakeGL[, Species:='Greylag']
+IntakeBN = IntakeBN[, V2 := V2 * .79]
+IntakeBN[, Species := 'Barnacle']
+IntakeGL = copy(IntakePF)
+IntakeGL = IntakeGL[, V2 := V2 * 1.16]
+IntakeGL[, Species := 'Greylag']
 
 grain = rbind(rbind(IntakeBN, IntakePF), IntakeGL)
-grain[, Response:='Grain']
+grain[, Response := 'Grain']
 q = ggplot(grain, aes(V1, V2, colour = Species)) + geom_line(size = 1) + theme_bw() + xlab(expression(paste('Grain/', m^2))) + ylab('kJ per min')
 q = q + ggtitle('Grain')
 
@@ -486,12 +532,12 @@ q = q + ggtitle('Grain')
 GrassGL = fread(paste0(resultpath, 'CurvePointsKJIntakeAtVaryingGrassHeights_GL.txt'))
 GrassPF = fread(paste0(resultpath, 'CurvePointsKJIntakeAtVaryingGrassHeights_PF.txt'))
 GrassBN = fread(paste0(resultpath, 'CurvePointsKJIntakeAtVaryingGrassHeights_BG.txt'))
-GrassGL[, Species:='Greylag']
-GrassBN[, Species:='Barnacle']
-GrassPF[, Species:='Pinkfeet']
+GrassGL[, Species := 'Greylag']
+GrassBN[, Species := 'Barnacle']
+GrassPF[, Species := 'Pinkfeet']
 
 grass = rbind(rbind(GrassBN, GrassPF), GrassGL)
-grass[, Response:='Grass']
+grass[, Response := 'Grass']
 
 z = ggplot(grass, aes(V1, V2, colour = Species)) + geom_line(size = .5) + theme_bw() + xlab('Grass height (cm)') + ylab('kJ per min')
 z = z + ggtitle('Grass')
