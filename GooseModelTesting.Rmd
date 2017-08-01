@@ -315,8 +315,8 @@ The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlap
 # num_id_to_chr = function(id) {
 # 	switch(EXPR = as.character(id),
 # 		'63' = 'Pinkfoot',
-# 		'59' = 'Barnacle',
-# 		'67' = 'Greylag',
+# 		'59' = 'Greylag',
+# 		'67' = 'Barnacle',
 # 		'Undefined species')
 # }
 # 
@@ -331,42 +331,73 @@ The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlap
 # obs <- read_excel(file.path(o_drive, 'Field data/Fugledata_Obslist_20160414_clean.xlsx'), sheet = 'Observation') %>%
 #   dplyr::filter(Year == 2015, Month %in% c(9,10,11,12,1,2,3), ArtID %in% c(63, 59, 67)) %>%
 #   mutate(Species = map_chr(.x = ArtID, .f = num_id_to_chr),
-#          Date = ymd_hms(ObsDato),
-#          Week = week(Date)) %>% 
+#          Date = lubridate::ymd_hms(ObsDato),
+#          Week = lubridate::week(Date)) %>%
 #   dplyr::select(PolygonID, Date, Week, Species, Antal)
 # 
 # # Construct path to field data on the o-drive:
 # pth <- file.path(o_drive, paste0("Field data/FieldobsDistancesFromRoost", Sys.Date(), ".txt"))
 # 
-# inner_join(polys, obs, by = c("PolyID" = "PolygonID")) %>% 
-#   mutate(dist = pmap_dbl(list(X, Y, Species), .f = find_closest)) %>% 
+# inner_join(polys, obs, by = c("PolyID" = "PolygonID")) %>%
+#   mutate(dist = pmap_dbl(list(X, Y, Species), .f = find_closest)) %>%
 #   data.table::fwrite(file = pth, quote = FALSE, sep = "\t")
 
-col_types <- "iidiiiiii"
-poly <- read_tsv(paste0(resultpath, 'Vejlerne2015_polyrefs_RenumFBHBOp.txt'), skip = 1, col_types = col_types)
-
+# Get the field centroids from the polyref file
+poly <- read_tsv("~/ALMaSS/WorkDirectory/VejlerneOpenMay2016PolyRef.txt",
+                 skip = 1,
+                 col_types = "iiiiiiiii") %>% 
+  dplyr::select(PolyRefNum, CentroidX, CentroidY)
+# Read in the precalculated distance from the field data
 col_types_field <- "dddTicdd"
-fieldobs <- read_tsv(file.path(o_drive, 'Field data/FieldobsDistancesFromRoost2017-08-01.txt'), col_types = col_types_field)
+fieldobs <- read_tsv(file.path(o_drive, 'Field data/FieldobsDistancesFromRoost2017-08-01.txt'),
+                     col_types = col_types_field) %>% 
+    mutate(week = ifelse(Week < 25, Week + 55, Week), 
+         Season = 1,
+         Type = "Fieldobs")
 
-roost = read_tsv(paste0(resultpath,'GooseRoosts.txt'), skip = 1, col_names = FALSE, col_types = "iii")
+fieldobs_weekly <- fieldobs %>% 
+  group_by(Season, week, Species, Type) %>% 
+  summarise(mean_dist = mean(dist))
 
-DistToNearestRoostSim <- CalcDistToRoosts(roost = roost,
-                                          fields = forage,
-                                          polyref = poly,
-                                          species = c('Pinkfoot', 'Barnacle', 'Greylag'),
-                                          fieldobs = FALSE) %>% 
-                          mutate(Type = "Simulated") %>% 
-                          dplyr::select(Shortest, Species, Type)
+# Plot the weekly average distance  
+fieldobs_weekly %>% 
+  ggplot(aes(week, mean_dist/1000)) + 
+  geom_line(aes(color = Species)) + 
+  ggtitle("Field observations (2015)", subtitle = "Mean weekly distance (km) from forage location to roost") +
+  scale_color_colorblind() + 
+  scale_x_continuous(breaks = seq(40, 65, by = 5)) +
+  theme_fivethirtyeight()
 
-distances <- bind_rows(DistToNearestRoostSim, DistToNearestRoostField)
+# Calculate distances from the simulation
+col_types <- "iiiiiiiiiiiidddddcddicc"
+forage <- read_tsv("~/ALMaSS/WorkDirectory/GooseFieldForageData.txt",
+                   col_types = col_types) %>% 
+  dplyr::select(Season, Day, Polyref, Barnacle, Pinkfoot, Greylag) %>%
+  gather_(value_col = "Numbers", key_col = "Species", gather_cols = c("Barnacle", "Pinkfoot", "Greylag")) %>%
+  # select(Season, Day, Polyref, ends_with("Timed")) %>%
+  # gather_(value_col = "Numbers", key_col = "Species", gather_cols = paste0(c("Barnacle", "Pinkfoot", "Greylag"), "Timed")) %>%
+  filter(Numbers > 0) %>% 
+  mutate(week = lubridate::week(as.Date(Day, origin = "2015-01-01"))) %>% 
+  mutate(week = if_else(week < 25, week + 55, week)) %>% 
+  left_join(poly, by = c("Polyref" = "PolyRefNum")) %>% 
+  mutate(dist = pmap_dbl(list(CentroidX, CentroidY, Species), .f = find_closest),
+         Type = "Simulated")
 
-RoostDistFitGL <- CalcOverlap(distances, species = 'Greylag', metric = 'Shortest')
-RoostDistFitPF <- CalcOverlap(distances, species = 'Pinkfoot', metric = 'Shortest')
-RoostDistFitBN <- CalcOverlap(distances, species = 'Barnacle', metric = 'Shortest')
+sim_weekly <- forage %>%   
+  group_by(Season, week, Species, Type) %>% 
+  dplyr::summarise(mean_dist = mean(dist))
+  
+distances <- forage %>% 
+  dplyr::select(Species, dist, Type) %>% 
+  bind_rows(fieldobs)
+
+RoostDistFitGL <- CalcOverlap(distances, species = 'Greylag', metric = 'dist')
+RoostDistFitPF <- CalcOverlap(distances, species = 'Pinkfoot', metric = 'dist')
+RoostDistFitBN <- CalcOverlap(distances, species = 'Barnacle', metric = 'dist')
 
 # ggplot(Dists, aes(x=Shortest)) + geom_histogram(binwidth = 1000) + theme_bw() + facet_wrap(~Species)
 # png(file = 'o:/ST_Lada/Projekter/GBB/Figures/DistanceToRoost.png', height = 480*2.5, width = 480*4, res = 400)
-ggplot(distances, aes(x = log10(Shortest), fill = Type)) +
+ggplot(distances, aes(x = log10(dist), fill = Type)) +
   geom_density(alpha = 0.5, colour = NA) +
   facet_wrap(~Species, scales = 'free_x') +
   theme_bw()
