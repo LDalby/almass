@@ -310,41 +310,43 @@ The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlap
 ```{r distances, echo=FALSE, fig.height=6, fig.width=12, message=FALSE}
 # Data was handled here:
 # Load function that was previous part of the ralmass package:
-source("~/git/almass/calc_pseudo_centroid.r")
-# Define function to convert ArtID to chr species names:
-num_id_to_chr = function(id) {
-	switch(EXPR = as.character(id),
-		'63' = 'Pinkfoot',
-		'59' = 'Barnacle',
-		'67' = 'Greylag',
-		'Undefined species')
-}
-
-polys <- read_excel(file.path(o_drive, 'Field data/Fugledata_Obslist_20160414_clean.xlsx'), sheet = 'Polygon') %>% 
-  dplyr::select(PolyID, PolygonData) %>% 
-  CalcPseudoCentroid(project = TRUE) %>% 
-  UtmToALMaSS(long = 'UtmX', lat = 'UtmY', map = 'VejlerneBigMap', subset = TRUE) %>% 
-  dplyr::select(PolyID, X = ALong, Y = ALat)
-
-library(lubridate)
-  
-obs <- read_excel(file.path(o_drive, 'Field data/Fugledata_Obslist_20160414_clean.xlsx'), sheet = 'Observation') %>% 
-  dplyr::filter(Year == 2015, Month %in% c(9,10,11,12,1,2,3), ArtID %in% c(63, 59, 67)) %>% 
-  dplyr::select(PolygonID, ObsDato, ArtID, Antal) %>% 
-  mutate(Species = map_chr(.x = ArtID, .f = num_id_to_chr),
-         Date = ymd_hms(ObsDato),
-         Week = week(Date))
-# Construct path to field data on the o-drive:
-pth <- file.path(o_drive, paste0("Field data/FieldobsDistancesFromRoost", Sys.Date(), ".txt"))  
-inner_join(polys, obs, by = c("PolyID" = "PolygonID")) %>% 
-  data.table::fwrite(file = pth, quote = FALSE)
-
+# source("~/git/almass/calc_pseudo_centroid.r")
+# # Define function to convert ArtID to chr species names:
+# num_id_to_chr = function(id) {
+# 	switch(EXPR = as.character(id),
+# 		'63' = 'Pinkfoot',
+# 		'59' = 'Barnacle',
+# 		'67' = 'Greylag',
+# 		'Undefined species')
+# }
+# 
+# polys <- read_excel(file.path(o_drive, 'Field data/Fugledata_Obslist_20160414_clean.xlsx'), sheet = 'Polygon') %>%
+#   dplyr::select(PolyID, PolygonData) %>%
+#   CalcPseudoCentroid(project = TRUE) %>%
+#   UtmToALMaSS(long = 'UtmX', lat = 'UtmY', map = 'VejlerneBigMap', subset = TRUE) %>%
+#   dplyr::select(PolyID, X = ALong, Y = ALat)
+# 
+# library(lubridate)
+# 
+# obs <- read_excel(file.path(o_drive, 'Field data/Fugledata_Obslist_20160414_clean.xlsx'), sheet = 'Observation') %>%
+#   dplyr::filter(Year == 2015, Month %in% c(9,10,11,12,1,2,3), ArtID %in% c(63, 59, 67)) %>%
+#   mutate(Species = map_chr(.x = ArtID, .f = num_id_to_chr),
+#          Date = ymd_hms(ObsDato),
+#          Week = week(Date)) %>% 
+#   dplyr::select(PolygonID, Date, Week, Species, Antal)
+# 
+# # Construct path to field data on the o-drive:
+# pth <- file.path(o_drive, paste0("Field data/FieldobsDistancesFromRoost", Sys.Date(), ".txt"))
+# 
+# inner_join(polys, obs, by = c("PolyID" = "PolygonID")) %>% 
+#   mutate(dist = pmap_dbl(list(X, Y, Species), .f = find_closest)) %>% 
+#   data.table::fwrite(file = pth, quote = FALSE, sep = "\t")
 
 col_types <- "iidiiiiii"
 poly <- read_tsv(paste0(resultpath, 'Vejlerne2015_polyrefs_RenumFBHBOp.txt'), skip = 1, col_types = col_types)
 
-col_types_field <- "iddddiic"
-fieldobs <- read_delim(file.path(o_drive, 'Field data/FieldobsDistancesFromRoost2016-04-25.txt'), delim = ' ', col_types = col_types_field)
+col_types_field <- "dddTicdd"
+fieldobs <- read_tsv(file.path(o_drive, 'Field data/FieldobsDistancesFromRoost2017-08-01.txt'), col_types = col_types_field)
 
 roost = read_tsv(paste0(resultpath,'GooseRoosts.txt'), skip = 1, col_names = FALSE, col_types = "iii")
 
@@ -354,14 +356,6 @@ DistToNearestRoostSim <- CalcDistToRoosts(roost = roost,
                                           species = c('Pinkfoot', 'Barnacle', 'Greylag'),
                                           fieldobs = FALSE) %>% 
                           mutate(Type = "Simulated") %>% 
-                          dplyr::select(Shortest, Species, Type)
-
-DistToNearestRoostField <- CalcDistToRoosts(roost = roost,
-                                            fields = fieldobs,
-                                            polyref = poly,
-                                            species = c('Pinkfoot', 'Barnacle', 'Greylag'),
-                                            fieldobs = TRUE) %>% 
-                          mutate(Type = "Fieldobs") %>% 
                           dplyr::select(Shortest, Species, Type)
 
 distances <- bind_rows(DistToNearestRoostSim, DistToNearestRoostField)
