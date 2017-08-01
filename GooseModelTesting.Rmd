@@ -360,12 +360,13 @@ fieldobs_weekly <- fieldobs %>%
   summarise(mean_dist = mean(dist))
 
 # Plot the weekly average distance  
-fieldobs_weekly %>% 
+field_plot <- fieldobs_weekly %>% 
   ggplot(aes(week, mean_dist/1000)) + 
   geom_line(aes(color = Species)) + 
   ggtitle("Field observations (2015)", subtitle = "Mean weekly distance (km) from forage location to roost") +
   scale_color_colorblind() + 
-  scale_x_continuous(breaks = seq(40, 65, by = 5)) +
+  scale_x_continuous(breaks = seq(35, 75, by = 5), limits = c(35, 70)) + 
+  scale_y_continuous(limits = c(0, 11), breaks = seq(0,11,2)) +
   theme_fivethirtyeight()
 
 # Calculate distances from the simulation
@@ -384,8 +385,18 @@ forage <- read_tsv("~/ALMaSS/WorkDirectory/GooseFieldForageData.txt",
          Type = "Simulated")
 
 sim_weekly <- forage %>%   
-  group_by(Season, week, Species, Type) %>% 
+  group_by(week, Species, Type) %>% 
   dplyr::summarise(mean_dist = mean(dist))
+sim_plot <- sim_weekly %>% 
+  ggplot(aes(week, mean_dist/1000)) + 
+  geom_line(aes(color = Species)) + 
+  ggtitle("Simulated (average of 5 seasons)", subtitle = "Mean weekly distance (km) from forage location to roost") +
+  scale_color_colorblind() + 
+  scale_x_continuous(breaks = seq(35, 75, by = 5), limits = c(35, 70)) + 
+  scale_y_continuous(limits = c(0, 11), breaks = seq(0,11,2)) +
+  theme_fivethirtyeight()
+grid.arrange(field_plot, sim_plot)
+  
   
 distances <- forage %>% 
   dplyr::select(Species, dist, Type) %>% 
