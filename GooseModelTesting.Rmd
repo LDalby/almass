@@ -30,9 +30,6 @@ runinfo = readLines(file.path(resultpath, 'BatchALMaSS.ini'))
 simyears = as.numeric(runinfo[length(runinfo) - 1])
 
 extention = ''
-
-
-
 sim = ''
 extention = '.res'
 
@@ -59,9 +56,9 @@ Date stamp on ALMaSS exe file: `r file.info(paste0(resultpath, 'ALMaSS_CmdLine.e
 ## Available forage
 ```{r forage, echo=FALSE, fig.width=14, fig.height=16, warning=FALSE}
 coltypes = "iiiiiiiiiiiidddddcddicc"
-forage = read_tsv(file.path(resultpath, 'GooseFieldForageData.txt'), col_types = coltypes) %>% 
+forage <- read_tsv(file.path(resultpath, 'GooseFieldForageData.txt'), col_types = coltypes) %>% 
   mutate(Day = Day - 365, Date = as.Date(Day, origin = as.Date('2009-01-01'))) %>% 
-  filter(month(Date) %in% c(8:12,1:2), Geese > 0) %>% 
+  filter(month(Date) %in% c(8:12,1:3), Geese > 0) %>% 
   ClassifyHabitatUse(species = 'goose', timed = TRUE)
 
 # First melt the numbers:
@@ -419,16 +416,15 @@ The degree of overlap is: Barnacle `r RoostDistFitBN`, Pinkfoot `r RoostDistFitP
 
 ## Habitat use
 ```{r habitat, habitatuse, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
-invisible({
-FieldData = fread('o:/ST_GooseProject/Field data/Fugledata/HabitatUseAll2014.csv')
-# habuse[, N:=sum(N), by=.(Month, HabitatUse, Species)]
-FieldData[HabitatUse == 'Stubble undersown', HabitatUse := 'Stubble']
-FieldData[HabitatUse == 'UnharvestedBarley', HabitatUse := 'Stubble']
-FieldData = FieldData[HabitatUse != 'Plowed',]
-FieldData[, NMTotal := sum(N), by = .(Month, Species)]
-FieldData[, Prop := N/NMTotal]
+FieldData <- read_csv(file.path(o_drive, 'Field data/Fugledata/HabitatUseAll2014.csv')) %>% 
+  mutate(HabitatUse = recode(HabitatUse,
+                             "Stubble undersown" = "Stubble",
+                             "UnharvestedBarley" = "Stubble")) %>% 
+  filter(HabitatUse != "Plowed") %>% 
+  group_by(Month, Species) %>% 
+  mutate(Prop = N/sum(N))
 
-forage = as.data.table(forage)
+forage
 forage[, Month := month(as.Date(Day, origin = '2012-01-01'))]
 HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'LS')
 HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'SSSE')
