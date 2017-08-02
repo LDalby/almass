@@ -15,7 +15,7 @@ assign("depthtrigger", 60, data.table:::.global)  # To prevent data.table printi
 # library(devtools)
 # install_github('LDalby/ralmass')
 packs = c('xtable', 'RColorBrewer', 'ralmass', 'gridExtra', 'knitr', 'lubridate', 'viridis', 'tidyverse',
-          'data.table', 'stringr', 'readxl', 'ggvis', "sf", "raster", "ggmap", "broom", "maptools")
+          'data.table', 'stringr', 'readxl', 'ggvis', "sf", "raster", "ggmap", "broom", "maptools", "ggthemes")
 sapply(packs, FUN = require, character.only = TRUE)
 sysinfo <- Sys.info()
 if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
@@ -416,18 +416,69 @@ The degree of overlap is: Barnacle `r RoostDistFitBN`, Pinkfoot `r RoostDistFitP
 
 ## Habitat use
 ```{r habitat, habitatuse, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
-FieldData <- read_csv(file.path(o_drive, 'Field data/Fugledata/HabitatUseAll2014.csv')) %>% 
+FieldData <- read_csv(file.path(o_drive, 'Field data/Fugledata/HabitatUseAll2014.csv'),
+                      col_types = "icic") %>% 
   mutate(HabitatUse = recode(HabitatUse,
                              "Stubble undersown" = "Stubble",
-                             "UnharvestedBarley" = "Stubble")) %>% 
+                             "UnharvestedBarley" = "Stubble"),
+         Month = ifelse(Month < 7, Month + 12, Month)) %>% 
   filter(HabitatUse != "Plowed") %>% 
-  group_by(Month, Species) %>% 
-  mutate(Prop = N/sum(N))
+  group_by(Month, Species, HabitatUse) %>% 
+  mutate(n = sum(N)) %>% 
+  dplyr::select(-N) %>% 
+  dplyr::distinct()
 
-forage
-forage[, Month := month(as.Date(Day, origin = '2012-01-01'))]
+  # group_by(Month, Species) %>% 
+  # mutate(Prop = N/sum(N))
+    
+cols <- c("Grass" = "#66C2A5", "Maize" = "#FC8D62", "Rape" = "#8DA0CB", "Stubble" = "#E78AC3", "WinterCereal" = "#A6D854")
+
+fd_plot <- FieldData %>% 
+  ggplot(aes(Month, fill = HabitatUse)) +
+  geom_bar(aes(weight = n), position = 'fill') + 
+  facet_wrap(~Species, scales = "free_x") + 
+  scale_fill_manual(values = cols, guide_legend(title = "Habitat")) +
+  scale_y_continuous(labels = scales::percent) + 
+  ylab("Use") + 
+  scale_x_continuous(breaks = 8:15, labels = c("8", "9", "10", "11", "12", "1", "2", "3")) +
+  theme_fivethirtyeight() +
+  ggtitle("Field data habitat use")
+  
+
+forage <- forage %>% 
+  mutate(Month = month(Date),
+         Month = ifelse(Month < 6, Month + 12, Month))
+# Strp the relevant columns and construct a habitat use data set
+habpf <- forage %>% 
+  dplyr::select(Season, Month, habitat_use = HabitatUsePF, numbers = PinkfootTimed) %>% 
+  dplyr::filter(numbers > 0) %>% 
+  dplyr::mutate(species = "Pinkfoot")
+
+habgl <- forage %>% 
+  dplyr::select(Season, Month, habitat_use = HabitatUseGL, numbers = GreylagTimed) %>% 
+  dplyr::filter(numbers > 0) %>% 
+  dplyr::mutate(species = "Greylag")
+
+habbn <- forage %>% 
+  dplyr::select(Season, Month, habitat_use = HabitatUseBN, numbers = BarnacleTimed) %>% 
+  dplyr::filter(numbers > 0) %>% 
+  dplyr::mutate(species = "Barnacle")
+# Combine this and plot  
+s_plot <- bind_rows(habpf, habgl, habbn) %>% 
+  ggplot(aes(Month, fill = habitat_use)) +
+  geom_bar(aes(weight = numbers), position = 'fill') + 
+  facet_wrap(~species, scales = "free_x") + 
+  scale_fill_manual(values = cols, guide_legend(title = "Habitat")) +
+  scale_y_continuous(labels = scales::percent) + 
+  ylab("Use") + 
+  scale_x_continuous(breaks = 8:15, labels = c("8", "9", "10", "11", "12", "1", "2", "3")) +
+  theme_fivethirtyeight() +
+  ggtitle("Simulated habitat use")
+
+grid.arrange(fd_plot, s_plot)
+
 HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'LS')
-HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'SSSE')
+
 HabUsePF = HabitatUseFit[Species == 'Pinkfoot', Fit]
 HabUseGL = HabitatUseFit[Species == 'Greylag', Fit]
 HabUseBN = HabitatUseFit[Species == 'Barnacle', Fit]
