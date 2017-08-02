@@ -416,24 +416,29 @@ The degree of overlap is: Barnacle `r RoostDistFitBN`, Pinkfoot `r RoostDistFitP
 
 ## Habitat use
 ```{r habitat, habitatuse, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
-FieldData <- read_csv(file.path(o_drive, 'Field data/Fugledata/HabitatUseAll2014.csv'),
+field_data <- read_csv(file.path(o_drive, 'Field data/Fugledata/HabitatUseAll2014.csv'),
                       col_types = "icic") %>% 
-  mutate(HabitatUse = recode(HabitatUse,
+  mutate(habitat_use = recode(HabitatUse,
                              "Stubble undersown" = "Stubble",
                              "UnharvestedBarley" = "Stubble"),
          Month = ifelse(Month < 7, Month + 12, Month)) %>% 
   filter(HabitatUse != "Plowed") %>% 
-  group_by(Month, Species, HabitatUse) %>% 
-  mutate(n = sum(N)) %>% 
-  dplyr::select(-N) %>% 
-  dplyr::distinct()
-
-  # group_by(Month, Species) %>% 
-  # mutate(Prop = N/sum(N))
+  group_by(Month, Species, habitat_use) %>% 
+  mutate(numbers = sum(N)) %>% 
+  dplyr::select(-N, -HabitatUse) %>% 
+  dplyr::distinct() %>% # needed this one after some categories were joined
+  dplyr::group_by(Month, Species) %>%  # need this to avoid grouping by habitat_use here
+  dplyr::mutate(prop_field = numbers/sum(numbers)) %>% 
+  dplyr::rename(month = Month,
+                species = Species)
     
-cols <- c("Grass" = "#66C2A5", "Maize" = "#FC8D62", "Rape" = "#8DA0CB", "Stubble" = "#E78AC3", "WinterCereal" = "#A6D854")
+cols <- c("Grass" = "#66C2A5",
+          "Maize" = "#FC8D62",
+          "Rape" = "#8DA0CB",
+          "Stubble" = "#E78AC3",
+          "WinterCereal" = "#A6D854")
 
-fd_plot <- FieldData %>% 
+fd_plot <- field_data %>% 
   ggplot(aes(Month, fill = HabitatUse)) +
   geom_bar(aes(weight = n), position = 'fill') + 
   facet_wrap(~Species, scales = "free_x") + 
@@ -446,26 +451,38 @@ fd_plot <- FieldData %>%
   
 
 forage <- forage %>% 
-  mutate(Month = month(Date),
-         Month = ifelse(Month < 6, Month + 12, Month))
+  mutate(month = month(Date),
+         month = ifelse(month < 6, month + 12, month))
 # Strp the relevant columns and construct a habitat use data set
 habpf <- forage %>% 
-  dplyr::select(Season, Month, habitat_use = HabitatUsePF, numbers = PinkfootTimed) %>% 
+  dplyr::select(Season, month, habitat_use = HabitatUsePF, numbers = PinkfootTimed) %>% 
   dplyr::filter(numbers > 0) %>% 
-  dplyr::mutate(species = "Pinkfoot")
+  dplyr::group_by(Season, month, habitat_use) %>% 
+  dplyr::summarise(numbers = sum(numbers)) %>% 
+  dplyr::mutate(species = "Pinkfoot",
+                prop = numbers/sum(numbers))
 
 habgl <- forage %>% 
-  dplyr::select(Season, Month, habitat_use = HabitatUseGL, numbers = GreylagTimed) %>% 
+  dplyr::select(Season, month, habitat_use = HabitatUseGL, numbers = GreylagTimed) %>% 
   dplyr::filter(numbers > 0) %>% 
-  dplyr::mutate(species = "Greylag")
+  dplyr::group_by(Season, month, habitat_use) %>% 
+  dplyr::summarise(numbers = sum(numbers)) %>% 
+  dplyr::mutate(species = "Greylag",
+                prop = numbers/sum(numbers))
 
 habbn <- forage %>% 
-  dplyr::select(Season, Month, habitat_use = HabitatUseBN, numbers = BarnacleTimed) %>% 
+  dplyr::select(Season, month, habitat_use = HabitatUseBN, numbers = BarnacleTimed) %>% 
   dplyr::filter(numbers > 0) %>% 
-  dplyr::mutate(species = "Barnacle")
+  dplyr::group_by(Season, month, habitat_use) %>% 
+  dplyr::summarise(numbers = sum(numbers)) %>% 
+  dplyr::mutate(species = "Barnacle",
+                prop = numbers/sum(numbers))
+
+sim_data <- bind_rows(habpf, habgl, habbn)
+  
 # Combine this and plot  
-s_plot <- bind_rows(habpf, habgl, habbn) %>% 
-  ggplot(aes(Month, fill = habitat_use)) +
+s_plot <- sim_data %>% 
+  ggplot(aes(month, fill = habitat_use)) +
   geom_bar(aes(weight = numbers), position = 'fill') + 
   facet_wrap(~species, scales = "free_x") + 
   scale_fill_manual(values = cols, guide_legend(title = "Habitat")) +
@@ -477,40 +494,22 @@ s_plot <- bind_rows(habpf, habgl, habbn) %>%
 
 grid.arrange(fd_plot, s_plot)
 
+# Calculate the fit:
+full_join(sim_data, field_data,
+          by = c("month", "habitat_use", "species")) %>%
+  replace_na(list(prop_field = 0.0, prop = 0.0)) %>% 
+  dplyr::mutate(sq_diff = (prop - prop_field)^2) %>% 
+  dplyr::group_by(Season, month, species) %>% 
+  dplyr::summarise(ls = sum(sq_diff))
+
+
 HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'LS')
 
 HabUsePF = HabitatUseFit[Species == 'Pinkfoot', Fit]
 HabUseGL = HabitatUseFit[Species == 'Greylag', Fit]
 HabUseBN = HabitatUseFit[Species == 'Barnacle', Fit]
 	
-hbpf = forage[Month > 8 | Month == 1, .(PinkfootTimed, HabitatUsePF, Month)]
-hbpf[, Species := 'Pinkfoot']
-hbpf = hbpf[complete.cases(hbpf),]
-setnames(hbpf, old = c('HabitatUsePF', 'PinkfootTimed'), new = c('HabitatUse', 'N'))
 
-hbgl = forage[Month > 8 | Month == 1, .(GreylagTimed, HabitatUseGL, Month)]
-hbgl[, Species := 'Greylag']
-hbgl = hbgl[complete.cases(hbgl),]
-setnames(hbgl, old = c('HabitatUseGL', 'GreylagTimed'), new = c('HabitatUse', 'N'))
-
-hbbn = forage[Month > 8 | Month == 1, .(BarnacleTimed, HabitatUseBN, Month)]
-hbbn[, Species := 'Barnacle']
-hbbn = hbbn[complete.cases(hbbn),]
-setnames(hbbn, old = c('HabitatUseBN', 'BarnacleTimed'), new = c('HabitatUse', 'N'))
-hb = rbind(hbpf, hbbn, hbgl)
-setkeyv(hb, c('Species', 'Month'))
-
-hb[,NMTotal := sum(N), by = .(Month, Species)]
-hb[, Prop := N/NMTotal]
-hb[, Month := as.factor(Month)]
-setkeyv(hb, c('Species', 'Month'))
-
-FieldData[, Type := 'FieldObs']
-FieldData = FieldData[rep(seq(.N),N), .(Month, HabitatUse, N, Species, NMTotal, Prop, Type), by = Species]
-hb[, Type := 'Simulated']
-SimData = hb[rep(seq(.N),N), .(Month, HabitatUse, N, Species, NMTotal, Prop, Type), by = Species]
-dt = rbind(FieldData, SimData)
-})
 # png(file = 'o:/ST_Lada/Projekter/GBB/Figures/HabitatUse.png', height = 480*3.5, width = 480*4, res = 400)
 ggplot(dt, aes(Month, fill = HabitatUse)) + geom_bar(position = 'fill') + theme_bw() +
  facet_grid(Type~Species) + scale_fill_brewer(palette = "Set2")
