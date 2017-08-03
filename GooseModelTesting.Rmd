@@ -379,7 +379,8 @@ bind_rows(sim_weekly, fieldobs_weekly) %>%
   scale_color_colorblind() + 
   scale_x_continuous(breaks = seq(35, 75, by = 5), limits = c(35, 70)) + 
   scale_y_continuous(limits = c(0, 11), breaks = seq(0,11,2)) +
-  theme_fivethirtyeight()
+  theme_fivethirtyeight() + 
+  theme(axis.text = element_text(size = 12))
   
 # Calculate fit
 # First join the data
