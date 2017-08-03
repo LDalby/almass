@@ -418,13 +418,14 @@ The degree of overlap is: Barnacle `r RoostDistFitBN`, Pinkfoot `r RoostDistFitP
 ```{r habitat, habitatuse, echo=FALSE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
 field_data <- read_csv(file.path(o_drive, 'Field data/Fugledata/HabitatUseAll2014.csv'),
                       col_types = "icic") %>% 
-  mutate(habitat_use = recode(HabitatUse,
+  dplyr::mutate(habitat_use = recode(HabitatUse,
                              "Stubble undersown" = "Stubble",
                              "UnharvestedBarley" = "Stubble"),
          Month = ifelse(Month < 7, Month + 12, Month)) %>% 
-  filter(HabitatUse != "Plowed") %>% 
-  group_by(Month, Species, habitat_use) %>% 
-  mutate(numbers = sum(N)) %>% 
+  dplyr::filter(HabitatUse != "Plowed") %>% 
+  dplyr::group_by(Month, Species, habitat_use) %>% 
+  dplyr::mutate(numbers = sum(N)) %>% 
+  dplyr::filter(numbers > 0) %>% 
   dplyr::select(-N, -HabitatUse) %>% 
   dplyr::distinct() %>% # needed this one after some categories were joined
   dplyr::group_by(Month, Species) %>%  # need this to avoid grouping by habitat_use here
@@ -439,9 +440,9 @@ cols <- c("Grass" = "#66C2A5",
           "WinterCereal" = "#A6D854")
 
 fd_plot <- field_data %>% 
-  ggplot(aes(Month, fill = HabitatUse)) +
-  geom_bar(aes(weight = n), position = 'fill') + 
-  facet_wrap(~Species, scales = "free_x") + 
+  ggplot(aes(month, fill = habitat_use)) +
+  geom_bar(aes(weight = numbers), position = 'fill') + 
+  facet_wrap(~species, scales = "free_x") + 
   scale_fill_manual(values = cols, guide_legend(title = "Habitat")) +
   scale_y_continuous(labels = scales::percent) + 
   ylab("Use") + 
@@ -495,40 +496,18 @@ s_plot <- sim_data %>%
 grid.arrange(fd_plot, s_plot)
 
 # Calculate the fit:
-full_join(sim_data, field_data,
-          by = c("month", "habitat_use", "species")) %>%
-  replace_na(list(prop_field = 0.0, prop = 0.0)) %>% 
-  dplyr::mutate(sq_diff = (prop - prop_field)^2) %>% 
+habitat_use_fits <- inner_join(sim_data, field_data,
+          by = c("month", "habitat_use", "species")) %>% 
+  replace_na(list(prop = 0.0)) %>% 
+  dplyr::mutate(sq_diff = (prop - prop_field)^2) %>%
   dplyr::group_by(Season, month, species) %>% 
-  dplyr::summarise(ls = sum(sq_diff))
+  dplyr::summarise(ls = sum(sq_diff)) %>% 
+  dplyr::group_by(species) %>% 
+  dplyr::summarise(avg_ls = mean(ls))
 
-
-HabitatUseFit = CalcHabitatUseFit(FieldData = FieldData, SimData = forage, measure = 'LS')
-
-HabUsePF = HabitatUseFit[Species == 'Pinkfoot', Fit]
-HabUseGL = HabitatUseFit[Species == 'Greylag', Fit]
-HabUseBN = HabitatUseFit[Species == 'Barnacle', Fit]
-	
-
-# png(file = 'o:/ST_Lada/Projekter/GBB/Figures/HabitatUse.png', height = 480*3.5, width = 480*4, res = 400)
-ggplot(dt, aes(Month, fill = HabitatUse)) + geom_bar(position = 'fill') + theme_bw() +
- facet_grid(Type~Species) + scale_fill_brewer(palette = "Set2")
-# dev.off()
-
-# DK version:
-# str(dt)
-# dt[, Type:=as.factor(Type)]
-# levels(dt$Type) = c('Feltobs', 'Simuleret')
-# dt[, HabitatUse:=as.factor(HabitatUse)]
-# levels(dt$HabitatUse) = c('Gr?s', 'Majs', 'Raps', 'Stub', 'Vinters?d')
-# dt[, Species:=as.factor(Species)]
-# levels(dt$Species) = c('Bramg?s', 'Gr?g?s', 'Kortn?bbet')
-# 
-# ggplot(dt, aes(Month, fill = HabitatUse)) + geom_bar(position = 'fill') + theme_bw() +
-#  facet_grid(Type~Species) + scale_fill_brewer(palette = "Set2", guide = guide_legend(title = "Habitat")) + xlab('M?ned') + ylab('Andel')
-
-
-
+HabUsePF = habitat_use_fits %>% filter(species == "Pinktfoot") %>% pull(avg_ls)
+HabUseGL = habitat_use_fits %>% filter(species == "Greylag") %>% pull(avg_ls)
+HabUseBN = habitat_use_fits %>% filter(species == "Barnacle") %>% pull(avg_ls)
 ```
 Habitat use fits were: Barnacle `r HabUseBN`, Greylag `r HabUseGL` & Pinkfoot `r HabUsePF`
 
