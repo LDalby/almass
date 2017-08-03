@@ -220,8 +220,6 @@ aor_tab <- read_tsv("C:/MSV/WorkDirectory/AORPinkfeet.txt")
 ```
 
 
-
-
 ## Numbers
 ```{r numbers, echo=FALSE, fig.height=6, fig.width=10}
 invisible({popn = fread(file.path(resultpath, 'GoosePopulationData.txt'))
@@ -340,7 +338,7 @@ The degree of overlap is: Barnacle `r DegreeOverlapB`, Pinkfoot `r DegreeOverlap
 #   data.table::fwrite(file = pth, quote = FALSE, sep = "\t")
 
 # Get the field centroids from the polyref file
-poly <- read_tsv("~/ALMaSS/WorkDirectory/VejlerneOpenMay2016PolyRef.txt",
+poly <- read_tsv(file.path(resultpath, "VejlerneOpenMay2016PolyRef.txt"),
                  skip = 1,
                  col_types = "iiiiiiiii") %>% 
   dplyr::select(PolyRefNum, CentroidX, CentroidY)
@@ -349,11 +347,11 @@ col_types_field <- "dddTicdd"
 fieldobs <- read_tsv(file.path(o_drive, 'Field data/FieldobsDistancesFromRoost2017-08-01.txt'),
                      col_types = col_types_field) %>% 
     mutate(week = ifelse(Week < 25, Week + 55, Week), 
-         Season = 1,
+         # Season = 1,
          Type = "Fieldobs")
 
 fieldobs_weekly <- fieldobs %>% 
-  group_by(Season, week, Species, Type) %>% 
+  group_by(week, Species, Type) %>% 
   summarise(mean_dist = mean(dist))
 
 # Plot the weekly average distance  
@@ -367,23 +365,22 @@ field_plot <- fieldobs_weekly %>%
   theme_fivethirtyeight()
 
 # Calculate distances from the simulation
-col_types <- "iiiiiiiiiiiidddddcddicc"
-forage <- read_tsv("~/ALMaSS/WorkDirectory/GooseFieldForageData.txt",
-                   col_types = col_types) %>% 
-  dplyr::select(Season, Day, Polyref, Barnacle, Pinkfoot, Greylag) %>%
+forage_dist <- forage %>% 
+  dplyr::select(Season, Date, Polyref, Barnacle, Pinkfoot, Greylag) %>%
   gather_(value_col = "Numbers", key_col = "Species", gather_cols = c("Barnacle", "Pinkfoot", "Greylag")) %>%
   # select(Season, Day, Polyref, ends_with("Timed")) %>%
   # gather_(value_col = "Numbers", key_col = "Species", gather_cols = paste0(c("Barnacle", "Pinkfoot", "Greylag"), "Timed")) %>%
   filter(Numbers > 0) %>% 
-  mutate(week = lubridate::week(as.Date(Day, origin = "2015-01-01"))) %>% 
+  mutate(week = lubridate::week(Date)) %>% 
   mutate(week = if_else(week < 25, week + 55, week)) %>% 
   left_join(poly, by = c("Polyref" = "PolyRefNum")) %>% 
   mutate(dist = pmap_dbl(list(CentroidX, CentroidY, Species), .f = find_closest),
          Type = "Simulated")
 
-sim_weekly <- forage %>%   
+sim_weekly <- forage_dist %>%   
   group_by(week, Species, Type) %>% 
   dplyr::summarise(mean_dist = mean(dist))
+
 sim_plot <- sim_weekly %>% 
   ggplot(aes(week, mean_dist/1000)) + 
   geom_line(aes(color = Species)) + 
@@ -394,24 +391,24 @@ sim_plot <- sim_weekly %>%
   theme_fivethirtyeight()
 grid.arrange(field_plot, sim_plot)
   
-  
-distances <- forage %>% 
-  dplyr::select(Species, dist, Type) %>% 
-  bind_rows(fieldobs)
+# Calculate fit
+# First join the data
+distances <- dplyr::inner_join(sim_weekly, fieldobs_weekly,
+                  by = c("week", "Species"), 
+                  suffix = c("_sim", "_fieldobs")) %>% 
+  dplyr::group_by(Species) %>% 
+  dplyr::mutate(min_dist = min(c(mean_dist_sim, mean_dist_fieldobs)),
+                max_dist = max(c(mean_dist_sim, mean_dist_fieldobs)),
+                scaled_sim = (mean_dist_sim - min_dist) / (max_dist - min_dist),
+                scaled_field = (mean_dist_fieldobs - min_dist) / (max_dist - min_dist))
+distance_fits <- distances %>%  
+  dplyr::summarise(ls = sum((scaled_field - scaled_sim)^2))
 
-RoostDistFitGL <- CalcOverlap(distances, species = 'Greylag', metric = 'dist')
-RoostDistFitPF <- CalcOverlap(distances, species = 'Pinkfoot', metric = 'dist')
-RoostDistFitBN <- CalcOverlap(distances, species = 'Barnacle', metric = 'dist')
-
-# ggplot(Dists, aes(x=Shortest)) + geom_histogram(binwidth = 1000) + theme_bw() + facet_wrap(~Species)
-# png(file = 'o:/ST_Lada/Projekter/GBB/Figures/DistanceToRoost.png', height = 480*2.5, width = 480*4, res = 400)
-ggplot(distances, aes(x = log10(dist), fill = Type)) +
-  geom_density(alpha = 0.5, colour = NA) +
-  facet_wrap(~Species, scales = 'free_x') +
-  theme_bw()
-# dev.off()
+distfit_bn <- distance_fits %>% filter(Species == "Barnacle") %>% pull(ls)
+distfit_gl <- distance_fits %>% filter(Species == "Greylag") %>% pull(ls)
+distfit_pf <- distance_fits %>% filter(Species == "Pinkfoot") %>% pull(ls)
 ``` 
-The degree of overlap is: Barnacle `r RoostDistFitBN`, Pinkfoot `r RoostDistFitPF`, & Greylag `r RoostDistFitGL`.
+The degree of overlap is: Barnacle `r distfit_bn`, Pinkfoot `r distfit_pf`, & Greylag `r distfit_gl`.
 
 
 ## Habitat use
@@ -446,7 +443,9 @@ fd_plot <- field_data %>%
   scale_fill_manual(values = cols, guide_legend(title = "Habitat")) +
   scale_y_continuous(labels = scales::percent) + 
   ylab("Use") + 
-  scale_x_continuous(breaks = 8:15, labels = c("8", "9", "10", "11", "12", "1", "2", "3")) +
+  scale_x_continuous(breaks = 8:15, 
+                     labels = c("8", "9", "10", "11", "12", "1", "2", "3"),
+                     limits = c(8, 15)) +
   theme_fivethirtyeight() +
   ggtitle("Field data habitat use")
   
@@ -491,7 +490,7 @@ s_plot <- sim_data %>%
   ylab("Use") + 
   scale_x_continuous(breaks = 8:15, labels = c("8", "9", "10", "11", "12", "1", "2", "3")) +
   theme_fivethirtyeight() +
-  ggtitle("Simulated habitat use")
+  ggtitle("Simulated habitat use", subtitle = "Five seasons combined")
 
 grid.arrange(fd_plot, s_plot)
 
@@ -505,7 +504,7 @@ habitat_use_fits <- inner_join(sim_data, field_data,
   dplyr::group_by(species) %>% 
   dplyr::summarise(avg_ls = mean(ls))
 
-HabUsePF = habitat_use_fits %>% filter(species == "Pinktfoot") %>% pull(avg_ls)
+HabUsePF = habitat_use_fits %>% filter(species == "Pinkfoot") %>% pull(avg_ls)
 HabUseGL = habitat_use_fits %>% filter(species == "Greylag") %>% pull(avg_ls)
 HabUseBN = habitat_use_fits %>% filter(species == "Barnacle") %>% pull(avg_ls)
 ```
