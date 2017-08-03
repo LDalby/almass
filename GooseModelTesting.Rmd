@@ -354,16 +354,6 @@ fieldobs_weekly <- fieldobs %>%
   group_by(week, Species, Type) %>% 
   summarise(mean_dist = mean(dist))
 
-# Plot the weekly average distance  
-field_plot <- fieldobs_weekly %>% 
-  ggplot(aes(week, mean_dist/1000)) + 
-  geom_line(aes(color = Species)) + 
-  ggtitle("Field observations (2015)", subtitle = "Mean weekly distance (km) from forage location to roost") +
-  scale_color_colorblind() + 
-  scale_x_continuous(breaks = seq(35, 75, by = 5), limits = c(35, 70)) + 
-  scale_y_continuous(limits = c(0, 11), breaks = seq(0,11,2)) +
-  theme_fivethirtyeight()
-
 # Calculate distances from the simulation
 forage_dist <- forage %>% 
   dplyr::select(Season, Date, Polyref, Barnacle, Pinkfoot, Greylag) %>%
@@ -381,15 +371,15 @@ sim_weekly <- forage_dist %>%
   group_by(week, Species, Type) %>% 
   dplyr::summarise(mean_dist = mean(dist))
 
-sim_plot <- sim_weekly %>% 
+# Make a combined plot: 
+bind_rows(sim_weekly, fieldobs_weekly) %>% 
   ggplot(aes(week, mean_dist/1000)) + 
-  geom_line(aes(color = Species)) + 
-  ggtitle("Simulated (average of 5 seasons)", subtitle = "Mean weekly distance (km) from forage location to roost") +
+  geom_line(aes(color = Species, linetype = Type)) + 
+  ggtitle("Mean weekly distance (km) from forage location to roost", subtitle = "Simulated data is averaged over five seasons. Field observations are from 2015.") +
   scale_color_colorblind() + 
   scale_x_continuous(breaks = seq(35, 75, by = 5), limits = c(35, 70)) + 
   scale_y_continuous(limits = c(0, 11), breaks = seq(0,11,2)) +
   theme_fivethirtyeight()
-grid.arrange(field_plot, sim_plot)
   
 # Calculate fit
 # First join the data
