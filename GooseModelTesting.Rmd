@@ -229,10 +229,11 @@ aor_tab <- read_tsv("C:/MSV/WorkDirectory/AORPinkfeet.txt")
 
 ## Numbers
 ```{r numbers, echo=FALSE, fig.height=6, fig.width=10}
-invisible({popn = fread(file.path(resultpath, 'GoosePopulationData.txt'))
-popn[, Day := Day - 365] })
-#popn = SubsetOutput(popn, CutOff) 
-PlotGoosePopulation(data = popn, dates = TRUE)
+col_types <- "iiiiiiii"
+popn <- read_tsv(file.path(resultpath, 'GoosePopulationData.txt'),
+                 col_types = col_types) %>% 
+  dplyr::mutate(Day = Day - 365) %>% 
+  PlotGoosePopulation()
 ```
 \newpage
 
