@@ -21,6 +21,7 @@ sysinfo <- Sys.info()
 if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
   resultpath <- '~/ALMaSS/WorkDirectory/'
   o_drive <- "/run/user/1000/gvfs/smb-share:server=uni.au.dk,share=dfs/ST_GooseProject/"
+  git_dir <- "~/git/"
 }
 if ("Windows" == sysinfo[match("sysname", names(sysinfo))]) {
   resultpath <- 'c:/MSV/WorkDirectory/'
@@ -97,8 +98,14 @@ weights %>% ggplot(aes(Date, MeanWeight)) +
       geom_point() +
       geom_errorbar(aes(ymin = SElower, ymax = SEupper), width = 0.5) + 
       facet_wrap(~Species, scales = 'free_y')
-
-field = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/APIdata.txt')
+if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
+  col_types <- "Dcid"
+  field <- read_tsv(file.path(git_dir,  '/ALMaSS_inputs/GooseManagement/Vejlerne/APIdata.txt'),
+                    col_types = "Dcdd")
+}
+if ("Windows" == sysinfo[match("sysname", names(sysinfo))]) {
+  field = fread('C:/MSV/ALMaSS_inputs/GooseManagement/Vejlerne/APIdata.txt')
+}              
 fits = CalcWeightFit(weights, field, measure = 'LS')
 ```
 
@@ -155,7 +162,7 @@ forage %>%
 utm32 <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 # Define AOR grid size
 grid_size = 1000
-ext <- readShapePoly("O:/ST_GooseProject/ALMaSS/GooseModelTesting/vejlerne_outline.shp",
+ext <- readShapePoly(file.path(o_drive, "/ALMaSS/GooseModelTesting/vejlerne_outline.shp"),
                      proj4string = CRS("+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs")) %>% 
   # spTransform(CRSobj = CRS(utm32)) %>% 
   extent()
@@ -165,11 +172,11 @@ r1 <- raster(nrows = 24000/grid_size,
              ext = ext,
              crs = "+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs")
 # Get the default value for FL  
-cfg <- readLines(paste(resultpath, 'TIALMaSSConfig.cfg', sep = ''))
+cfg <- readLines(file.path(resultpath, 'TIALMaSSConfig.cfg'))
 defaultval = GetParamValue(param = "GOOSE_FOLLOWINGLIKELYHOOD_PF",
                            config = cfg)
 # Make spatial object of xy dump file
-polygons <- read_tsv("C:/MSV/WorkDirectory/GooseXYDump.txt", col_types = "iiiiii") %>% 
+polygons <- read_tsv(file.path(resultpath, "GooseXYDump.txt"), col_types = "iiiiii") %>% 
   UtmToALMaSS(long = "X", lat = "Y", toalmass = FALSE, map = "VejlerneBigMap") %>% 
   dplyr::select(ALong, ALat) %>% 
   SpatialPoints(proj4string = CRS("+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs")) %>% 
@@ -192,7 +199,7 @@ polygons <- read_tsv("C:/MSV/WorkDirectory/GooseXYDump.txt", col_types = "iiiiii
 #   spTransform(CRSobj = CRS("+init=epsg:4326")) %>% 
 
   
-map <- st_read(dsn = "O:/ST_GooseProject/ALMaSS/GooseModelTesting", layer = "vejlerne_outline") %>% 
+map <- st_read(dsn = file.path(o_drive, "ALMaSS/GooseModelTesting"), layer = "vejlerne_outline") %>% 
   st_transform(crs = "+init=epsg:4326") %>% 
   st_bbox() %>% 
   as.numeric() %>% 
@@ -377,7 +384,9 @@ bind_rows(sim_weekly, fieldobs_weekly) %>%
   geom_line(aes(color = Species, linetype = Type)) + 
   ggtitle("Mean weekly distance (km) from forage location to roost", subtitle = "Simulated data is averaged over five seasons. Field observations are from 2015.") +
   scale_color_colorblind() + 
-  scale_x_continuous(breaks = seq(35, 75, by = 5), limits = c(35, 70)) + 
+  scale_x_continuous(breaks = seq(35, 75, by = 5), 
+                     limits = c(35, 70),
+                     labels = as.character(c(seq(35, 55, by = 5), c(5,10, 15, 20)))) + 
   scale_y_continuous(limits = c(0, 11), breaks = seq(0,11,2)) +
   theme_fivethirtyeight() + 
   theme(axis.text = element_text(size = 12))
