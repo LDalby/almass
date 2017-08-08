@@ -1,26 +1,4 @@
-library(devtools)
-library(roxygen2)
-# ralmass
-setwd('C:/Users/lada/Git/ralmass')
-document()
-
-install_github('LDalby/ralmass')
-# install_github('LDalby/ralmass', ref = 'devel1')
-
-use_rstudio()
-use_rcpp()
-
-
-
-
-
-
-# loggr
-setwd('C:/Users/lada/Git/loggr')
-document()
-
-install_github('LDalby/loggr')
-
+# Short script to render rmd files 
 
 if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
   gitpath = '~/git/almass/'
