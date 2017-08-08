@@ -38,10 +38,26 @@ plotorder = c("Baseline", "Barnacle x 0", "Barnacle x 2", "Barnacle x 4", "Barna
 thelist[, Scenario:=factor(Scenario, levels = plotorder)]
 # thelistfile = file.path('o:/ST_GooseProject/ALMaSS/Scenarios/', paste0("Scenarios ", Sys.Date(), ".txt"))
 # write.table(thelist, file = thelistfile, row.names = FALSE)
+# Read the list:
+if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
+  o_drive <- "/run/user/1000/gvfs/smb-share:server=uni.au.dk,share=dfs/ST_GooseProject/"
+ }
+if ("Windows" == sysinfo[match("sysname", names(sysinfo))]) {
+   o_drive <- "o:/ST_GooseProject/"
+}
+
+thelist <- read_delim(file.path(o_drive, "/ALMaSS/Scenarios/Scenarios 2016-09-15.txt"),
+                      delim = " ",
+                      col_types = "iciciii") %>% 
+  mutate(Species = as.factor(Species))
+max_totalbag <- thelist %>% 
+  summarise(max_totalbag = max(TotalBag)) %>% 
+  pull(max_totalbag)
+# Plot it all
 p = ggplot(thelist, aes(Scenario, mean)) + 
 	 geom_pointrange(aes(ymin = min, ymax = max, color = Species), position=position_dodge(width=0.2)) + 
-	 scale_color_viridis(discrete=TRUE, guide = guide_legend(title = "Art")) + 
-	 ylab('Totalt udbytte') + ylim(0, thelist[, max(TotalBag)]) +  theme_dark()
+	 scale_color_viridis(discrete=TRUE, guide = guide_legend(title = "Species")) + 
+	 ylab('Total bag') + ylim(0, max_totalbag) +  theme_dark()
 p = p + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust =1))
 p
 
@@ -56,46 +72,58 @@ for (i in 1:length(resultlist)) {
 }
 thelist = rbindlist(resultlist)
 thelist
-write.table(thelist, file = 'o:/ST_GooseProject/ALMaSS/Scenarios/ScenarioHuntingBags2.txt', row.names = FALSE)
+# write.table(thelist, file = 'o:/ST_GooseProject/ALMaSS/Scenarios/ScenarioHuntingBags2.txt', row.names = FALSE)
 
 # ---- Do presentation plots:
 library(ggplot2)
-presentationplot = function(plotdata) {
-p = ggplot(plotdata, aes(Scenario, mean)) + 
-   geom_pointrange(aes(ymin = min, ymax = max, color = Species), position=position_dodge(width=0.2)) + 
-   scale_color_viridis(discrete=TRUE, guide = guide_legend(title = "")) + 
-   ylab('Årligt udbytte') + 
-   ylim(0, plotdata[, max(TotalBag)]) +
-   theme_dark()
-p = p + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust =1, size = 15),
+presentationplot = function(plotdata, scenarios) {
+  d <- plotdata %>% 
+    filter(Scenario %in% scenarios) %>% 
+    mutate(Scenario = fct_relevel(Scenario, "Baseline"))
+  
+  max_totalbag <- d %>% 
+    summarise(max_totalbag = max(TotalBag)) %>% 
+    pull(max_totalbag)
+  
+  p <- d %>% 
+   ggplot(aes(Scenario, mean)) + 
+   geom_pointrange(aes(ymin = min, ymax = max, color = Species), position = position_dodge(width = 0.2)) + 
+   scale_color_colorblind(guide = guide_legend(title = "")) + 
+   ylab('Annual hunting bag') + 
+   xlab('') +
+   scale_y_continuous(limits = c(0, max_totalbag)) + 
+   theme_bw() + 
+   theme(
+    # axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1, size = 15),
+  axis.text.x = element_text(size = 15),
               axis.text.y = element_text(size = 12), axis.title.y = element_text(size = 15),
               legend.text = element_text(size = 12),
-              legend.position="top") + xlab('') 
+              legend.position = "top")
 return(p)
 }
 
-thelist = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenarios 2016-09-15.txt')
-thelist[, Species:=as.factor(Species)]
-levels(thelist$Species) = c('Grågås', 'Kortnæbbet gås')
-# Gåseplots.
+# thelist = fread('o:/ST_GooseProject/ALMaSS/Scenarios/Scenarios 2016-09-15.txt')
+
+# thelist[, Species:=as.factor(Species)]
+# levels(thelist$Species) = c('Gr?g?s', 'Kortn?bbet g?s')
+# G?seplots.
 subset = c('Baseline', 'Greylag x 0.5', 'Greylag x 2', 'Pinkfoot x 2')
-plotdata = thelist[Scenario %in% subset,]
-plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "Grågås x 0.5", "Grågås x 2", "Kortnæbbet gås x 2")
-p = presentationplot(plotdata)
-p
-png(filename = 'o:/ST_GooseProject/Presentations/Graa.png', width = 14, height = 15, unit = 'cm', res = 300 )
+p <- thelist %>% 
+    presentationplot(scenarios = subset)
+p + scale_y_continuous(limits = c(0, 3000),
+                     breaks = seq(0, 2500, 500))
+# png(filename = 'o:/ST_GooseProject/Presentations/Graa.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
-# Bramgås
+
+# Bramg?s
 subset = c('Baseline', 'Barnacle x 0', 'Barnacle x 4')
-plotdata = thelist[Scenario %in% subset,]
-plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "Bramgås x 0", "Bramgås x 4")
-p = presentationplot(plotdata)
-png(filename = 'o:/ST_GooseProject/Presentations/Bram.png', width = 14, height = 15, unit = 'cm', res = 300 )
+p <- thelist %>% 
+  presentationplot(scenarios = subset)
+# png(filename = 'o:/ST_GooseProject/Presentations/Bram.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
+
 # Checkers
 subset = c('Baseline', 'No checkers', 'All hunters checkers')
 plotdata = thelist[Scenario %in% subset,]
@@ -114,24 +142,24 @@ p = presentationplot(plotdata)
 png(filename = 'o:/ST_GooseProject/Presentations/Janjagt.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
-# Jagtadfærd
+# Jagtadf?rd
 subset = c('Baseline', '1.5 x efficiency', 'Hunters teaming up', 'Doubling of hunters')
 plotdata = thelist[Scenario %in% subset,]
 plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "Øget effektivitet", "Jæger gruppering", "Fordobling af jægere")
+levels(plotdata$Scenario) = c("Baseline", "?get effektivitet", "J?ger gruppering", "Fordobling af j?gere")
 p = presentationplot(plotdata)
 p
-png(filename = 'o:/ST_GooseProject/Presentations/JagtAdfærd.png', width = 14, height = 15, unit = 'cm', res = 300 )
+png(filename = 'o:/ST_GooseProject/Presentations/JagtAdf?rd.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
-# Jagtadfærd II
+# Jagtadf?rd II
 subset = c('Baseline', 'Hunt once a week', 'Hunt twice a week', 'Pinkfoot baglimit 10', 'Pinkfoot baglimit 15')
 plotdata = thelist[Scenario %in% subset,]
 plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "1 ugentlig jagtdag", "2 ugentlige jagtdage", "Kvote på 10 KG", "Kvote på 15 KG")
+levels(plotdata$Scenario) = c("Baseline", "1 ugentlig jagtdag", "2 ugentlige jagtdage", "Kvote p? 10 KG", "Kvote p? 15 KG")
 p = presentationplot(plotdata)
 p
-png(filename = 'o:/ST_GooseProject/Presentations/JagtAdfærd2.png', width = 14, height = 15, unit = 'cm', res = 300 )
+png(filename = 'o:/ST_GooseProject/Presentations/JagtAdf?rd2.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 
