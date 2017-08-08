@@ -222,8 +222,8 @@ ggmap(map) +
 ```
 
 ## AOR table - WIP
-```{r AOR_table, echo=FALSE, message=FALSE}
-aor_tab <- read_tsv("C:/MSV/WorkDirectory/AORPinkfeet.txt")
+```{r AOR_table, echo=FALSE, message=FALSE, eval=FALSE}
+aor_tab <- read_tsv(file.path(resultpath, "AORPinkfeet.txt"))
 ```
 
 
@@ -645,7 +645,10 @@ PlotWeather(file = file.path(resultpath, 'Vejlerne2009-2014.pre'), from = '2009-
 ```{r config, echo=FALSE}
 ScipenDefault = getOption('scipen')  # In case it should be turned back again.
 options(scipen = 99)  # To avoid scientific notation in the resulting file
-configs = fread(paste(resultpath, 'GooseConfig.txt', sep = ''))
-kable(configs, caption = 'Config settings used in this run')
+if (file.exists(file.path(resultpath, "GooseConfig.txt"))) {
+  configs = fread(file.path(resultpath, 'GooseConfig.txt'))
+  kable(configs, caption = 'Config settings used in this run')
+}
+
 ```
 
