@@ -126,40 +126,31 @@ dev.off()
 
 # Checkers
 subset = c('Baseline', 'No checkers', 'All hunters checkers')
-plotdata = thelist[Scenario %in% subset,]
-plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "Ingen tjekker", "Alle tjekker")
-p = presentationplot(plotdata)
-png(filename = 'o:/ST_GooseProject/Presentations/Tjekker.png', width = 14, height = 15, unit = 'cm', res = 300 )
+p <- thelist %>% 
+  presentationplot(scenarios = subset)
+# png(filename = 'o:/ST_GooseProject/Presentations/Tjekker.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 # Januar jagt
 subset = c('Baseline', 'January hunting')
-plotdata = thelist[Scenario %in% subset,]
-plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "Januar jagt")
-p = presentationplot(plotdata)
-png(filename = 'o:/ST_GooseProject/Presentations/Janjagt.png', width = 14, height = 15, unit = 'cm', res = 300 )
+p <- thelist %>% 
+  presentationplot(scenarios = subset)
+# png(filename = 'o:/ST_GooseProject/Presentations/Janjagt.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 # Jagtadf?rd
 subset = c('Baseline', '1.5 x efficiency', 'Hunters teaming up', 'Doubling of hunters')
-plotdata = thelist[Scenario %in% subset,]
-plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "?get effektivitet", "J?ger gruppering", "Fordobling af j?gere")
-p = presentationplot(plotdata)
-p
-png(filename = 'o:/ST_GooseProject/Presentations/JagtAdf?rd.png', width = 14, height = 15, unit = 'cm', res = 300 )
+p <- thelist %>% 
+  presentationplot(scenarios = subset)
+# png(filename = 'o:/ST_GooseProject/Presentations/JagtAdf?rd.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 # Jagtadf?rd II
 subset = c('Baseline', 'Hunt once a week', 'Hunt twice a week', 'Pinkfoot baglimit 10', 'Pinkfoot baglimit 15')
-plotdata = thelist[Scenario %in% subset,]
-plotdata[, Scenario:=factor(Scenario, levels = subset)]
-levels(plotdata$Scenario) = c("Baseline", "1 ugentlig jagtdag", "2 ugentlige jagtdage", "Kvote p? 10 KG", "Kvote p? 15 KG")
-p = presentationplot(plotdata)
+p <- thelist %>% 
+  presentationplot(scenarios = subset)
 p
-png(filename = 'o:/ST_GooseProject/Presentations/JagtAdf?rd2.png', width = 14, height = 15, unit = 'cm', res = 300 )
+# png(filename = 'o:/ST_GooseProject/Presentations/JagtAdf?rd2.png', width = 14, height = 15, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 
