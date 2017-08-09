@@ -86,6 +86,7 @@ Turn off this chunk to save time when the document complies.
 
 ```{r mean_grain, echo=FALSE, fig.width=10, message=FALSE, warning=FALSE}
 forage %>%
+  filter(Grain > 0.0) %>% 
     mutate(grain_kj_pf = map_dbl(Grain, .f = get_func_resp, species = "Pinkfoot", resp = resp),
          grain_kj_gl = map_dbl(Grain, .f = get_func_resp, species = "Greylag", resp = resp),
          grain_kj_bn = map_dbl(Grain, .f = get_func_resp, species = "Barnacle", resp = resp)) %>% 
