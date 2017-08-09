@@ -102,7 +102,7 @@ forage %>%
     facet_wrap(~Season) +
     theme_bw() + 
     ggtitle("Mean daily kJ available from grain",
-            subtitle = "kJ before flock size dependent feeding time adjustment")
+            subtitle = "kJ before flock size dependent feeding time adjustment \nOnly fields with geese")
 ```
 
 ## Weight development
