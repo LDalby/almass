@@ -84,6 +84,26 @@ left_join(numbers_tb, grassforage_tb, by = c('Day', 'Polyref', 'Species')) %>%
 Plot characters and lines all have the same grey color, so black chunks are the result of overplotting. Only fields where the geese where actually foraging on are plotted. Dots are scaled to the logarithm of the numbers present on a field.
 Turn off this chunk to save time when the document complies.
 
+```{r, mean_grain, echo=FALSE}
+forage %>%
+    mutate(grain_kj_pf = map_dbl(Grain, .f = get_func_resp, species = "Pinkfoot", resp = resp),
+         grain_kj_gl = map_dbl(Grain, .f = get_func_resp, species = "Greylag", resp = resp),
+         grain_kj_bn = map_dbl(Grain, .f = get_func_resp, species = "Barnacle", resp = resp)) %>% 
+  dplyr::select(Season, Day, starts_with("grain_")) %>% 
+  group_by(Season, Day) %>% 
+  summarise(avg_kj_pf = mean(grain_kj_pf),
+            avg_kj_gl = mean(grain_kj_gl),
+            avg_kj_bn = mean(grain_kj_bn)) %>% 
+  tidyr::gather(type, kJ, -Day, -Season) %>% 
+    ggplot(aes(Day, kJ)) +
+    geom_line(aes(color = type)) + 
+    geom_point(aes(color = type)) +
+    scale_color_colorblind() + 
+    facet_wrap(~Season) +
+    theme_bw() + 
+    ggtitle("Mean daily kJ available from grain",
+            subtitle = "kJ before flock size dependent feeding time adjustment")
+```
 
 ## Weight development
 ```{r weight, echo=FALSE, fig.width=10, message=FALSE, warning=FALSE}
