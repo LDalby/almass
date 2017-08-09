@@ -84,7 +84,7 @@ left_join(numbers_tb, grassforage_tb, by = c('Day', 'Polyref', 'Species')) %>%
 Plot characters and lines all have the same grey color, so black chunks are the result of overplotting. Only fields where the geese where actually foraging on are plotted. Dots are scaled to the logarithm of the numbers present on a field.
 Turn off this chunk to save time when the document complies.
 
-```{r, mean_grain, echo=FALSE}
+```{r mean_grain, echo=FALSE, fig.width=10, message=FALSE, warning=FALSE}
 forage %>%
     mutate(grain_kj_pf = map_dbl(Grain, .f = get_func_resp, species = "Pinkfoot", resp = resp),
          grain_kj_gl = map_dbl(Grain, .f = get_func_resp, species = "Greylag", resp = resp),
