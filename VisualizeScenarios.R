@@ -6,6 +6,7 @@ library(data.table)
 library(ralmass)
 library(ggplot2)
 library(viridis)
+library(tidyverse)
 
 pth = 'e:/almass/WorkDirectories/Goose/'
 dirs = dir(pth)
@@ -39,6 +40,7 @@ thelist[, Scenario:=factor(Scenario, levels = plotorder)]
 # thelistfile = file.path('o:/ST_GooseProject/ALMaSS/Scenarios/', paste0("Scenarios ", Sys.Date(), ".txt"))
 # write.table(thelist, file = thelistfile, row.names = FALSE)
 # Read the list:
+sysinfo <- Sys.info()
 if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
   o_drive <- "/run/user/1000/gvfs/smb-share:server=uni.au.dk,share=dfs/ST_GooseProject/"
  }
@@ -76,10 +78,11 @@ thelist
 
 # ---- Do presentation plots:
 library(ggplot2)
-presentationplot = function(plotdata, scenarios) {
+presentationplot <- function(plotdata, scenarios) {
   d <- plotdata %>% 
     filter(Scenario %in% scenarios) %>% 
-    mutate(Scenario = fct_relevel(Scenario, "Baseline"))
+    mutate(Scenario = forcats::fct_reorder(Scenario, mean),
+           Scenario = forcats::fct_relevel(Scenario, "Baseline"))
   
   max_totalbag <- d %>% 
     summarise(max_totalbag = max(TotalBag)) %>% 
@@ -88,7 +91,7 @@ presentationplot = function(plotdata, scenarios) {
   p <- d %>% 
    ggplot(aes(Scenario, mean)) + 
    geom_pointrange(aes(ymin = min, ymax = max, color = Species), position = position_dodge(width = 0.2)) + 
-   scale_color_colorblind(guide = guide_legend(title = "")) + 
+   ggthemes::scale_color_colorblind(guide = guide_legend(title = "")) + 
    ylab('Annual hunting bag') + 
    xlab('') +
    scale_y_continuous(limits = c(0, max_totalbag)) + 
@@ -97,7 +100,7 @@ presentationplot = function(plotdata, scenarios) {
     # axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1, size = 15),
   axis.text.x = element_text(size = 15),
               axis.text.y = element_text(size = 12), axis.title.y = element_text(size = 15),
-              legend.text = element_text(size = 12),
+              legend.text = element_text(size = 16),
               legend.position = "top")
 return(p)
 }
@@ -109,18 +112,18 @@ return(p)
 # G?seplots.
 subset = c('Baseline', 'Greylag x 0.5', 'Greylag x 2', 'Pinkfoot x 2')
 p <- thelist %>% 
-    presentationplot(scenarios = subset)
-p + scale_y_continuous(limits = c(0, 3000),
+    presentationplot(scenarios = subset) + 
+    scale_y_continuous(limits = c(0, 3000),
                      breaks = seq(0, 2500, 500))
-# png(filename = 'o:/ST_GooseProject/Presentations/Graa.png', width = 14, height = 15, unit = 'cm', res = 300 )
+png(filename = file.path(o_drive, '/Presentations/greylag.png'), width = 16, height = 10, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 
 # Bramg?s
-subset = c('Baseline', 'Barnacle x 0', 'Barnacle x 4')
+subset <- c('Baseline', 'Barnacle x 0', 'Barnacle x 4')
 p <- thelist %>% 
   presentationplot(scenarios = subset)
-# png(filename = 'o:/ST_GooseProject/Presentations/Bram.png', width = 14, height = 15, unit = 'cm', res = 300 )
+png(filename = file.path(o_drive, "/Presentations/Bram.png"), width = 14, height = 10, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 
@@ -128,29 +131,31 @@ dev.off()
 subset = c('Baseline', 'No checkers', 'All hunters checkers')
 p <- thelist %>% 
   presentationplot(scenarios = subset)
-# png(filename = 'o:/ST_GooseProject/Presentations/Tjekker.png', width = 14, height = 15, unit = 'cm', res = 300 )
+p <- p + scale_x_discrete(labels = c('Baseline', 'No checkers', 'All checkers'))
+png(filename = file.path(o_drive, "/Presentations/Tjekker.png"), width = 14, height = 10, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 # Januar jagt
 subset = c('Baseline', 'January hunting')
 p <- thelist %>% 
   presentationplot(scenarios = subset)
-# png(filename = 'o:/ST_GooseProject/Presentations/Janjagt.png', width = 14, height = 15, unit = 'cm', res = 300 )
+png(filename = file.path(o_drive, "/Presentations/Janjagt.png"), width = 12, height = 10, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 # Jagtadf?rd
 subset = c('Baseline', '1.5 x efficiency', 'Hunters teaming up', 'Doubling of hunters')
 p <- thelist %>% 
   presentationplot(scenarios = subset)
-# png(filename = 'o:/ST_GooseProject/Presentations/JagtAdf?rd.png', width = 14, height = 15, unit = 'cm', res = 300 )
+p <- p + scale_x_discrete(labels = c('Baseline', '1.5 x efficiency', 'Hunters teaming up', '2 x hunters'))
+png(filename = file.path(o_drive,'/Presentations/hunter_efficiency.png'), width = 20, height = 10, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 # Jagtadf?rd II
 subset = c('Baseline', 'Hunt once a week', 'Hunt twice a week', 'Pinkfoot baglimit 10', 'Pinkfoot baglimit 15')
 p <- thelist %>% 
   presentationplot(scenarios = subset)
-p
-# png(filename = 'o:/ST_GooseProject/Presentations/JagtAdf?rd2.png', width = 14, height = 15, unit = 'cm', res = 300 )
+p <- p + scale_x_discrete(labels = c('Baseline', 'Hunt 1 x week', 'Hunt 2 x week', 'Pf baglimit 10', 'Pf baglimit 15'))
+png(filename = file.path(o_drive, "/Presentations/hunting_limits.png"), width = 22, height = 12, unit = 'cm', res = 300 )
 print(p)
 dev.off()
 
