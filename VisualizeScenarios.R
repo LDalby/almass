@@ -77,7 +77,6 @@ thelist
 # write.table(thelist, file = 'o:/ST_GooseProject/ALMaSS/Scenarios/ScenarioHuntingBags2.txt', row.names = FALSE)
 
 # ---- Do presentation plots:
-library(ggplot2)
 presentationplot <- function(plotdata, scenarios) {
   d <- plotdata %>% 
     filter(Scenario %in% scenarios) %>% 
@@ -146,7 +145,7 @@ dev.off()
 subset = c('Baseline', '1.5 x efficiency', 'Hunters teaming up', 'Doubling of hunters')
 p <- thelist %>% 
   presentationplot(scenarios = subset)
-p <- p + scale_x_discrete(labels = c('Baseline', '1.5 x efficiency', 'Hunters teaming up', '2 x hunters'))
+p <- p + scale_x_discrete(labels = c('Baseline', 'Hunters teaming up', '1.5 x efficiency', '2 x hunters'))
 png(filename = file.path(o_drive,'/Presentations/hunter_efficiency.png'), width = 20, height = 10, unit = 'cm', res = 300 )
 print(p)
 dev.off()
