@@ -1,5 +1,5 @@
 # Short script to render rmd files 
-
+sysinfo <- Sys.info()
 if ("Linux" == sysinfo[match("sysname", names(sysinfo))]) {
   gitpath = '~/git/almass/'
   outpath <- "~/Desktop/"
@@ -8,8 +8,6 @@ if ("Windows" == sysinfo[match("sysname", names(sysinfo))]) {
   gitpath = 'c:/MSV/WorkDirectory/'
   outpath <- "o:/ST_Lada/Projekter/GBB/"
 }
-
-
 
 # Render rmd file
 library(rmarkdown)
