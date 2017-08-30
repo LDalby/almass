@@ -459,9 +459,9 @@ fd_plot <- field_data %>%
   scale_fill_manual(values = cols, guide_legend(title = "Habitat")) +
   scale_y_continuous(labels = scales::percent) + 
   ylab("Use") + 
-  scale_x_continuous(breaks = 8:15, 
-                     labels = c("8", "9", "10", "11", "12", "1", "2", "3"),
-                     limits = c(8, 15)) +
+  scale_x_continuous(breaks = 9:13, 
+                     labels = c("9", "10", "11", "12", "1"),
+                     limits = c(8, 14)) +
   theme_fivethirtyeight() +
   ggtitle("Field data habitat use")
   
@@ -504,9 +504,11 @@ s_plot <- sim_data %>%
   scale_fill_manual(values = cols, guide_legend(title = "Habitat")) +
   scale_y_continuous(labels = scales::percent) + 
   ylab("Use") + 
-  scale_x_continuous(breaks = 8:15, labels = c("8", "9", "10", "11", "12", "1", "2", "3")) +
+  scale_x_continuous(breaks = 9:13,
+                     labels = c("9", "10", "11", "12", "1"),
+                     limits = c(8, 14)) +
   theme_fivethirtyeight() +
-  ggtitle("Simulated habitat use", subtitle = "Five seasons combined")
+  ggtitle("Simulated habitat use")
 
 grid.arrange(fd_plot, s_plot)
 
