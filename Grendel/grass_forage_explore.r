@@ -42,15 +42,6 @@ forage %>%
   geom_line() + 
   ggtitle("PermanentGrassTussocky")
 
-
-
-
-forage %>% 
-  filter(Polyref == 134266,
-         Geese > 0) %>% 
-  View()
-  
-
 forage %>% 
   filter(Polyref == 147100) %>%
   dplyr::select(Day, VegHeight, Geese) %>% 
@@ -91,41 +82,120 @@ forage %>%
 grainy <- c("SpringBarley", "SpringBarleySpr", "WinterBarley", "SpringWheat", "WinterWheat", "WinterRye", "Oats", "Triticale", "SpringBarleySeed", "SpringBarleyStrigling", "SpringBarleyStriglingSingle", "SpringBarleyStriglingCulm", "WinterWheatStrigling", "WinterWheatStriglingSingle", "WinterWheatStriglingCulm", "OWinterBarley", "OWinterBarleyExt", "OWinterRye", "SpringBarleyGrass", "SpringBarleyCloverGrass", "SpringBarleyPeaCloverGrassStrigling", "OSpringBarley", "OSpringBarleyPigs", "OWinterWheatUndersown", "OWinterWheat", "OOats", "OTriticale", "WWheatPControl", "WWheatPToxicControl", "WWheatPTreatment", "AgroChemIndustryCereal", "SpringBarleyPTreatment", "SpringBarleySKManagement", "OSpringBarleyExt", "OSpringBarleyGrass", "OSpringBarleyClover")
 
 forage %>% 
-  filter(VegTypeChr %in% grainy) %>% 
+  # filter(VegTypeChr %in% grainy) %>%
+  # filter(str_detect(VegTypeChr, "Clover")) %>%
+  filter(Grain > 0) %>%
   dplyr::select(Day, Grain, Polyref, VegTypeChr) %>% 
   group_by(Day, VegTypeChr) %>% 
   summarise(mean_grain = mean(Grain),
             median_grain = median(Grain)) %>% 
   ggplot(aes(Day, mean_grain)) +
   geom_line(aes(color = VegTypeChr)) + 
-  ylab("Mean grain (kJ)") + 
+  ylab("Mean number of grain") + 
   ggtitle("Mean grain per crop type") +
   # scale_color_brewer(palette = "Set3", guide_legend(title = "Crop type")) + 
-  scale_color_tableau(guide = guide_legend(title = "Crop type")) +
+  scale_color_discrete(guide = guide_legend(title = "Crop type")) +
   theme_bw()
+# Plot all the polyrefs
+forage %>% 
+  # filter(VegTypeChr %in% grainy) %>% 
+  filter(Grain > 0) %>%
+  dplyr::select(Day, Grain, Polyref, VegTypeChr) %>% 
+  group_by(Day, VegTypeChr) %>% 
+  ggplot(aes(Day, Grain)) +
+  geom_line(aes(color = factor(Polyref)), alpha = 0.5) + 
+  scale_color_discrete(guide = FALSE) +
+  ylab("Mean number of grain") + 
+  ggtitle("Grain per crop type") +
+  facet_wrap(~VegTypeChr, ncol = 3) +
+  theme_bw()
+
+
+# ggvis test
+library(ggvis)
+getlabel <- function(df) {
+  paste("Polyref:", df$poly)
+}
+forage %>%
+  filter(VegTypeChr == "OTriticale") %>% 
+  mutate(poly = as.factor(Polyref)) %>% 
+  ggvis(x = ~Day, y = ~Grain, stroke = ~poly) %>% 
+  layer_lines() %>% 
+  # layer_points() %>% 
+  add_tooltip(getlabel)
+
+
+
+
+
 
 # Calculate the decay rate
 # Find the mean early in the season
 # Find the mean 75 days later (or in mid Nov)
 # Calculate the proportion left
 the_max <- forage %>% 
-  filter(VegTypeChr %in% grainy) %>% 
-  dplyr::select(Day, Grain, VegTypeChr) %>% 
+  filter(Grain > 0,
+         Day == 257) %>%
+  dplyr::select(Day, Grain) %>% 
   group_by(Day) %>% 
   summarise(mean_grain = mean(Grain)) %>% 
-  slice(which.max(mean_grain)) %>% 
+  # slice(which.max(mean_grain)) %>% 
   # dplyr::select(Day, mean_grain)
   pull(mean_grain)
 
 
 the_decayed <- forage %>% 
-  filter(VegTypeChr %in% grainy,
+  filter(Grain > 0,
          Day == 318) %>% 
-  dplyr::select(Day, Grain, VegTypeChr) %>% 
+  dplyr::select(Day, Grain) %>% 
   group_by(Day) %>% 
   summarise(mean_grain = mean(Grain)) %>% 
   # dplyr::select(Day, mean_grain)
   pull(mean_grain)
 
 the_decayed/the_max
-ConvertSimDay(231)
+
+ConvertSimDay(255)
+
+# Find the fields with grain on them on Day 318
+with_grain <- forage %>% 
+  filter(Grain > 0,
+         Day == 318) %>% 
+  dplyr::select(Polyref) %>% 
+  distinct() %>% 
+  pull(Polyref)
+# Subset the same fields on day 257
+
+the_with_grain_sep <- forage %>% 
+  filter(Polyref %in% with_grain,
+         Grain > 0,
+         Day == 257) %>%
+  dplyr::select(Polyref) %>% 
+  distinct() %>% 
+  pull(Polyref)
+  
+all_equal(with_grain, the_with_grain_sep)  
+
+
+the_max <- forage %>% 
+  filter(Polyref %in% the_with_grain_sep,
+         Grain > 0,
+         Day == 257) %>%
+  dplyr::select(Day, Grain) %>% 
+  group_by(Day) %>% 
+  summarise(mean_grain = mean(Grain)) %>% 
+  # slice(which.max(mean_grain)) %>% 
+  # dplyr::select(Day, mean_grain)
+  pull(mean_grain)
+
+the_decayed <- forage %>% 
+  filter(Polyref %in% the_with_grain_sep,
+         Grain > 0,
+         Day == 318) %>% 
+  dplyr::select(Day, Grain) %>% 
+  group_by(Day) %>% 
+  summarise(mean_grain = mean(Grain)) %>% 
+  # dplyr::select(Day, mean_grain)
+  pull(mean_grain)
+
+the_decayed/the_max
