@@ -610,7 +610,7 @@ p = p + ggtitle('Maize')
 IntakePF = fread(paste0(resultpath, 'CurvePointsKJIntakeAtDiffGrainDensitiesHollNolet_PF.txt'))
 IntakePF = IntakePF[V1 <= 2500,]
 IntakePF[, Species := 'Pinkfeet']
-IntakePF[, V2 := V2 * 17.67 * 0.695 * 60]
+IntakePF[, V2 := V2 * 17.67 * 60]
 IntakeBN = copy(IntakePF)
 IntakeBN = IntakeBN[, V2 := V2 * .79]
 IntakeBN[, Species := 'Barnacle']
