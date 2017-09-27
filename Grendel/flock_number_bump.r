@@ -2,12 +2,11 @@ library(tidyverse)
 library(ggvis)
 library(ggridges)
 library(lubridate)
-library(ralmass)
+
 
 # Set paths ----
 resultpath <- '~/ALMaSS/WorkDirectory/'
 o_drive <- "/run/user/1000/gvfs/smb-share:server=uni.au.dk,share=dfs/ST_GooseProject/"
-git_dir <- "~/git/"
 
 # Number of calls to st_ChooseForageLocation ----
 state <- read_tsv(file.path(resultpath, "GooseStateStats.txt"),
