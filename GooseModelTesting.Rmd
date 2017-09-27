@@ -612,10 +612,12 @@ IntakePF = IntakePF[V1 <= 2500,]
 IntakePF[, Species := 'Pinkfeet']
 IntakePF[, V2 := V2 * 17.67 * 60]
 IntakeBN = copy(IntakePF)
-IntakeBN = IntakeBN[, V2 := V2 * .79]
+# IntakeBN = IntakeBN[, V2 := V2 * .79]  # Our own scaling factor
+IntakeBN = IntakeBN[, V2 := V2 * .75]  # Scaling from Nolet & Chudzinska xlsx file
 IntakeBN[, Species := 'Barnacle']
 IntakeGL = copy(IntakePF)
-IntakeGL = IntakeGL[, V2 := V2 * 1.16]
+# IntakeGL = IntakeGL[, V2 := V2 * 1.16]  # Our own scaling factor
+IntakeGL = IntakeGL[, V2 := V2 * 1.75]  # Scaling from Nolet & Chudzinska xlsx file
 IntakeGL[, Species := 'Greylag']
 
 grain = rbind(rbind(IntakeBN, IntakePF), IntakeGL)
